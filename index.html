@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Home</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
     --bg:#f2f4f7;
@@ -237,8 +238,8 @@
           <label>Anzeigename</label>
           <input id="regName" placeholder="z. B. HighRoller_88">
         </div>
-        <label>Benutzername oder E-Mail</label>
-        <input id="authUser" placeholder="z. B. HighRoller_88" autocomplete="username">
+        <label>E-Mail</label>
+        <input id="authUser" type="email" placeholder="z. B. name@mail.com" autocomplete="username">
         <label>Passwort</label>
         <input id="authPass" type="password" placeholder="••••••••" autocomplete="current-password">
         <div class="error" id="authError"></div>
@@ -317,6 +318,12 @@
   makeRow('row2',3);
   makeRow('row3',5);
 
+  // --- Supabase Setup ---
+  // Trage hier deine eigenen Werte ein (Supabase Dashboard -> Project Settings -> API)
+  const SUPABASE_URL = 'https://tydippnbkkvdohzxplgw.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_0ZvwrcL4AuFobJGdyARmhA_KfchINLa';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
   // --- Auth Logik ---
   const overlay = document.getElementById('overlay');
   const authArea = document.getElementById('authArea');
@@ -327,17 +334,8 @@
   const submitBtn = document.getElementById('submitBtn');
   const modalTitle = document.getElementById('modalTitle');
   const modalSub = document.getElementById('modalSub');
+  const chipDisplay = document.getElementById('chipDisplay');
   let mode = 'login';
-
-  function usersDB(){
-    return JSON.parse(localStorage.getItem('casino_users') || '{}');
-  }
-  function saveUsersDB(db){
-    localStorage.setItem('casino_users', JSON.stringify(db));
-  }
-  function currentUser(){
-    return JSON.parse(localStorage.getItem('casino_session') || 'null');
-  }
 
   function openModal(m){
     mode = m;
@@ -354,81 +352,105 @@
 
   document.getElementById('closeModal').addEventListener('click', closeModal);
   overlay.addEventListener('click', e => { if(e.target === overlay) closeModal(); });
-
   tabs.forEach(t => t.addEventListener('click', () => openModal(t.dataset.tab)));
 
-  authForm.addEventListener('submit', e => {
+  authForm.addEventListener('submit', async e => {
     e.preventDefault();
-    const user = document.getElementById('authUser').value.trim();
+    const email = document.getElementById('authUser').value.trim();
     const pass = document.getElementById('authPass').value;
-    const db = usersDB();
 
-    if(!user || !pass){
+    if(!email || !pass){
       authError.textContent = 'Bitte alle Felder ausfüllen.';
       return;
     }
 
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Bitte warten...';
+
     if(mode === 'register'){
-      const name = document.getElementById('regName').value.trim() || user;
-      if(db[user]){
-        authError.textContent = 'Nutzername bereits vergeben.';
+      const name = document.getElementById('regName').value.trim() || email.split('@')[0];
+      const { data, error } = await supabase.auth.signUp({
+        email, password: pass,
+        options: { data: { name } }
+      });
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Konto erstellen';
+      if(error){
+        authError.textContent = error.message;
         return;
       }
-      db[user] = { pass, name, chips: 1240 };
-      saveUsersDB(db);
-      localStorage.setItem('casino_session', JSON.stringify({ user, name, chips: 1240 }));
-      closeModal();
-      renderAuthArea();
+      if(data.session){
+        closeModal();
+        await loadProfile();
+      } else {
+        authError.style.color = '#4ade80';
+        authError.textContent = 'Bestätigungslink wurde an deine E-Mail geschickt.';
+      }
     } else {
-      const record = db[user];
-      if(!record || record.pass !== pass){
-        authError.textContent = 'Benutzername oder Passwort falsch.';
+      const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Anmelden';
+      if(error){
+        authError.textContent = 'E-Mail oder Passwort falsch.';
         return;
       }
-      localStorage.setItem('casino_session', JSON.stringify({ user, name: record.name, chips: record.chips }));
       closeModal();
-      renderAuthArea();
+      await loadProfile();
     }
   });
 
-  function logout(){
-    localStorage.removeItem('casino_session');
-    renderAuthArea();
+  async function logout(){
+    await supabase.auth.signOut();
+    renderAuthArea(null);
   }
 
-  function renderAuthArea(){
-    const u = currentUser();
-    const chipDisplay = document.getElementById('chipDisplay');
-    if(!u){
+  async function loadProfile(){
+    const { data: { user } } = await supabase.auth.getUser();
+    if(!user){ renderAuthArea(null); return; }
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('name, chips')
+      .eq('id', user.id)
+      .single();
+    if(error){ console.error(error); renderAuthArea(null); return; }
+    renderAuthArea(profile);
+  }
+
+  function renderAuthArea(profile){
+    if(!profile){
       chipDisplay.style.display = 'none';
       authArea.innerHTML = `<button id="loginBtn" style="background:var(--blue);color:white;border:none;
         padding:8px 18px;border-radius:18px;font-weight:700;font-size:13px;cursor:pointer;">Anmelden</button>`;
       document.getElementById('loginBtn').addEventListener('click', () => openModal('login'));
-    } else {
-      chipDisplay.style.display = 'flex';
-      chipDisplay.innerHTML = `<span class="coin"></span> ${u.chips.toLocaleString('de-DE')} Chips`;
-      const initial = u.name.charAt(0).toUpperCase();
-      authArea.innerHTML = `
-        <div class="user-chip" id="userChip">
-          <div class="avatar">${initial}</div>
-          <span class="uname">${u.name}</span>
-          <div class="dropdown" id="dropdown">
-            <div id="logoutBtn">Abmelden</div>
-          </div>
-        </div>`;
-      document.getElementById('userChip').addEventListener('click', e => {
-        document.getElementById('dropdown').classList.toggle('open');
-      });
-      document.getElementById('logoutBtn').addEventListener('click', logout);
-      document.addEventListener('click', function outside(e){
-        if(!document.getElementById('userChip')?.contains(e.target)){
-          document.getElementById('dropdown')?.classList.remove('open');
-        }
-      });
+      return;
     }
+    chipDisplay.style.display = 'flex';
+    chipDisplay.innerHTML = `<span class="coin"></span> ${profile.chips.toLocaleString('de-DE')} Chips`;
+    const initial = profile.name.charAt(0).toUpperCase();
+    authArea.innerHTML = `
+      <div class="user-chip" id="userChip">
+        <div class="avatar">${initial}</div>
+        <span class="uname">${profile.name}</span>
+        <div class="dropdown" id="dropdown">
+          <div id="logoutBtn">Abmelden</div>
+        </div>
+      </div>`;
+    document.getElementById('userChip').addEventListener('click', () => {
+      document.getElementById('dropdown').classList.toggle('open');
+    });
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+    document.addEventListener('click', function outside(e){
+      if(!document.getElementById('userChip')?.contains(e.target)){
+        document.getElementById('dropdown')?.classList.remove('open');
+      }
+    });
   }
 
-  renderAuthArea();
+  // Session beim Laden prüfen + auf Änderungen reagieren
+  supabase.auth.onAuthStateChange((_event, session) => {
+    if(session) loadProfile(); else renderAuthArea(null);
+  });
+  loadProfile();
 </script>
 
 </body>
