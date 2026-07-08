@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Home</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Segoe+UI&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#f2f4f7;
@@ -16,6 +18,19 @@
     --blue-dark:#0087d6;
     --border:#e5e7eb;
     --green:#00b06f;
+
+    /* luxury modal tokens */
+    --lux-bg:#141a24;
+    --lux-panel:#1c2530;
+    --lux-panel-2:#202935;
+    --lux-border:#2a3542;
+    --lux-gold:#d4af37;
+    --lux-gold-dark:#a8842a;
+    --lux-gold-soft:rgba(212,175,55,.18);
+    --lux-felt:#0e3b2e;
+    --lux-text:#f2e9d8;
+    --lux-muted:#8b96a5;
+    --font-display:'Playfair Display', Georgia, serif;
   }
   *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif;}
   body{background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden;}
@@ -55,10 +70,10 @@
   .search svg{position:absolute;left:12px;top:9px;width:16px;height:16px;fill:var(--muted);}
 
   .top-right{margin-left:auto;display:flex;align-items:center;gap:18px;}
-  .robux{display:flex;align-items:center;gap:6px;font-weight:600;font-size:14px;color:#1c1d1f;
-    background:var(--bg);padding:6px 12px;border-radius:16px;cursor:pointer;}
-  .robux .coin{width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffe08a,#d4a017 70%);
-    box-shadow:0 0 0 2px #b8860b inset;display:inline-block;}
+  .points-chip{display:flex;align-items:center;gap:7px;font-weight:700;font-size:13px;color:#3d2f0a;
+    background:linear-gradient(135deg,#f6e7b0,#e3c777 55%,#d4af37);padding:6px 14px;border-radius:16px;cursor:default;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.4);}
+  .points-chip .star{width:13px;height:13px;fill:#7a5c10;}
   .icon-btn{width:32px;height:32px;border-radius:50%;background:var(--bg);display:flex;align-items:center;
     justify-content:center;cursor:pointer;color:var(--muted);position:relative;}
   .icon-btn svg{width:16px;height:16px;fill:currentColor;}
@@ -114,49 +129,153 @@
     .hero{padding:0 20px;}
   }
 
-  /* Login Modal */
+  /* ---------- Luxury overlay/modal shared styles ---------- */
   .overlay{
-    position:fixed;inset:0;background:rgba(6,10,16,.7);backdrop-filter:blur(3px);
+    position:fixed;inset:0;background:rgba(6,10,16,.72);backdrop-filter:blur(3px);
     display:none;align-items:center;justify-content:center;z-index:100;
   }
   .overlay.open{display:flex;}
   .modal{
-    width:380px;background:#141a24;border-radius:16px;padding:36px 32px 28px;
-    box-shadow:0 20px 60px rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.06);
+    width:380px;background:var(--lux-bg);border-radius:16px;padding:36px 32px 28px;
+    box-shadow:0 24px 70px rgba(0,0,0,.55);border:1px solid var(--lux-gold-soft);
     position:relative;
+    background-image:radial-gradient(circle at 50% 0%, rgba(212,175,55,.08), transparent 60%);
   }
   .modal .close{
     position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:50%;
-    background:#1c2530;color:#8b96a5;display:flex;align-items:center;justify-content:center;
-    cursor:pointer;font-size:16px;
+    background:var(--lux-panel);color:var(--lux-muted);display:flex;align-items:center;justify-content:center;
+    cursor:pointer;font-size:16px;transition:.15s;
   }
-  .modal .close:hover{color:white;}
+  .modal .close:hover{color:var(--lux-text);background:var(--lux-panel-2);}
   .modal .mlogo{
     width:52px;height:52px;border-radius:12px;margin:0 auto 18px;
-    background:linear-gradient(135deg,#d4a017,#b8860b);
-    display:flex;align-items:center;justify-content:center;color:#1c1d1f;font-weight:800;font-size:26px;
+    background:linear-gradient(135deg,#f0d888,#d4af37 55%,#a8842a);
+    display:flex;align-items:center;justify-content:center;color:#241a03;font-weight:800;font-size:26px;
+    box-shadow:0 4px 16px rgba(212,175,55,.35), inset 0 0 0 1px rgba(255,255,255,.35);
   }
-  .modal h1{color:white;text-align:center;font-size:20px;font-weight:700;margin-bottom:6px;}
-  .modal .sub{color:#8b96a5;text-align:center;font-size:13px;margin-bottom:22px;}
-  .modal .tabs{display:flex;background:#1c2530;border-radius:10px;padding:4px;margin-bottom:20px;}
+  .modal h1{font-family:var(--font-display);color:var(--lux-text);text-align:center;font-size:22px;font-weight:700;margin-bottom:6px;letter-spacing:.2px;}
+  .modal .sub{color:var(--lux-muted);text-align:center;font-size:13px;margin-bottom:22px;}
+  .modal .gold-rule{height:1px;margin:18px 0;background:linear-gradient(90deg,transparent,rgba(212,175,55,.55),transparent);}
+  .modal .tabs{display:flex;background:var(--lux-panel);border-radius:10px;padding:4px;margin-bottom:20px;gap:2px;}
   .modal .tab{flex:1;text-align:center;padding:8px 0;border-radius:8px;font-size:13px;font-weight:600;
-    color:#8b96a5;cursor:pointer;transition:.15s;}
-  .modal .tab.active{background:var(--blue);color:white;}
-  .modal label{display:block;color:#c3cad4;font-size:12px;font-weight:600;margin:12px 0 6px;}
+    color:var(--lux-muted);cursor:pointer;transition:.15s;}
+  .modal .tab.active{background:linear-gradient(135deg,#e6c766,#c69d34);color:#241a03;}
+  .modal label{display:block;color:#c3cad4;font-size:12px;font-weight:600;margin:12px 0 6px;letter-spacing:.2px;}
   .modal input{
-    width:100%;height:42px;border-radius:8px;border:1px solid #2a3542;background:#1c2530;
-    color:white;padding:0 14px;font-size:14px;outline:none;transition:.15s;
+    width:100%;height:42px;border-radius:8px;border:1px solid var(--lux-border);background:var(--lux-panel);
+    color:var(--lux-text);padding:0 14px;font-size:14px;outline:none;transition:.15s;
   }
   .modal input::placeholder{color:#5a6472;}
-  .modal input:focus{border-color:var(--blue);}
+  .modal input:focus{border-color:var(--lux-gold);box-shadow:0 0 0 3px var(--lux-gold-soft);}
   .modal .error{color:#ff6b6b;font-size:12px;margin-top:8px;min-height:16px;}
+  .modal .hint{color:#4ade80;font-size:12px;margin-top:8px;min-height:16px;}
   .modal button.submit{
     width:100%;height:44px;border:none;border-radius:22px;margin-top:10px;
-    background:linear-gradient(135deg,#d4a017,#b8860b);color:#1c1d1f;font-weight:800;font-size:14px;
-    cursor:pointer;transition:.15s;
+    background:linear-gradient(135deg,#f0d888,#d4af37 55%,#a8842a);color:#241a03;font-weight:800;font-size:14px;
+    cursor:pointer;transition:.15s;letter-spacing:.2px;
   }
   .modal button.submit:hover{filter:brightness(1.08);}
+  .modal button.submit:disabled{opacity:.6;cursor:default;filter:none;}
+  .modal button.link-btn{
+    background:none;border:none;color:var(--lux-gold);font-size:12px;font-weight:600;cursor:pointer;
+    display:block;margin:14px auto 0;text-align:center;
+  }
+  .modal button.link-btn:hover{text-decoration:underline;}
   .modal .age{text-align:center;font-size:11px;color:#5a6472;margin-top:16px;line-height:1.5;}
+
+  /* Login-specific spacing kept via shared .modal rules above */
+
+  /* Settings modal specifics */
+  @keyframes modalIn{
+    from{opacity:0;transform:translateY(10px) scale(.97);}
+    to{opacity:1;transform:translateY(0) scale(1);}
+  }
+  .overlay.open .modal{animation:modalIn .28s cubic-bezier(.16,1,.3,1);}
+
+  .modal.settings{
+    width:460px;padding:0;overflow:hidden;
+    border:1px solid rgba(212,175,55,.28);
+    box-shadow:0 30px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(212,175,55,.06) inset;
+  }
+  .settings .settings-head{
+    padding:0;position:relative;
+    background:
+      radial-gradient(circle at 12% -20%, rgba(212,175,55,.22), transparent 55%),
+      linear-gradient(160deg, #17371f 0%, #0e2419 45%, var(--lux-bg) 100%);
+    padding:30px 32px 22px;
+    border-bottom:1px solid rgba(212,175,55,.18);
+  }
+  .settings .settings-head:after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background-image:
+      repeating-linear-gradient(135deg, rgba(255,255,255,.015) 0 2px, transparent 2px 5px);
+  }
+  .settings-id-row{display:flex;align-items:center;gap:16px;position:relative;z-index:1;}
+  .settings-id-row .big-avatar{
+    width:58px;height:58px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+    color:white;font-weight:700;font-size:22px;flex-shrink:0;font-family:var(--font-display);
+    box-shadow:0 6px 18px rgba(0,0,0,.35), 0 0 0 2px rgba(212,175,55,.5), inset 0 0 0 1px rgba(255,255,255,.15);
+    position:relative;
+  }
+  .settings-id-row .id-text{min-width:0;}
+  .settings-id-row .id-name{
+    font-family:var(--font-display);color:var(--lux-text);font-weight:700;font-size:19px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .settings-id-row .id-email{color:var(--lux-muted);font-size:12px;margin-top:3px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .settings-id-row .id-badge{
+    display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:10.5px;font-weight:700;
+    letter-spacing:.6px;text-transform:uppercase;color:#3d2f0a;
+    background:linear-gradient(135deg,#f0d888,#d4af37);padding:3px 9px;border-radius:20px;
+  }
+  .settings-id-row .id-badge svg{width:10px;height:10px;fill:#3d2f0a;}
+
+  .settings-tabnav{display:flex;gap:4px;padding:0 32px;margin-top:22px;border-bottom:1px solid var(--lux-border);position:relative;z-index:1;}
+  .settings-tabnav .stab{
+    display:flex;align-items:center;gap:7px;
+    padding:11px 4px 12px;font-size:13px;font-weight:600;color:var(--lux-muted);cursor:pointer;
+    border-bottom:2px solid transparent;margin-right:26px;transition:color .15s;
+  }
+  .settings-tabnav .stab svg{width:14px;height:14px;fill:currentColor;opacity:.8;}
+  .settings-tabnav .stab.active{color:var(--lux-gold);border-bottom-color:var(--lux-gold);}
+  .settings-tabnav .stab:hover{color:var(--lux-text);}
+
+  .settings-body{padding:24px 32px 30px;max-height:56vh;overflow-y:auto;}
+  .settings-body::-webkit-scrollbar{width:8px;}
+  .settings-body::-webkit-scrollbar-thumb{background:#33404f;border-radius:6px;}
+  .settings-pane{display:none;animation:modalIn .22s ease;}
+  .settings-pane.active{display:block;}
+
+  .lux-card{
+    background:linear-gradient(180deg, var(--lux-panel), var(--lux-panel-2));
+    border:1px solid var(--lux-border);border-radius:12px;padding:20px;margin-bottom:16px;
+    position:relative;
+  }
+  .lux-card .card-title{
+    display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.5px;
+    text-transform:uppercase;color:var(--lux-gold);margin-bottom:14px;
+  }
+  .lux-card .card-title svg{width:13px;height:13px;fill:var(--lux-gold);}
+  .lux-card:first-child{margin-top:0;}
+
+  .swatches{display:flex;gap:10px;flex-wrap:wrap;}
+  .swatch{width:28px;height:28px;border-radius:8px;cursor:pointer;border:2px solid transparent;
+    transition:transform .15s, box-shadow .15s;box-shadow:0 2px 6px rgba(0,0,0,.25);}
+  .swatch:hover{transform:translateY(-2px);}
+  .swatch.selected{border-color:var(--lux-gold);transform:scale(1.08);box-shadow:0 0 0 3px var(--lux-gold-soft);}
+
+  .divider-label{display:flex;align-items:center;gap:10px;color:var(--lux-muted);font-size:11px;
+    text-transform:uppercase;letter-spacing:1px;margin:4px 0 4px;}
+  .divider-label:before,.divider-label:after{content:"";flex:1;height:1px;background:var(--lux-border);}
+
+  .lux-card .card-note{color:var(--lux-muted);font-size:12px;line-height:1.6;margin-bottom:14px;}
+  .lux-card button.submit{margin-top:14px;}
+  .lux-card button.submit.ghost{
+    background:var(--lux-panel-2);color:var(--lux-text);
+    box-shadow:inset 0 0 0 1px var(--lux-border);margin-top:4px;
+  }
+  .lux-card button.submit.ghost:hover{box-shadow:inset 0 0 0 1px var(--lux-gold);}
 
   /* Logged-in state in topbar */
   .user-chip{display:flex;align-items:center;gap:8px;cursor:pointer;position:relative;}
@@ -165,11 +284,12 @@
   .user-chip .uname{font-size:13px;font-weight:600;}
   .dropdown{
     position:absolute;top:44px;right:0;background:white;border:1px solid var(--border);border-radius:10px;
-    box-shadow:0 8px 24px rgba(0,0,0,.12);min-width:150px;display:none;overflow:hidden;z-index:50;
+    box-shadow:0 8px 24px rgba(0,0,0,.12);min-width:170px;display:none;overflow:hidden;z-index:50;
   }
   .dropdown.open{display:block;}
-  .dropdown div{padding:10px 14px;font-size:13px;cursor:pointer;}
+  .dropdown div{padding:10px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;}
   .dropdown div:hover{background:var(--bg);}
+  .dropdown svg{width:14px;height:14px;fill:var(--muted);}
 </style>
 </head>
 <body>
@@ -209,7 +329,7 @@
       <input placeholder="Spiele, Erlebnisse suchen">
     </div>
     <div class="top-right">
-      <div class="robux" id="chipDisplay"><span class="coin"></span> 1.240 Chips</div>
+      <div class="points-chip" id="pointsDisplay"><svg class="star" viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg> Level 12 · 1.240 Punkte</div>
       <div class="icon-btn">
         <svg viewBox="0 0 24 24"><path d="M12 22a2 2 0 002-2h-4a2 2 0 002 2zm6-6v-5a6 6 0 10-12 0v5l-2 2v1h16v-1z"/></svg>
         <div class="badge">3</div>
@@ -221,6 +341,7 @@
     </div>
   </div>
 
+  <!-- ================= LOGIN / REGISTER MODAL ================= -->
   <div class="overlay" id="overlay">
     <div class="modal">
       <div class="close" id="closeModal">✕</div>
@@ -245,10 +366,121 @@
         <div class="error" id="authError"></div>
         <button type="submit" class="submit" id="submitBtn">Anmelden</button>
       </form>
+      <button type="button" class="link-btn" id="forgotFromLogin">Passwort vergessen?</button>
 
       <div class="age">
         Mit der Anmeldung bestätigst du, dass du volljährig bist und unsere
         Nutzungsbedingungen akzeptierst.
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= FORGOT PASSWORD MODAL ================= -->
+  <div class="overlay" id="forgotOverlay">
+    <div class="modal">
+      <div class="close" id="closeForgot">✕</div>
+      <div class="mlogo">♠</div>
+      <h1>Passwort vergessen</h1>
+      <div class="sub">Wir schicken dir einen Link zum Zurücksetzen</div>
+
+      <form id="forgotForm">
+        <label>E-Mail</label>
+        <input id="forgotEmail" type="email" placeholder="z. B. name@mail.com" autocomplete="username">
+        <div class="error" id="forgotError"></div>
+        <div class="hint" id="forgotHint"></div>
+        <button type="submit" class="submit" id="forgotSubmitBtn">Link senden</button>
+      </form>
+      <button type="button" class="link-btn" id="backToLogin">Zurück zum Login</button>
+    </div>
+  </div>
+
+  <!-- ================= ACCOUNT SETTINGS MODAL ================= -->
+  <div class="overlay" id="settingsOverlay">
+    <div class="modal settings">
+      <div class="close" id="closeSettings">✕</div>
+      <div class="settings-head">
+        <div class="settings-id-row">
+          <div class="big-avatar" id="bigAvatar">H</div>
+          <div class="id-text">
+            <div class="id-name" id="settingsUname">—</div>
+            <div class="id-email" id="settingsEmail">—</div>
+            <div class="id-badge">
+              <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>
+              VIP-Mitglied
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-tabnav">
+        <div class="stab active" data-spane="profile">
+          <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5zm-7 19c0-3.9 3.1-7 7-7s7 3.1 7 7z"/></svg>
+          Profil
+        </div>
+        <div class="stab" data-spane="security">
+          <svg viewBox="0 0 24 24"><path d="M12 2l7 3v6c0 5-3.4 8.7-7 10-3.6-1.3-7-5-7-10V5z"/></svg>
+          Sicherheit
+        </div>
+      </div>
+
+      <div class="settings-body">
+        <!-- Profil pane -->
+        <div class="settings-pane active" id="pane-profile">
+          <div class="lux-card">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5z"/></svg>
+              Anzeigename
+            </div>
+            <form id="profileNameForm">
+              <input id="profileName" placeholder="Dein Anzeigename">
+              <div class="error" id="profileError"></div>
+              <div class="hint" id="profileHint"></div>
+              <button type="submit" class="submit" id="profileSubmitBtn">Änderungen speichern</button>
+            </form>
+          </div>
+
+          <div class="lux-card">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/></svg>
+              Avatarfarbe
+            </div>
+            <div class="swatches" id="colorSwatches"></div>
+          </div>
+        </div>
+
+        <!-- Sicherheit pane -->
+        <div class="settings-pane" id="pane-security">
+          <div class="lux-card">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24"><path d="M12 2l7 3v6c0 5-3.4 8.7-7 10-3.6-1.3-7-5-7-10V5z"/></svg>
+              Passwort ändern
+            </div>
+            <form id="pwForm">
+              <label>Neues Passwort</label>
+              <input id="newPass" type="password" placeholder="Mindestens 6 Zeichen" autocomplete="new-password">
+              <label>Neues Passwort bestätigen</label>
+              <input id="newPass2" type="password" placeholder="Passwort wiederholen" autocomplete="new-password">
+              <div class="error" id="pwError"></div>
+              <div class="hint" id="pwHint"></div>
+              <button type="submit" class="submit" id="pwSubmitBtn">Passwort ändern</button>
+            </form>
+          </div>
+
+          <div class="lux-card">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24"><path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-9h-1V6a5 5 0 00-10 0v2H6a2 2 0 00-2 2v9a2 2 0 002 2h12a2 2 0 002-2v-9a2 2 0 00-2-2zM9 6a3 3 0 016 0v2H9z"/></svg>
+              Zugriff verloren?
+            </div>
+            <p class="card-note">
+              Wir senden dir einen Link an deine hinterlegte E-Mail, mit dem du dein Passwort
+              zurücksetzen kannst, ohne das aktuelle zu kennen.
+            </p>
+            <button type="button" class="submit ghost" id="sendResetFromSettings">
+              Reset-Link an meine E-Mail senden
+            </button>
+            <div class="hint" id="resetFromSettingsHint"></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -284,14 +516,14 @@
 
 <script>
   const games = [
-    ["Blackjack Royale","#0f3d2e","#1c6b4f","3,2 Mio."],
-    ["Texas Hold'em Poker","#7a1f1f","#c0392b","1,8 Mio."],
-    ["Roulette Deluxe","#3d0f0f","#8e2de2","980 Tsd."],
-    ["Slots Frenzy","#f7971e","#ffd200","540 Tsd."],
-    ["Baccarat Lounge","#1a1a2e","#16213e","2,1 Mio."],
-    ["Three Card Poker","#0d3b66","#3282b8","1,4 Mio."],
-    ["Craps Table","#4a0e0e","#a0153e","310 Tsd."],
-    ["Video Poker Classic","#232526","#414345","760 Tsd."],
+    ["Kartenlegende Royale","#0f3d2e","#1c6b4f","3,2 Mio."],
+    ["Turnier-Tisch Deluxe","#7a1f1f","#c0392b","1,8 Mio."],
+    ["Glücksrad Deluxe","#3d0f0f","#8e2de2","980 Tsd."],
+    ["Symbol-Frenzy","#f7971e","#ffd200","540 Tsd."],
+    ["Kartenlounge","#1a1a2e","#16213e","2,1 Mio."],
+    ["Drei-Karten-Duell","#0d3b66","#3282b8","1,4 Mio."],
+    ["Würfeltisch","#4a0e0e","#a0153e","310 Tsd."],
+    ["Karten-Klassiker","#232526","#414345","760 Tsd."],
   ];
 
   const icons = ["♠","♥","♦","🎰","♣","♦","🎲","♠"];
@@ -324,17 +556,26 @@
   const SUPABASE_ANON_KEY = 'sb_publishable_0ZvwrcL4AuFobJGdyARmhA_KfchINLa';
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // --- Auth Logik ---
+  const AVATAR_COLORS = [
+    'linear-gradient(135deg,#00a2ff,#7c3aed)',
+    'linear-gradient(135deg,#f0d888,#d4af37)',
+    'linear-gradient(135deg,#ff6b6b,#c0392b)',
+    'linear-gradient(135deg,#1c6b4f,#0e3b2e)',
+    'linear-gradient(135deg,#8e2de2,#4a00e0)',
+    'linear-gradient(135deg,#ffb347,#ff5e62)'
+  ];
+
+  // --- Login/Register modal logic ---
   const overlay = document.getElementById('overlay');
   const authArea = document.getElementById('authArea');
-  const tabs = document.querySelectorAll('.modal .tab');
+  const tabs = document.querySelectorAll('.modal .tabs .tab');
   const regFields = document.getElementById('regFields');
   const authForm = document.getElementById('authForm');
   const authError = document.getElementById('authError');
   const submitBtn = document.getElementById('submitBtn');
   const modalTitle = document.getElementById('modalTitle');
   const modalSub = document.getElementById('modalSub');
-  const chipDisplay = document.getElementById('chipDisplay');
+  const pointsDisplay = document.getElementById('pointsDisplay');
   let mode = 'login';
 
   function openModal(m){
@@ -399,10 +640,58 @@
     }
   });
 
+  // --- Forgot password modal (from login screen) ---
+  const forgotOverlay = document.getElementById('forgotOverlay');
+  const forgotForm = document.getElementById('forgotForm');
+  const forgotError = document.getElementById('forgotError');
+  const forgotHint = document.getElementById('forgotHint');
+  const forgotSubmitBtn = document.getElementById('forgotSubmitBtn');
+
+  document.getElementById('forgotFromLogin').addEventListener('click', () => {
+    closeModal();
+    forgotError.textContent = '';
+    forgotHint.textContent = '';
+    forgotForm.reset();
+    document.getElementById('forgotEmail').value = document.getElementById('authUser').value.trim();
+    forgotOverlay.classList.add('open');
+  });
+  document.getElementById('closeForgot').addEventListener('click', () => forgotOverlay.classList.remove('open'));
+  document.getElementById('backToLogin').addEventListener('click', () => {
+    forgotOverlay.classList.remove('open');
+    openModal('login');
+  });
+  forgotOverlay.addEventListener('click', e => { if(e.target === forgotOverlay) forgotOverlay.classList.remove('open'); });
+
+  forgotForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    const email = document.getElementById('forgotEmail').value.trim();
+    forgotError.textContent = '';
+    forgotHint.textContent = '';
+    if(!email){
+      forgotError.textContent = 'Bitte E-Mail-Adresse eingeben.';
+      return;
+    }
+    forgotSubmitBtn.disabled = true;
+    forgotSubmitBtn.textContent = 'Sende...';
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.href
+    });
+    forgotSubmitBtn.disabled = false;
+    forgotSubmitBtn.textContent = 'Link senden';
+    if(error){
+      forgotError.textContent = error.message;
+      return;
+    }
+    forgotHint.textContent = 'Falls ein Konto zu dieser E-Mail existiert, wurde ein Link verschickt.';
+  });
+
+  // --- Account / logout ---
   async function logout(){
     await supabaseClient.auth.signOut();
     renderAuthArea(null);
   }
+
+  let currentProfile = null;
 
   async function loadProfile(){
     const { data: { user } } = await supabaseClient.auth.getUser();
@@ -413,32 +702,45 @@
       .eq('id', user.id)
       .single();
     if(error){ console.error(error); renderAuthArea(null); return; }
-    renderAuthArea(profile);
+    currentProfile = profile;
+    renderAuthArea(profile, user.email);
   }
 
-  function renderAuthArea(profile){
+  function renderAuthArea(profile, email){
     if(!profile){
-      chipDisplay.style.display = 'none';
+      pointsDisplay.style.display = 'none';
       authArea.innerHTML = `<button id="loginBtn" style="background:var(--blue);color:white;border:none;
         padding:8px 18px;border-radius:18px;font-weight:700;font-size:13px;cursor:pointer;">Anmelden</button>`;
       document.getElementById('loginBtn').addEventListener('click', () => openModal('login'));
       return;
     }
-    chipDisplay.style.display = 'flex';
-    chipDisplay.innerHTML = `<span class="coin"></span> ${profile.chips.toLocaleString('de-DE')} Chips`;
+    pointsDisplay.style.display = 'flex';
+    const level = Math.max(1, Math.floor((profile.chips || 0) / 100));
+    pointsDisplay.innerHTML = `<svg class="star" viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg> Level ${level} · ${(profile.chips||0).toLocaleString('de-DE')} Punkte`;
     const initial = profile.name.charAt(0).toUpperCase();
     authArea.innerHTML = `
       <div class="user-chip" id="userChip">
         <div class="avatar">${initial}</div>
         <span class="uname">${profile.name}</span>
         <div class="dropdown" id="dropdown">
-          <div id="logoutBtn">Abmelden</div>
+          <div id="openSettingsBtn">
+            <svg viewBox="0 0 24 24"><path d="M19.4 13a7.9 7.9 0 000-2l2.1-1.6-2-3.4-2.5 1a8 8 0 00-1.7-1L14.9 3H9.1l-.4 2.9a8 8 0 00-1.7 1l-2.5-1-2 3.4L4.6 11a7.9 7.9 0 000 2l-2.1 1.6 2 3.4 2.5-1a8 8 0 001.7 1l.4 2.9h5.8l.4-2.9a8 8 0 001.7-1l2.5 1 2-3.4z"/></svg>
+            Einstellungen
+          </div>
+          <div id="logoutBtn">
+            <svg viewBox="0 0 24 24"><path d="M16 13v-2H7V8l-5 4 5 4v-3zM20 3H10v2h10v14H10v2h10a2 2 0 002-2V5a2 2 0 00-2-2z"/></svg>
+            Abmelden
+          </div>
         </div>
       </div>`;
     document.getElementById('userChip').addEventListener('click', () => {
       document.getElementById('dropdown').classList.toggle('open');
     });
     document.getElementById('logoutBtn').addEventListener('click', logout);
+    document.getElementById('openSettingsBtn').addEventListener('click', () => {
+      document.getElementById('dropdown').classList.remove('open');
+      openSettings(email);
+    });
     document.addEventListener('click', function outside(e){
       if(!document.getElementById('userChip')?.contains(e.target)){
         document.getElementById('dropdown')?.classList.remove('open');
@@ -446,8 +748,149 @@
     });
   }
 
-  // Session beim Laden prüfen + auf Änderungen reagieren
-  supabaseClient.auth.onAuthStateChange((_event, session) => {
+  // --- Settings modal ---
+  const settingsOverlay = document.getElementById('settingsOverlay');
+  const stabs = document.querySelectorAll('.stab');
+  const panes = document.querySelectorAll('.settings-pane');
+  const colorSwatches = document.getElementById('colorSwatches');
+  const bigAvatar = document.getElementById('bigAvatar');
+  let selectedColor = AVATAR_COLORS[0];
+
+  AVATAR_COLORS.forEach((grad, i) => {
+    const sw = document.createElement('div');
+    sw.className = 'swatch' + (i === 0 ? ' selected' : '');
+    sw.style.background = grad;
+    sw.addEventListener('click', () => {
+      selectedColor = grad;
+      document.querySelectorAll('.swatch').forEach(s => s.classList.remove('selected'));
+      sw.classList.add('selected');
+      bigAvatar.style.background = grad;
+    });
+    colorSwatches.appendChild(sw);
+  });
+
+  function openSettings(email){
+    document.getElementById('profileError').textContent = '';
+    document.getElementById('profileHint').textContent = '';
+    document.getElementById('pwError').textContent = '';
+    document.getElementById('pwHint').textContent = '';
+    document.getElementById('resetFromSettingsHint').textContent = '';
+    document.getElementById('pwForm').reset();
+
+    if(currentProfile){
+      document.getElementById('profileName').value = currentProfile.name;
+      document.getElementById('settingsUname').textContent = currentProfile.name;
+      bigAvatar.textContent = currentProfile.name.charAt(0).toUpperCase();
+      bigAvatar.style.background = selectedColor;
+    }
+    document.getElementById('settingsEmail').textContent = email || '—';
+    settingsOverlay.classList.add('open');
+    switchPane('profile');
+  }
+  document.getElementById('closeSettings').addEventListener('click', () => settingsOverlay.classList.remove('open'));
+  settingsOverlay.addEventListener('click', e => { if(e.target === settingsOverlay) settingsOverlay.classList.remove('open'); });
+
+  function switchPane(name){
+    stabs.forEach(t => t.classList.toggle('active', t.dataset.spane === name));
+    panes.forEach(p => p.classList.toggle('active', p.id === 'pane-' + name));
+  }
+  stabs.forEach(t => t.addEventListener('click', () => switchPane(t.dataset.spane)));
+
+  // Profil speichern (Anzeigename)
+  document.getElementById('profileNameForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const profileError = document.getElementById('profileError');
+    const profileHint = document.getElementById('profileHint');
+    const profileSubmitBtn = document.getElementById('profileSubmitBtn');
+    profileError.textContent = '';
+    profileHint.textContent = '';
+
+    const newName = document.getElementById('profileName').value.trim();
+    if(!newName){
+      profileError.textContent = 'Bitte einen Anzeigenamen eingeben.';
+      return;
+    }
+
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if(!user){ profileError.textContent = 'Nicht angemeldet.'; return; }
+
+    profileSubmitBtn.disabled = true;
+    profileSubmitBtn.textContent = 'Speichere...';
+    const { error } = await supabaseClient
+      .from('profiles')
+      .update({ name: newName })
+      .eq('id', user.id);
+    profileSubmitBtn.disabled = false;
+    profileSubmitBtn.textContent = 'Änderungen speichern';
+
+    if(error){
+      profileError.textContent = error.message;
+      return;
+    }
+    profileHint.textContent = 'Profil aktualisiert.';
+    await loadProfile();
+  });
+
+  // Passwort ändern (während man eingeloggt ist)
+  document.getElementById('pwForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const pwError = document.getElementById('pwError');
+    const pwHint = document.getElementById('pwHint');
+    const pwSubmitBtn = document.getElementById('pwSubmitBtn');
+    pwError.textContent = '';
+    pwHint.textContent = '';
+
+    const p1 = document.getElementById('newPass').value;
+    const p2 = document.getElementById('newPass2').value;
+
+    if(!p1 || p1.length < 6){
+      pwError.textContent = 'Das Passwort muss mindestens 6 Zeichen haben.';
+      return;
+    }
+    if(p1 !== p2){
+      pwError.textContent = 'Die Passwörter stimmen nicht überein.';
+      return;
+    }
+
+    pwSubmitBtn.disabled = true;
+    pwSubmitBtn.textContent = 'Ändere...';
+    const { error } = await supabaseClient.auth.updateUser({ password: p1 });
+    pwSubmitBtn.disabled = false;
+    pwSubmitBtn.textContent = 'Passwort ändern';
+
+    if(error){
+      pwError.textContent = error.message;
+      return;
+    }
+    pwHint.textContent = 'Passwort erfolgreich geändert.';
+    document.getElementById('pwForm').reset();
+  });
+
+  // Reset-Link aus den Settings heraus verschicken (falls Nutzer aktuelles PW nicht kennt)
+  document.getElementById('sendResetFromSettings').addEventListener('click', async () => {
+    const hint = document.getElementById('resetFromSettingsHint');
+    hint.textContent = '';
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if(!user?.email){ hint.textContent = 'Keine E-Mail gefunden.'; return; }
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(user.email, {
+      redirectTo: window.location.href
+    });
+    hint.textContent = error ? error.message : `Link wurde an ${user.email} gesendet.`;
+  });
+
+  // Falls Supabase uns über einen Passwort-Reset-Link zurückschickt (PASSWORD_RECOVERY event),
+  // direkt das Sicherheits-Tab der Einstellungen öffnen, damit der Nutzer ein neues Passwort setzen kann.
+  supabaseClient.auth.onAuthStateChange((event, session) => {
+    // WICHTIG: dieser Callback darf NICHT async sein, sonst kann es bei
+    // Supabase intern zu einem Deadlock beim Login kommen. Stattdessen
+    // Promises per .then() abhängen, ohne den Callback selbst zu blockieren.
+    if(event === 'PASSWORD_RECOVERY'){
+      loadProfile().then(() => {
+        openSettings(session?.user?.email);
+        switchPane('security');
+      });
+      return;
+    }
     if(session) loadProfile(); else renderAuthArea(null);
   });
   loadProfile();
