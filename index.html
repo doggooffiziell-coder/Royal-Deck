@@ -94,13 +94,24 @@
   .hero{
     height:230px;border-radius:16px;
     background:
-      radial-gradient(circle at 85% 0%, rgba(212,175,55,.18), transparent 55%),
-      linear-gradient(120deg,#0e2419,#123a2a 55%,#17371f);
+      radial-gradient(circle at 88% 6%, rgba(212,175,55,.22), transparent 55%),
+      radial-gradient(circle at 0% 100%, rgba(212,175,55,.08), transparent 50%),
+      linear-gradient(125deg,#0b0e13,#151b25 55%,#1c2530);
     display:flex;align-items:center;padding:0 44px;color:var(--text);margin-bottom:30px;position:relative;overflow:hidden;
-    border:1px solid rgba(212,175,55,.18);
+    border:1px solid rgba(212,175,55,.2);
   }
   .hero:after{content:"";position:absolute;right:-40px;top:-40px;width:280px;height:280px;
-    background:radial-gradient(circle,rgba(212,175,55,.14),transparent 70%);}
+    background:radial-gradient(circle,rgba(212,175,55,.16),transparent 70%);}
+  .hero:before{
+    content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+    background-image:repeating-linear-gradient(135deg, rgba(212,175,55,.025) 0 2px, transparent 2px 6px);
+  }
+  .hero-inner{position:relative;z-index:1;}
+  .hero-eyebrow{
+    display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:1.2px;
+    text-transform:uppercase;color:var(--lux-gold);margin-bottom:10px;
+  }
+  .hero-eyebrow svg{width:11px;height:11px;fill:var(--lux-gold);}
   .hero h1{font-family:var(--font-display);font-size:32px;font-weight:700;margin-bottom:10px;letter-spacing:.2px;}
   .hero p{font-size:14px;color:var(--muted);margin-bottom:18px;max-width:380px;line-height:1.5;}
   .hero button{background:linear-gradient(135deg,#f0d888,#d4af37 55%,#a8842a);color:#241a03;border:none;padding:11px 24px;border-radius:22px;
@@ -209,8 +220,8 @@
   .settings .settings-head{
     padding:0;position:relative;
     background:
-      radial-gradient(circle at 12% -20%, rgba(212,175,55,.22), transparent 55%),
-      linear-gradient(160deg, #17371f 0%, #0e2419 45%, var(--lux-bg) 100%);
+      radial-gradient(circle at 12% -20%, rgba(212,175,55,.24), transparent 55%),
+      linear-gradient(160deg, #1c2530 0%, #151b25 45%, var(--lux-bg) 100%);
     padding:30px 32px 22px;
     border-bottom:1px solid rgba(212,175,55,.18);
   }
@@ -338,7 +349,7 @@
       <input placeholder="Spiele, Erlebnisse suchen">
     </div>
     <div class="top-right">
-      <div class="points-chip" id="pointsDisplay"><svg class="star" viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg> Level 12 · 1.240 Punkte</div>
+      <div class="points-chip" id="pointsDisplay"><svg class="star" viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg> Level 1 · 0 Punkte</div>
       <div class="icon-btn">
         <svg viewBox="0 0 24 24"><path d="M12 22a2 2 0 002-2h-4a2 2 0 002 2zm6-6v-5a6 6 0 10-12 0v5l-2 2v1h16v-1z"/></svg>
         <div class="badge">3</div>
@@ -496,8 +507,12 @@
 
   <div class="content">
     <div class="hero">
-      <div>
-        <h1>Willkommen zurück</h1>
+      <div class="hero-inner">
+        <div class="hero-eyebrow">
+          <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>
+          Willkommen zurück
+        </div>
+        <h1 id="heroGreeting">Hallo, Gast!</h1>
         <p>Entdecke neue Erlebnisse, spiel mit Freunden und gestalte deinen Avatar.</p>
         <button>Jetzt entdecken</button>
       </div>
@@ -525,12 +540,12 @@
 
 <script>
   const games = [
-    ["Kartenlegende Royale","#0e2419","#1c6b4f","3,2 Mio."],
+    ["Kartenlegende Royale","#1c1408","#8a6a1a","3,2 Mio."],
     ["Turnier-Tisch Deluxe","#2a1010","#7a2e2e","1,8 Mio."],
-    ["Glücksrad Deluxe","#1c1408","#8a6a1a","980 Tsd."],
-    ["Symbol-Frenzy","#241a03","#a8842a","540 Tsd."],
+    ["Glücksrad Deluxe","#241a03","#a8842a","980 Tsd."],
+    ["Symbol-Frenzy","#1c1408","#c69d34","540 Tsd."],
     ["Kartenlounge","#10141b","#243447","2,1 Mio."],
-    ["Drei-Karten-Duell","#0e2419","#17371f","1,4 Mio."],
+    ["Drei-Karten-Duell","#151b25","#2a3542","1,4 Mio."],
     ["Würfeltisch","#2a1010","#5c1c2e","310 Tsd."],
     ["Karten-Klassiker","#1a1a1a","#3a3a3a","760 Tsd."],
   ];
@@ -569,7 +584,7 @@
     'linear-gradient(135deg,#00a2ff,#7c3aed)',
     'linear-gradient(135deg,#f0d888,#d4af37)',
     'linear-gradient(135deg,#ff6b6b,#c0392b)',
-    'linear-gradient(135deg,#1c6b4f,#0e3b2e)',
+    'linear-gradient(135deg,#8b96a5,#2a3542)',
     'linear-gradient(135deg,#8e2de2,#4a00e0)',
     'linear-gradient(135deg,#ffb347,#ff5e62)'
   ];
@@ -715,14 +730,29 @@
     renderAuthArea(profile, user.email);
   }
 
+  // --- Zeitbasierte Begrüßung im Hero-Header ---
+  const heroGreeting = document.getElementById('heroGreeting');
+  function greetingText(name){
+    const h = new Date().getHours();
+    if(h >= 5 && h < 11)  return `Guten Morgen, ${name}!`;
+    if(h >= 11 && h < 18) return `Hallo, ${name}!`;
+    if(h >= 18 && h < 22) return `Guten Abend, ${name}!`;
+    return `Hallo Nachteule, ${name}!`;
+  }
+  function updateHeroGreeting(name){
+    heroGreeting.textContent = greetingText(name || 'Gast');
+  }
+
   function renderAuthArea(profile, email){
     if(!profile){
       pointsDisplay.style.display = 'none';
+      updateHeroGreeting('Gast');
       authArea.innerHTML = `<button id="loginBtn" style="background:linear-gradient(135deg,#f0d888,#d4af37 55%,#a8842a);color:#241a03;border:none;
         padding:8px 20px;border-radius:18px;font-weight:800;font-size:13px;cursor:pointer;">Anmelden</button>`;
       document.getElementById('loginBtn').addEventListener('click', () => openModal('login'));
       return;
     }
+    updateHeroGreeting(profile.name);
     pointsDisplay.style.display = 'flex';
     const level = Math.max(1, Math.floor((profile.chips || 0) / 100));
     pointsDisplay.innerHTML = `<svg class="star" viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg> Level ${level} · ${(profile.chips||0).toLocaleString('de-DE')} Punkte`;
