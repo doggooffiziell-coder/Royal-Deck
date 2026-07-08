@@ -384,7 +384,7 @@
         await loadProfile();
       } else {
         authError.style.color = '#4ade80';
-        authError.textContent = 'Bestätigungslink wurde an deine E-Mail geschickt.';
+        authError.textContent = 'Bestätigungslink wurde an deine E-Mail geschickt. Schau bitte auch im Spam-Ordner nach.';
       }
     } else {
       const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
