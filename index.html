@@ -322,7 +322,7 @@
   // Trage hier deine eigenen Werte ein (Supabase Dashboard -> Project Settings -> API)
   const SUPABASE_URL = 'https://tydippnbkkvdohzxplgw.supabase.co';
   const SUPABASE_ANON_KEY = 'sb_publishable_0ZvwrcL4AuFobJGdyARmhA_KfchINLa';
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   // --- Auth Logik ---
   const overlay = document.getElementById('overlay');
@@ -369,7 +369,7 @@
 
     if(mode === 'register'){
       const name = document.getElementById('regName').value.trim() || email.split('@')[0];
-      const { data, error } = await supabase.auth.signUp({
+      const { data, error } = await supabaseClient.auth.signUp({
         email, password: pass,
         options: { data: { name } }
       });
@@ -387,7 +387,7 @@
         authError.textContent = 'Bestätigungslink wurde an deine E-Mail geschickt.';
       }
     } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
+      const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
       submitBtn.disabled = false;
       submitBtn.textContent = 'Anmelden';
       if(error){
@@ -400,14 +400,14 @@
   });
 
   async function logout(){
-    await supabase.auth.signOut();
+    await supabaseClient.auth.signOut();
     renderAuthArea(null);
   }
 
   async function loadProfile(){
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabaseClient.auth.getUser();
     if(!user){ renderAuthArea(null); return; }
-    const { data: profile, error } = await supabase
+    const { data: profile, error } = await supabaseClient
       .from('profiles')
       .select('name, chips')
       .eq('id', user.id)
@@ -447,7 +447,7 @@
   }
 
   // Session beim Laden prüfen + auf Änderungen reagieren
-  supabase.auth.onAuthStateChange((_event, session) => {
+  supabaseClient.auth.onAuthStateChange((_event, session) => {
     if(session) loadProfile(); else renderAuthArea(null);
   });
   loadProfile();
