@@ -3570,7 +3570,7 @@
   // falls der Host diese Header nicht sauber setzt: Fallback auf einen einfachen Hash
   // des HTML-Inhalts.
   // ============================================================
-  const DEPLOY_CHECK_INTERVAL_MS = 30000; // alle 30s prüfen
+  const DEPLOY_CHECK_INTERVAL_MS = 3000; // alle 3s prüfen — so kommt der Update-Screen quasi sofort nach dem Deploy
   let deployBaseline = null;
   let deployCheckRunning = false;
 
@@ -3583,6 +3583,16 @@
   async function fetchDeployMarker(){
     const sep = location.pathname.includes('?') ? '&' : '?';
     const url = location.pathname + sep + '_v=' + Date.now();
+    // Erst günstig per HEAD versuchen (kein Bodyinhalt) — reicht, wenn der Hoster ETag/Last-Modified sauber setzt.
+    try {
+      const headRes = await fetch(url, { method: 'HEAD', cache: 'no-store' });
+      const etag = headRes.headers.get('etag');
+      const lastModified = headRes.headers.get('last-modified');
+      if(etag || lastModified){
+        return { etag, lastModified, bodyHash: null };
+      }
+    } catch(e){ /* HEAD evtl. nicht unterstützt, fällt auf GET zurück */ }
+    // Fallback: voller GET + Hash-Vergleich, falls keine brauchbaren Header vorhanden sind.
     const res = await fetch(url, { method: 'GET', cache: 'no-store' });
     const etag = res.headers.get('etag');
     const lastModified = res.headers.get('last-modified');
