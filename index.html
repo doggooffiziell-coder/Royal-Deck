@@ -1427,11 +1427,18 @@
       renderAuthArea(null);
       return;
     }
-    const { data: profile, error } = await supabaseClient
+    let { data: profile, error } = await supabaseClient
       .from('profiles')
       .select('name, chips, gender')
       .eq('id', user.id)
       .single();
+    if(error){
+      // "gender"-Spalte existiert evtl. noch nicht in der profiles-Tabelle — ohne sie nochmal versuchen,
+      // damit der Login trotzdem funktioniert.
+      const fallback = await supabaseClient.from('profiles').select('name, chips').eq('id', user.id).single();
+      profile = fallback.data;
+      error = fallback.error;
+    }
     if(error){ console.error(error); renderAuthArea(null); return; }
     currentProfile = profile;
     currentUserId = user.id;
