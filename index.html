@@ -1003,6 +1003,15 @@
   .soon-fade-in-d1{animation-delay:.08s;}
   .soon-fade-in-d2{animation-delay:.16s;}
 
+  /* --------- kurze, schnelle Animation beim tatsächlichen Öffnen der Seite
+     (Wartungs-/Coming-Soon-Screen) — läuft nur einmal pro Seitenaufruf,
+     nicht beim Zurück-Tabben oder erneuten Renders --------- */
+  @keyframes soonPageIn{
+    0%{opacity:0;transform:translateY(10px) scale(.97);}
+    100%{opacity:1;transform:translateY(0) scale(1);}
+  }
+  .soon-page-in{animation:soonPageIn .32s cubic-bezier(.22,.9,.35,1) both;}
+
   .soon-title{
     font-family:var(--font-marquee);font-weight:800;font-size:42px;letter-spacing:1px;
     text-transform:uppercase;margin:18px 0 4px;line-height:1.05;
@@ -3065,6 +3074,12 @@
   }
   document.getElementById('maintLoginBtn').addEventListener('click', () => openModal('login'));
 
+  // Merkt sich, ob der Coming-Soon-/Wartungsbildschirm in dieser Seiten-Session schon einmal
+  // eingeblendet wurde — die schnelle Öffnungs-Animation soll nur beim echten Seitenaufruf laufen,
+  // nicht bei jedem erneuten loadProfile() (z.B. durch Realtime-Updates) und nicht beim Zurück-Tabben.
+  let comingSoonScreenShown = false;
+  let maintenanceScreenShown = false;
+
   async function loadProfile(){
     const { data: { user } } = await supabaseClient.auth.getUser();
     maintenanceMode = await fetchMaintenanceMode();
@@ -3080,6 +3095,15 @@
       document.querySelector('.sidebar').style.display = 'none';
       document.querySelector('.main').style.display = 'none';
       renderMaintenanceAuthRow(user?.email || null);
+      if(!maintenanceScreenShown){
+        maintenanceScreenShown = true;
+        const content = document.querySelector('#maintenanceScreen .maint-content');
+        if(content){
+          content.classList.remove('soon-page-in');
+          void content.offsetWidth;
+          content.classList.add('soon-page-in');
+        }
+      }
       document.getElementById('bootGate').style.display = 'none';
       return;
     }
@@ -3096,6 +3120,15 @@
         soonDisplayName = soonProfile?.name || null;
       }
       renderComingSoonAuthRow(user?.email || null, soonDisplayName);
+      if(!comingSoonScreenShown){
+        comingSoonScreenShown = true;
+        const content = document.querySelector('#comingSoonScreen .soon-content');
+        if(content){
+          content.classList.remove('soon-page-in');
+          void content.offsetWidth;
+          content.classList.add('soon-page-in');
+        }
+      }
       document.getElementById('bootGate').style.display = 'none';
       return;
     }
