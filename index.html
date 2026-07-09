@@ -3244,6 +3244,7 @@
   // spätere Aktualisierungen (z.B. Namensänderung) setzen den Text direkt ohne erneute Animation.
   let heroGreetingTyped = false;
   let heroGreetingTypeTimer = null;
+  let heroGreetingLastText = null;
   function typeHeroGreeting(text){
     clearTimeout(heroGreetingTypeTimer);
     heroGreeting.textContent = '';
@@ -3264,6 +3265,11 @@
 
   function updateHeroGreeting(name){
     const text = greetingText(name || 'Gast');
+    // Verhindert, dass ein zweiter Aufruf mit demselben Text (z.B. durch parallel
+    // laufendes loadProfile()) die laufende Tipp-Animation abbricht und den Text
+    // sofort komplett anzeigt ("Aufploppen").
+    if(text === heroGreetingLastText) return;
+    heroGreetingLastText = text;
     if(!heroGreetingTyped){
       heroGreetingTyped = true;
       typeHeroGreeting(text);
