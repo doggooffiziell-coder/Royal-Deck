@@ -185,6 +185,11 @@
     border:1px solid transparent;margin:auto;
   }
   .hud-rail .icon-btn:hover{color:var(--accent-hi);background:rgba(212,175,106,.08);border-color:rgba(212,175,106,.22);}
+  .hud-rail .icon-btn:active{transform:scale(.92);}
+  .hud-rail .icon-btn.active{
+    color:var(--accent-hi);background:rgba(212,175,106,.13);border-color:rgba(212,175,106,.4);
+    box-shadow:0 0 0 3px rgba(212,175,106,.1),inset 0 0 0 1px rgba(212,175,106,.15);
+  }
   .icon-btn svg{width:18px;height:18px;fill:currentColor;}
   .badge{
     position:absolute;top:-3px;right:-3px;background:var(--danger);color:#1a0808;font-size:9px;
@@ -670,6 +675,9 @@
   /* Logged-in state in topbar */
   .user-chip{display:flex;align-items:center;gap:8px;cursor:pointer;position:relative;padding:4px 10px 4px 4px;border-radius:14px;transition:.16s;}
   .user-chip:hover{background:rgba(212,175,106,.07);}
+  .user-chip:active{transform:scale(.97);}
+  .user-chip.active{background:rgba(212,175,106,.1);box-shadow:inset 0 0 0 1px rgba(212,175,106,.22);}
+  .user-chip.active .caret{fill:var(--accent-hi);transform:rotate(180deg);}
   .user-chip .avatar{
     display:flex;align-items:center;justify-content:center;color:var(--accent-ink);font-weight:700;font-size:13px;flex-shrink:0;
   }
@@ -689,10 +697,20 @@
   .admin-access-tag svg{width:8px;height:8px;fill:var(--accent-ink);flex-shrink:0;}
   .dd-info .admin-access-tag{margin:4px 0 5px;}
   .dropdown{
-    position:absolute;top:48px;right:0;background:var(--surface);border:1px solid var(--border);border-radius:10px;
-    box-shadow:0 12px 30px rgba(0,0,0,.45);min-width:230px;display:none;overflow:hidden;z-index:50;
+    position:absolute;top:48px;right:0;background:var(--surface);border:1px solid rgba(212,175,106,.22);border-radius:12px;
+    box-shadow:0 16px 40px rgba(0,0,0,.55),0 0 0 1px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.03);
+    min-width:230px;display:none;overflow:hidden;z-index:50;
+    max-width:calc(100vw - 32px);max-height:calc(100vh - 90px);
   }
-  .dropdown.open{display:block;}
+  .dropdown.open{display:block;animation:ddPop .16s cubic-bezier(.2,.9,.3,1) both;}
+  @keyframes ddPop{from{opacity:0;transform:translateY(-6px) scale(.97);}to{opacity:1;transform:translateY(0) scale(1);}}
+  /* kleiner Zeiger, der optisch zurück auf den Auslöser-Knopf verweist —
+     macht klar, dass das Panel zum Button gehört statt beliebig über der Seite zu schweben */
+  .dropdown:before{
+    content:"";position:absolute;top:-6px;right:16px;width:11px;height:11px;
+    background:var(--surface);border-left:1px solid rgba(212,175,106,.22);border-top:1px solid rgba(212,175,106,.22);
+    transform:rotate(45deg);border-radius:2px 0 0 0;
+  }
   .dropdown .dd-menu div{padding:11px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:9px;color:var(--text);transition:.12s;}
   .dropdown .dd-menu div:hover{background:var(--surface-2);color:var(--accent-hi);}
   .dropdown svg{width:14px;height:14px;fill:currentColor;}
@@ -1964,6 +1982,20 @@
                     </div>
                   </div>
                 </div>
+
+                <div class="adm-card wide" data-accent="gold" style="margin-top:14px;">
+                  <div class="adm-card-head">
+                    <div class="adm-card-icon">
+                      <svg viewBox="0 0 24 24"><path d="M12 4l1.4 1.4L8.8 10H20v2H8.8l4.6 4.6L12 18l-8-8z"/></svg>
+                    </div>
+                    <div class="adm-card-title">Update-Screen erzwingen</div>
+                  </div>
+                  <p class="adm-card-note">Zeigt allen gerade verbundenen Nutzern außer Admins sofort den "Neue Version verfügbar"-Screen an — unabhängig vom automatischen Deploy-Check.</p>
+                  <div class="adm-card-foot">
+                    <button type="button" class="adm-ghost-btn" id="forceUpdateBtn">Jetzt an alle senden</button>
+                    <div class="hint" id="forceUpdateHint"></div>
+                  </div>
+                </div>
               </div>
 
               <!-- ===== Reiter: Whitelists ===== -->
@@ -2215,6 +2247,13 @@
   //    Coming-Soon-Screen) den Realtime-Broadcast gar nicht erst zugestellt und müssten
   //    tatsächlich neu laden, während eingeloggte Admins den Wartungsmodus-Toggle trotzdem
   //    live sehen. Das ist der wahrscheinlichste Grund, falls es sich noch unterschiedlich anfühlt.
+  let lastForceUpdateAt = null;
+  let forceUpdateBaselineReady = false;
+  (async () => {
+    lastForceUpdateAt = await fetchForceUpdateAt();
+    forceUpdateBaselineReady = true;
+  })();
+
   supabaseClient
     .channel('app_settings_changes')
     .on('postgres_changes', {
@@ -2228,6 +2267,15 @@
       // und ohne Extra-Request bei allen verbundenen Clients an, inkl. nicht
       // eingeloggten Besuchern auf dem Coming-Soon-Screen.
       console.log('[app_settings] Realtime-Update empfangen:', payload.new);
+      // Erzwungener Update-Screen: nur triggern, wenn sich der Zeitstempel wirklich
+      // geändert hat (nicht bei jedem app_settings-Update erneut) und nur bei
+      // Nicht-Admins — Admins sollen selbst arbeiten können, während der Screen
+      // an alle anderen ausgespielt wird.
+      const newForceUpdateAt = payload.new?.force_update_at || null;
+      if(forceUpdateBaselineReady && newForceUpdateAt && newForceUpdateAt !== lastForceUpdateAt){
+        lastForceUpdateAt = newForceUpdateAt;
+        if(!isAdmin) triggerUpdateReload();
+      }
       loadProfile();
     })
     .subscribe((status, err) => {
@@ -2734,7 +2782,8 @@
       e.stopPropagation();
       const willOpen = !dd.classList.contains('open');
       document.querySelectorAll('.panel-dropdown, #dropdown').forEach(d => d.classList.remove('open'));
-      if(willOpen){ dd.classList.add('open'); if(onOpen) onOpen(); }
+      document.querySelectorAll('.icon-btn.active, .user-chip.active').forEach(el => el.classList.remove('active'));
+      if(willOpen){ dd.classList.add('open'); btn.classList.add('active'); if(onOpen) onOpen(); }
     });
   }
   setupPanelToggle('notifBtn', 'notifDropdown', async () => {
@@ -2745,6 +2794,11 @@
   document.addEventListener('click', e => {
     if(!e.target.closest('.icon-btn-wrap')){
       document.querySelectorAll('.panel-dropdown').forEach(d => d.classList.remove('open'));
+      document.querySelectorAll('.icon-btn.active').forEach(el => el.classList.remove('active'));
+    }
+    if(!e.target.closest('.user-chip')){
+      document.getElementById('dropdown')?.classList.remove('open');
+      document.getElementById('userChip')?.classList.remove('active');
     }
   });
 
@@ -3047,6 +3101,32 @@
     const { error } = await supabaseClient
       .from('app_settings')
       .update(payload)
+      .eq('id', 1);
+    return error;
+  }
+
+  // --- Update-Screen für alle (außer Admins) erzwingen ---
+  // Nutzt dieselbe app_settings-Zeile (id=1) und denselben Realtime-Channel wie
+  // Wartungs-/Coming-Soon-Modus: ein Admin setzt "force_update_at" auf jetzt,
+  // alle verbundenen Clients bekommen das per Realtime zugestellt und zeigen,
+  // sofern sie kein Admin sind, das #updateOverlay an (siehe triggerUpdateReload()
+  // weiter unten und der app_settings_changes-Handler).
+  // WICHTIG: Erfordert die Spalte "force_update_at" (timestamptz, nullable) in der
+  // Supabase-Tabelle "app_settings" — falls die Spalte fehlt, gibt update() einen Fehler zurück.
+  async function fetchForceUpdateAt(){
+    const { data, error } = await supabaseClient
+      .from('app_settings')
+      .select('force_update_at')
+      .eq('id', 1)
+      .maybeSingle();
+    if(error){ console.error(error); return null; }
+    return data?.force_update_at || null;
+  }
+
+  async function triggerForceUpdateForUsers(){
+    const { error } = await supabaseClient
+      .from('app_settings')
+      .update({ force_update_at: new Date().toISOString() })
       .eq('id', 1);
     return error;
   }
@@ -3395,17 +3475,24 @@
           </div>
         </div>
       </div>`;
-    document.getElementById('userChip').addEventListener('click', () => {
-      document.getElementById('dropdown').classList.toggle('open');
+    document.getElementById('userChip').addEventListener('click', (e) => {
+      e.stopPropagation();
+      const willOpen = !document.getElementById('dropdown').classList.contains('open');
+      document.querySelectorAll('.panel-dropdown').forEach(d => d.classList.remove('open'));
+      document.querySelectorAll('.icon-btn.active').forEach(el => el.classList.remove('active'));
+      document.getElementById('dropdown').classList.toggle('open', willOpen);
+      document.getElementById('userChip').classList.toggle('active', willOpen);
     });
     document.getElementById('logoutBtn').addEventListener('click', logout);
     document.getElementById('openSettingsBtn').addEventListener('click', () => {
       document.getElementById('dropdown').classList.remove('open');
+      document.getElementById('userChip').classList.remove('active');
       openSettings(email);
     });
     document.addEventListener('click', function outside(e){
       if(!document.getElementById('userChip')?.contains(e.target)){
         document.getElementById('dropdown')?.classList.remove('open');
+        document.getElementById('userChip')?.classList.remove('active');
       }
     });
     updateNotifBadge();
@@ -3547,6 +3634,24 @@
       document.getElementById('maintenanceToggleHint').textContent = 'Automatisch deaktiviert (nicht gleichzeitig mit Coming-Soon-Modus möglich).';
     }
     updateAdminStatusConsole();
+  });
+
+  // --- Admin: Update-Screen für alle (außer Admins) erzwingen ---
+  const forceUpdateBtn = document.getElementById('forceUpdateBtn');
+  forceUpdateBtn.addEventListener('click', async () => {
+    const hint = document.getElementById('forceUpdateHint');
+    if(!confirm('Allen aktuell verbundenen Nutzern (außer Admins) jetzt den Update-Screen anzeigen?')) return;
+    hint.textContent = '';
+    forceUpdateBtn.disabled = true;
+    const error = await triggerForceUpdateForUsers();
+    forceUpdateBtn.disabled = false;
+    if(error){
+      hint.textContent = error.message;
+      showToast('Fehler: ' + error.message);
+      return;
+    }
+    hint.textContent = 'Gesendet — Nutzer sehen den Screen live.';
+    showToast('Update-Screen an alle Nutzer gesendet.');
   });
 
   // --- Admin: Wartungs-Whitelist verwalten ---
