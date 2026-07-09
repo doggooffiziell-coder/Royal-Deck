@@ -556,50 +556,20 @@
   }
   .avatar-picker-remove:hover{color:var(--danger);}
 
-  /* ---------- Profilbild-Zuschnitt-Editor ---------- */
-  .crop-modal{width:400px;}
-  .crop-stage{
-    width:300px;height:300px;margin:4px auto 18px;border-radius:14px;position:relative;overflow:hidden;
-    background:
-      repeating-conic-gradient(rgba(212,175,106,.06) 0% 25%, transparent 0% 50%) 50%/16px 16px,
-      var(--surface);
-    border:1px solid var(--border);cursor:grab;touch-action:none;user-select:none;
-    box-shadow:inset 0 0 0 1px rgba(212,175,106,.06);
+  /* ---------- Profilbild-Auswahl (vorgefertigte Avatare) ---------- */
+  .avatar-preset-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:9px;
+    margin-top:4px;max-height:260px;overflow-y:auto;padding-right:2px;
   }
-  .crop-stage.dragging{cursor:grabbing;}
-  .crop-stage img{
-    position:absolute;left:0;top:0;transform-origin:0 0;pointer-events:none;
-    max-width:none;max-height:none;
+  .avatar-preset{
+    width:46px;height:46px;border-radius:50%;cursor:pointer;border:2px solid transparent;
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-display);font-style:italic;font-weight:600;font-size:18px;color:var(--text);
+    transition:transform .15s, box-shadow .15s;
   }
-  .crop-mask{
-    position:absolute;inset:0;pointer-events:none;
-    box-shadow:0 0 0 2000px rgba(4,8,6,.62);
-    border-radius:50%;
-    box-sizing:border-box;
-    border:1px solid rgba(212,175,106,.5);
-  }
-  .crop-hint{color:var(--muted);font-size:12px;text-align:center;margin-top:-10px;margin-bottom:18px;}
-  .crop-zoom-row{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
-  .crop-zoom-row svg{width:16px;height:16px;fill:var(--faint);flex-shrink:0;}
-  .crop-zoom-row svg:last-child{width:20px;height:20px;}
-  .crop-zoom-row input[type="range"]{
-    flex:1;height:4px;border-radius:2px;background:var(--surface-2);appearance:none;outline:none;
-    box-shadow:inset 0 0 0 1px var(--border);
-  }
-  .crop-zoom-row input[type="range"]::-webkit-slider-thumb{
-    appearance:none;width:16px;height:16px;border-radius:50%;
-    background:linear-gradient(180deg,var(--accent-hi),var(--accent));cursor:pointer;
-    box-shadow:0 2px 6px rgba(0,0,0,.4), 0 0 0 2px var(--panel);
-  }
-  .crop-zoom-row input[type="range"]::-moz-range-thumb{
-    width:16px;height:16px;border-radius:50%;border:none;
-    background:linear-gradient(180deg,var(--accent-hi),var(--accent));cursor:pointer;
-    box-shadow:0 2px 6px rgba(0,0,0,.4), 0 0 0 2px var(--panel);
-  }
-  .crop-actions{display:flex;gap:10px;margin-top:18px;}
-  .crop-actions .submit{margin-top:0;}
-  .crop-actions .submit.ghost{flex:1;}
-  .crop-actions .submit.primary{flex:1.4;}
+  .avatar-preset:hover{transform:translateY(-2px);}
+  .avatar-preset.selected{border-color:var(--accent-hi);box-shadow:0 0 0 3px var(--accent-soft);}
+  .avatar-symbol{font-style:italic;}
   .lux-card button.submit{margin-top:14px;}
   .lux-card button.submit.ghost{
     background:var(--surface-2);color:var(--text);
@@ -1557,7 +1527,6 @@
               <svg viewBox="0 0 24 24"><path d="M12 9a3.5 3.5 0 100 7 3.5 3.5 0 000-7zM9 3l-1.5 2H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.5L15 3z"/></svg>
             </div>
           </div>
-          <input type="file" id="avatarFileInput" accept="image/*" style="display:none;">
           <div class="rail-id-name" id="settingsUname">—</div>
           <div class="rail-id-handle" id="settingsHandle" style="color:var(--accent-hi);font-size:12px;font-weight:600;text-align:center;margin-top:2px;">—</div>
           <div class="rail-id-email" id="settingsEmail">—</div>
@@ -1587,24 +1556,14 @@
                 <svg viewBox="0 0 24 24"><path d="M12 9a3.5 3.5 0 100 7 3.5 3.5 0 000-7zM9 3L7.5 5H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.5L15 3z"/></svg>
                 Profilbild anpassen
               </div>
-              <p class="card-note">Lade ein eigenes Foto hoch oder bleib bei einer Avatarfarbe weiter unten.</p>
+              <p class="card-note">Wähl eines von rund 50 Motiven passend zum Tisch – Kartenzeichen, Würfel, Chips und mehr.</p>
               <div class="avatar-picker">
                 <div class="avatar-picker-preview" id="avatarPickerPreview">H</div>
-                <div class="avatar-picker-actions">
-                  <div class="avatar-picker-actions-row">
-                    <button type="button" class="submit ghost" id="avatarPickerBtn">
-                      <svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:currentColor;vertical-align:-3px;margin-right:6px;"><path d="M12 9a3.5 3.5 0 100 7 3.5 3.5 0 000-7zM9 3L7.5 5H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.5L15 3z"/></svg>
-                      Bild auswählen
-                    </button>
-                    <button type="button" class="submit ghost" id="avatarRepositionBtn" style="display:none;">
-                      <svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:currentColor;vertical-align:-3px;margin-right:6px;"><path d="M7 10h2v7H7zm4 0h2v7h-2zm4 0h2v7h-2zM5 6h14l-1 2H6zm3-4h6l1 2H7z"/></svg>
-                      Position anpassen
-                    </button>
-                  </div>
+                <div class="avatar-picker-actions" style="flex:1;">
                   <button type="button" class="avatar-picker-remove" id="avatarPickerRemoveBtn">Profilbild entfernen</button>
-                  <div class="field-hint" style="margin-top:2px;">JPG oder PNG. Nach dem Hochladen kannst du den Ausschnitt direkt anpassen.</div>
                 </div>
               </div>
+              <div class="avatar-preset-grid" id="avatarPresetGrid"></div>
             </div>
 
             <div class="lux-card">
@@ -1800,28 +1759,6 @@
     </div>
   </div>
 
-  <!-- Profilbild-Zuschnitt-Editor: Position & Zoom manuell anpassen -->
-  <div class="overlay" id="avatarCropOverlay" style="z-index:1200;">
-    <div class="modal crop-modal">
-      <div class="close" id="avatarCropClose">✕</div>
-      <h1>Ausschnitt anpassen</h1>
-      <p class="sub">Ziehen zum Verschieben, mit dem Regler zoomen.</p>
-      <div class="crop-stage" id="cropStage">
-        <img id="cropImage" src="" alt="">
-        <div class="crop-mask"></div>
-      </div>
-      <div class="crop-hint">So wird dein Profilbild später kreisförmig angezeigt.</div>
-      <div class="crop-zoom-row">
-        <svg viewBox="0 0 24 24"><path d="M9 3a6 6 0 104.6 9.9l5.2 5.2 1.4-1.4-5.2-5.2A6 6 0 009 3zm0 2a4 4 0 110 8 4 4 0 010-8z"/></svg>
-        <input type="range" id="cropZoomSlider" min="1" max="3" step="0.01" value="1">
-        <svg viewBox="0 0 24 24"><path d="M9 3a6 6 0 104.6 9.9l5.2 5.2 1.4-1.4-5.2-5.2A6 6 0 009 3zm0 2a4 4 0 110 8 4 4 0 010-8zM7 8h4v2H7z"/></svg>
-      </div>
-      <div class="crop-actions">
-        <button type="button" class="submit ghost" id="avatarCropCancelBtn">Abbrechen</button>
-        <button type="button" class="submit primary" id="avatarCropSaveBtn">Speichern</button>
-      </div>
-    </div>
-  </div>
 
   <div class="content" id="homeView">
     <div class="hero">
@@ -2019,61 +1956,61 @@
     'linear-gradient(135deg,#ffb347,#ff5e62)'
   ];
 
-  // --- Eigenes Profilbild (lokal im Browser gespeichert, pro Nutzer-ID) ---
-  // Hinweis: Ohne eine "avatar_url"-Spalte in der Supabase "profiles"-Tabelle bleibt
-  // das Bild an diesen Browser gebunden und synchronisiert nicht geräteübergreifend.
+  // --- Vorgefertigte Profilbilder (Symbol + Farbverlauf, passend zum Tisch-Thema) ---
+  // Es werden keine eigenen Fotos mehr hochgeladen — stattdessen wählt man eines von
+  // ca. 50 Presets. Ein Preset wird als "preset:N" im selben "avatar_url"-Feld gespeichert,
+  // das vorher die Bild-URL enthielt (kein DB-Umbau nötig).
+  const AVATAR_SYMBOLS = ['♠','♥','♦','♣','★','♛','⚀','⚅','7','$','◆','♞'];
+  const AVATAR_GRADIENTS = [
+    'linear-gradient(135deg,#c9a05b,#8a6a35)',
+    'linear-gradient(135deg,#1c4830,#0f2c1d)',
+    'linear-gradient(135deg,#c1443c,#7a241f)',
+    'linear-gradient(135deg,#4a5568,#1a202c)',
+    'linear-gradient(135deg,#f0cf8e,#c9a05b)'
+  ];
+  const AVATAR_PRESETS = [];
+  AVATAR_SYMBOLS.forEach(symbol => {
+    AVATAR_GRADIENTS.forEach(bg => {
+      AVATAR_PRESETS.push({ id: `preset:${AVATAR_PRESETS.length}`, symbol, bg });
+    });
+  });
+  function getPreset(value){
+    if(!value || typeof value !== 'string' || !value.startsWith('preset:')) return null;
+    return AVATAR_PRESETS[parseInt(value.slice(7), 10)] || null;
+  }
+
   let avatarDataUrl = null;
   function avatarStorageKey(uid){ return `avatar_url_${uid}`; }
   function loadAvatarForUser(uid){
     if(!uid) return null;
     try { return localStorage.getItem(avatarStorageKey(uid)); } catch(e){ return null; }
   }
-  function saveAvatarForUser(uid, dataUrl){
+  function saveAvatarForUser(uid, value){
     try {
-      if(dataUrl) localStorage.setItem(avatarStorageKey(uid), dataUrl);
+      if(value) localStorage.setItem(avatarStorageKey(uid), value);
       else localStorage.removeItem(avatarStorageKey(uid));
     } catch(e){ console.error(e); }
   }
-  // Original-Upload (etwas größer als das finale 400x400-Profilbild) wird separat
-  // lokal gespeichert, damit "Position anpassen" den Ausschnitt später neu wählen kann,
-  // ohne dass erneut eine Datei hochgeladen werden muss.
-  function avatarOrigStorageKey(uid){ return `avatar_orig_${uid}`; }
-  function loadAvatarOrigForUser(uid){
-    if(!uid) return null;
-    try { return localStorage.getItem(avatarOrigStorageKey(uid)); } catch(e){ return null; }
-  }
-  function saveAvatarOrigForUser(uid, dataUrl){
-    try {
-      if(dataUrl) localStorage.setItem(avatarOrigStorageKey(uid), dataUrl);
-      else localStorage.removeItem(avatarOrigStorageKey(uid));
-    } catch(e){ console.error(e); }
-  }
-  // Merkt sich den zuletzt gewählten Ausschnitt (in Original-Bildkoordinaten),
-  // damit der Editor beim erneuten Öffnen wieder an der richtigen Stelle startet.
-  function avatarCropStorageKey(uid){ return `avatar_crop_${uid}`; }
-  function loadAvatarCropForUser(uid){
-    if(!uid) return null;
-    try {
-      const raw = localStorage.getItem(avatarCropStorageKey(uid));
-      return raw ? JSON.parse(raw) : null;
-    } catch(e){ return null; }
-  }
-  function saveAvatarCropForUser(uid, rect){
-    try {
-      if(rect) localStorage.setItem(avatarCropStorageKey(uid), JSON.stringify(rect));
-      else localStorage.removeItem(avatarCropStorageKey(uid));
-    } catch(e){ console.error(e); }
-  }
-  function applyAvatarToEl(el, initial, colorOrImage){
+  function applyAvatarToEl(el, initial, value){
     if(!el) return;
-    if(colorOrImage && colorOrImage.startsWith('data:')){
+    const preset = getPreset(value);
+    if(preset){
+      el.style.backgroundImage = '';
+      el.style.background = preset.bg;
+      el.textContent = preset.symbol;
+      el.classList.add('avatar-symbol');
+    } else if(value && (value.startsWith('data:') || value.startsWith('http'))){
+      // Alte, vor dem Umstieg auf Presets hochgeladene Bilder bleiben sichtbar,
+      // können aber nicht mehr neu angelegt werden.
       el.style.background = 'none';
-      el.style.backgroundImage = `url(${colorOrImage})`;
+      el.style.backgroundImage = `url(${value})`;
       el.textContent = '';
+      el.classList.remove('avatar-symbol');
     } else {
       el.style.backgroundImage = '';
-      el.style.background = colorOrImage;
+      el.style.background = value;
       el.textContent = initial;
+      el.classList.remove('avatar-symbol');
     }
   }
 
@@ -2881,10 +2818,18 @@
     pointsDisplay.innerHTML = `<svg class="star" viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg> Level ${level} · ${(profile.chips||0).toLocaleString('de-DE')} Punkte`;
     const initial = profile.name.charAt(0).toUpperCase();
     const chips = profile.chips || 0;
-    const avatarStyle = avatarDataUrl
-      ? `style="background-image:url(${avatarDataUrl})"`
-      : `style="background:${selectedColor}"`;
-    const avatarInner = avatarDataUrl ? '' : initial;
+    const avatarPreset = getPreset(avatarDataUrl);
+    let avatarStyle, avatarInner;
+    if(avatarPreset){
+      avatarStyle = `style="background:${avatarPreset.bg};font-family:var(--font-display);font-style:italic;"`;
+      avatarInner = avatarPreset.symbol;
+    } else if(avatarDataUrl && (avatarDataUrl.startsWith('data:') || avatarDataUrl.startsWith('http'))){
+      avatarStyle = `style="background-image:url(${avatarDataUrl})"`;
+      avatarInner = '';
+    } else {
+      avatarStyle = `style="background:${selectedColor}"`;
+      avatarInner = initial;
+    }
     const adminTagHTML = `<span class="admin-access-tag"><svg viewBox="0 0 24 24"><path d="M5 16L3 6l5.5 4L12 4l3.5 6L21 6l-2 10H5zm0 2h14v2H5z"/></svg>Adminzugriff</span>`;
     authArea.innerHTML = `
       <div class="user-chip" id="userChip">
@@ -2944,14 +2889,6 @@
   function updateAvatarPreviews(initial, colorOrImage){
     applyAvatarToEl(bigAvatar, initial, colorOrImage);
     applyAvatarToEl(avatarPickerPreview, initial, colorOrImage);
-    updateRepositionBtnVisibility();
-  }
-  // "Position anpassen" ergibt nur Sinn, wenn gerade ein eigenes Foto aktiv ist
-  // (bei einer reinen Avatarfarbe gibt es nichts zum Zuschneiden).
-  function updateRepositionBtnVisibility(){
-    const btn = document.getElementById('avatarRepositionBtn');
-    if(!btn) return;
-    btn.style.display = avatarDataUrl ? '' : 'none';
   }
 
   AVATAR_COLORS.forEach((grad, i) => {
@@ -2967,6 +2904,7 @@
       const initial = currentProfile ? currentProfile.name.charAt(0).toUpperCase() : 'H';
       updateAvatarPreviews(initial, grad);
       renderAuthArea(currentProfile, currentUserEmail);
+      renderAvatarPresetGrid();
       await syncAvatarToProfile(null);
     });
     colorSwatches.appendChild(sw);
@@ -3249,235 +3187,52 @@
       renderUsernameChangeCard();
       const initial = currentProfile.name.charAt(0).toUpperCase();
       updateAvatarPreviews(initial, avatarDataUrl || selectedColor);
+      renderAvatarPresetGrid();
     }
     document.getElementById('settingsEmail').textContent = email || '—';
     settingsOverlay.classList.add('open');
     switchPane('profile');
   }
 
-  // --- Profilbild hochladen (wird lokal komprimiert und im Browser gespeichert) ---
+  // --- Profilbild aus vorgefertigten Presets wählen ---
   document.getElementById('avatarUploadTrigger').addEventListener('click', () => {
-    document.getElementById('avatarFileInput').click();
-  });
-  document.getElementById('avatarPickerBtn').addEventListener('click', () => {
-    document.getElementById('avatarFileInput').click();
+    openSettings();
+    switchPane('profile');
   });
   document.getElementById('avatarPickerRemoveBtn').addEventListener('click', async () => {
     avatarDataUrl = null;
-    if(currentUserId){
-      saveAvatarForUser(currentUserId, null);
-      saveAvatarOrigForUser(currentUserId, null);
-      saveAvatarCropForUser(currentUserId, null);
-    }
+    if(currentUserId) saveAvatarForUser(currentUserId, null);
     const initial = currentProfile ? currentProfile.name.charAt(0).toUpperCase() : 'H';
     updateAvatarPreviews(initial, selectedColor);
     renderAuthArea(currentProfile, currentUserEmail);
+    renderAvatarPresetGrid();
     showToast('Profilbild entfernt.');
     await syncAvatarToProfile(null);
   });
-  document.getElementById('avatarFileInput').addEventListener('change', async e => {
-    const input = e.target;
-    const file = input.files[0];
-    if(!file) return;
-    if(!file.type.startsWith('image/')){
-      showToast('Bitte eine Bilddatei auswählen.');
-      input.value = '';
-      return;
-    }
-    // Handy-Fotos haben oft eine EXIF-Rotation. createImageBitmap mit imageOrientation
-    // richtet das Bild dabei automatisch korrekt aus (Canvas würde das sonst ignorieren
-    // und das Ergebnis schief/falsch gedreht speichern).
-    let source = null;
-    if(window.createImageBitmap){
-      try {
-        source = await createImageBitmap(file, { imageOrientation: 'from-image' });
-      } catch(err){
-        console.error('createImageBitmap fehlgeschlagen, Fallback auf Image():', err);
-      }
-    }
-    if(!source){
-      try {
-        source = await loadImageFromFile(file);
-      } catch(err){
-        showToast('Dieses Bildformat wird nicht unterstützt. Bitte JPG oder PNG verwenden.');
-        input.value = '';
-        return;
-      }
-    }
-    input.value = '';
-    try {
-      // Auf eine handliche Größe verkleinern, bevor wir es lokal als "Original" speichern —
-      // so kann der Zuschnitt später über "Position anpassen" jederzeit neu gewählt werden,
-      // ohne erneut eine Datei hochladen zu müssen.
-      const resizedDataUrl = downscaleToDataUrl(source, AVATAR_ORIG_MAX);
-      if(source && typeof source.close === 'function') source.close();
-      const img = new Image();
-      img.onload = () => openAvatarCropEditor(img, null);
-      img.onerror = () => showToast('Bild konnte nicht verarbeitet werden.');
-      img.src = resizedDataUrl;
-    } catch(err){
-      console.error('Profilbild konnte nicht verarbeitet werden:', err);
-      showToast('Profilbild konnte nicht verarbeitet werden.');
-    }
-  });
-  document.getElementById('avatarRepositionBtn').addEventListener('click', () => {
-    if(!avatarDataUrl) return;
-    const origDataUrl = (currentUserId && loadAvatarOrigForUser(currentUserId)) || avatarDataUrl;
-    const cropRect = currentUserId ? loadAvatarCropForUser(currentUserId) : null;
-    const img = new Image();
-    img.onload = () => openAvatarCropEditor(img, cropRect);
-    img.onerror = () => showToast('Bild konnte nicht geladen werden.');
-    img.src = origDataUrl;
-  });
 
-  function loadImageFromFile(file){
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onerror = () => reject(new Error('Datei konnte nicht gelesen werden.'));
-      reader.onload = evt => {
-        const img = new Image();
-        img.onerror = () => reject(new Error('Bild konnte nicht dekodiert werden.'));
-        img.onload = () => resolve(img);
-        img.src = evt.target.result;
-      };
-      reader.readAsDataURL(file);
+  const avatarPresetGrid = document.getElementById('avatarPresetGrid');
+  function renderAvatarPresetGrid(){
+    if(!avatarPresetGrid) return;
+    avatarPresetGrid.innerHTML = '';
+    AVATAR_PRESETS.forEach(preset => {
+      const el = document.createElement('div');
+      el.className = 'avatar-preset' + (avatarDataUrl === preset.id ? ' selected' : '');
+      el.style.background = preset.bg;
+      el.textContent = preset.symbol;
+      el.title = 'Als Profilbild wählen';
+      el.addEventListener('click', async () => {
+        avatarDataUrl = preset.id;
+        if(currentUserId) saveAvatarForUser(currentUserId, preset.id);
+        updateAvatarPreviews('', preset.id);
+        renderAuthArea(currentProfile, currentUserEmail);
+        renderAvatarPresetGrid();
+        showToast('Profilbild aktualisiert.');
+        await syncAvatarToProfile(preset.id);
+      });
+      avatarPresetGrid.appendChild(el);
     });
   }
-  function downscaleToDataUrl(imgSource, maxDim){
-    const srcW = imgSource.width || imgSource.naturalWidth;
-    const srcH = imgSource.height || imgSource.naturalHeight;
-    const scale = Math.min(1, maxDim / Math.max(srcW, srcH));
-    const w = Math.max(1, Math.round(srcW * scale)), h = Math.max(1, Math.round(srcH * scale));
-    const canvas = document.createElement('canvas');
-    canvas.width = w; canvas.height = h;
-    canvas.getContext('2d').drawImage(imgSource, 0, 0, w, h);
-    return canvas.toDataURL('image/jpeg', 0.92);
-  }
-
-  // ============================================================
-  // --- Profilbild-Zuschnitt-Editor ---
-  // Nach dem Hochladen (oder über "Position anpassen") lässt sich der sichtbare
-  // Ausschnitt des Profilbilds per Ziehen und Zoomen frei wählen, statt ihn
-  // nur automatisch zentriert zuzuschneiden.
-  // ============================================================
-  const AVATAR_OUTPUT = 400;
-  const AVATAR_ORIG_MAX = 1000;
-  const avatarCropOverlay = document.getElementById('avatarCropOverlay');
-  const cropStageEl = document.getElementById('cropStage');
-  const cropImageEl = document.getElementById('cropImage');
-  const cropZoomSlider = document.getElementById('cropZoomSlider');
-  let cropState = null;
-
-  function openAvatarCropEditor(imgEl, cropRect){
-    const viewSize = 300;
-    const naturalW = imgEl.naturalWidth || imgEl.width;
-    const naturalH = imgEl.naturalHeight || imgEl.height;
-    const baseScale = Math.max(viewSize / naturalW, viewSize / naturalH);
-    cropState = { imgEl, naturalW, naturalH, baseScale, viewSize, zoom: 1, scale: baseScale, offsetX: 0, offsetY: 0 };
-    cropImageEl.src = imgEl.src;
-    cropImageEl.style.width = naturalW + 'px';
-    cropImageEl.style.height = naturalH + 'px';
-
-    if(cropRect && cropRect.naturalW === naturalW && cropRect.naturalH === naturalH && cropRect.sSize > 0){
-      let scale = viewSize / cropRect.sSize;
-      let zoom = Math.min(3, Math.max(1, scale / baseScale));
-      cropState.zoom = zoom;
-      cropState.scale = baseScale * zoom;
-      cropState.offsetX = -cropRect.sx * cropState.scale;
-      cropState.offsetY = -cropRect.sy * cropState.scale;
-    } else {
-      const dispW = naturalW * baseScale, dispH = naturalH * baseScale;
-      cropState.offsetX = (viewSize - dispW) / 2;
-      cropState.offsetY = (viewSize - dispH) / 2;
-    }
-    clampCropOffsets();
-    applyCropTransform();
-    cropZoomSlider.value = cropState.zoom;
-    avatarCropOverlay.classList.add('open');
-  }
-  function closeAvatarCropEditor(){
-    avatarCropOverlay.classList.remove('open');
-    cropState = null;
-  }
-  function clampCropOffsets(){
-    if(!cropState) return;
-    const dispW = cropState.naturalW * cropState.scale;
-    const dispH = cropState.naturalH * cropState.scale;
-    const minX = Math.min(0, cropState.viewSize - dispW), maxX = 0;
-    const minY = Math.min(0, cropState.viewSize - dispH), maxY = 0;
-    cropState.offsetX = Math.min(maxX, Math.max(minX, cropState.offsetX));
-    cropState.offsetY = Math.min(maxY, Math.max(minY, cropState.offsetY));
-  }
-  function applyCropTransform(){
-    if(!cropState) return;
-    cropImageEl.style.transform = `translate(${cropState.offsetX}px, ${cropState.offsetY}px) scale(${cropState.scale})`;
-  }
-  function setCropZoom(newZoom){
-    if(!cropState) return;
-    const oldScale = cropState.scale;
-    const viewCenter = cropState.viewSize / 2;
-    const fx = (viewCenter - cropState.offsetX) / (cropState.naturalW * oldScale);
-    const fy = (viewCenter - cropState.offsetY) / (cropState.naturalH * oldScale);
-    cropState.zoom = newZoom;
-    cropState.scale = cropState.baseScale * newZoom;
-    cropState.offsetX = viewCenter - fx * cropState.naturalW * cropState.scale;
-    cropState.offsetY = viewCenter - fy * cropState.naturalH * cropState.scale;
-    clampCropOffsets();
-    applyCropTransform();
-  }
-  cropZoomSlider.addEventListener('input', () => setCropZoom(parseFloat(cropZoomSlider.value)));
-
-  let cropDragging = false, cropDragStartX = 0, cropDragStartY = 0, cropDragOrigX = 0, cropDragOrigY = 0;
-  cropStageEl.addEventListener('pointerdown', e => {
-    if(!cropState) return;
-    cropDragging = true;
-    cropStageEl.classList.add('dragging');
-    cropDragStartX = e.clientX; cropDragStartY = e.clientY;
-    cropDragOrigX = cropState.offsetX; cropDragOrigY = cropState.offsetY;
-    cropStageEl.setPointerCapture(e.pointerId);
-  });
-  cropStageEl.addEventListener('pointermove', e => {
-    if(!cropDragging || !cropState) return;
-    cropState.offsetX = cropDragOrigX + (e.clientX - cropDragStartX);
-    cropState.offsetY = cropDragOrigY + (e.clientY - cropDragStartY);
-    clampCropOffsets();
-    applyCropTransform();
-  });
-  function endCropDrag(){ cropDragging = false; cropStageEl.classList.remove('dragging'); }
-  cropStageEl.addEventListener('pointerup', endCropDrag);
-  cropStageEl.addEventListener('pointercancel', endCropDrag);
-  cropStageEl.addEventListener('pointerleave', endCropDrag);
-
-  document.getElementById('avatarCropCancelBtn').addEventListener('click', closeAvatarCropEditor);
-  document.getElementById('avatarCropClose').addEventListener('click', closeAvatarCropEditor);
-  avatarCropOverlay.addEventListener('click', e => { if(e.target === avatarCropOverlay) closeAvatarCropEditor(); });
-
-  document.getElementById('avatarCropSaveBtn').addEventListener('click', async () => {
-    if(!cropState) return;
-    try {
-      const sSize = cropState.viewSize / cropState.scale;
-      const sx = -cropState.offsetX / cropState.scale;
-      const sy = -cropState.offsetY / cropState.scale;
-      const outCanvas = document.createElement('canvas');
-      outCanvas.width = AVATAR_OUTPUT; outCanvas.height = AVATAR_OUTPUT;
-      outCanvas.getContext('2d').drawImage(cropState.imgEl, sx, sy, sSize, sSize, 0, 0, AVATAR_OUTPUT, AVATAR_OUTPUT);
-      const dataUrl = outCanvas.toDataURL('image/jpeg', 0.9);
-      avatarDataUrl = dataUrl;
-      if(currentUserId){
-        saveAvatarForUser(currentUserId, dataUrl);
-        saveAvatarOrigForUser(currentUserId, cropState.imgEl.src);
-        saveAvatarCropForUser(currentUserId, { sx, sy, sSize, naturalW: cropState.naturalW, naturalH: cropState.naturalH });
-      }
-      updateAvatarPreviews('', dataUrl);
-      renderAuthArea(currentProfile, currentUserEmail);
-      showToast('Profilbild aktualisiert.');
-      closeAvatarCropEditor();
-      await syncAvatarToProfile(dataUrl);
-    } catch(err){
-      console.error('Zuschnitt konnte nicht gespeichert werden:', err);
-      showToast('Profilbild konnte nicht verarbeitet werden.');
-    }
-  });
+  renderAvatarPresetGrid();
 
   document.getElementById('closeSettings').addEventListener('click', () => settingsOverlay.classList.remove('open'));
   settingsOverlay.addEventListener('click', e => { if(e.target === settingsOverlay) settingsOverlay.classList.remove('open'); });
@@ -3788,7 +3543,11 @@
   function initials(name){ return (name || '?').charAt(0).toUpperCase(); }
 
   function friendAvatarHTML(name, avatarUrl){
-    if(avatarUrl){
+    const preset = getPreset(avatarUrl);
+    if(preset){
+      return `<div class="avatar" style="background:${preset.bg};font-family:var(--font-display);font-style:italic;">${preset.symbol}</div>`;
+    }
+    if(avatarUrl && (avatarUrl.startsWith('data:') || avatarUrl.startsWith('http'))){
       return `<div class="avatar" style="background-image:url(${avatarUrl});background-size:cover;background-position:center;"></div>`;
     }
     return `<div class="avatar" style="background:linear-gradient(135deg,var(--accent-hi),var(--felt))">${initials(name)}</div>`;
