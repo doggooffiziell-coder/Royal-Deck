@@ -2035,8 +2035,7 @@
 
   // --- Vorgefertigte Profilbilder (Symbol + Farbverlauf, passend zum Tisch-Thema) ---
   // Es werden keine eigenen Fotos mehr hochgeladen — stattdessen wählt man eines von
-  // ca. 50 Presets. Ein Preset wird als "preset:N" im selben "avatar_url"-Feld gespeichert,
-  // das vorher die Bild-URL enthielt (kein DB-Umbau nötig).
+  // ca. 50 Presets. Die Auswahl gilt nur für die aktuelle Sitzung (kein Speichern/Sync).
   const AVATAR_SYMBOLS = ['♠','♥','♦','♣','★','♛','⚀','⚅','7','$','◆','♞'];
   const AVATAR_GRADIENTS = [
     'linear-gradient(135deg,#c9a05b,#8a6a35)',
@@ -2056,18 +2055,8 @@
     return AVATAR_PRESETS[parseInt(value.slice(7), 10)] || null;
   }
 
+  // Profilbild-Auswahl gilt nur für die aktuelle Sitzung — kein localStorage, kein Supabase-Sync.
   let avatarDataUrl = null;
-  function avatarStorageKey(uid){ return `avatar_url_${uid}`; }
-  function loadAvatarForUser(uid){
-    if(!uid) return null;
-    try { return localStorage.getItem(avatarStorageKey(uid)); } catch(e){ return null; }
-  }
-  function saveAvatarForUser(uid, value){
-    try {
-      if(value) localStorage.setItem(avatarStorageKey(uid), value);
-      else localStorage.removeItem(avatarStorageKey(uid));
-    } catch(e){ console.error(e); }
-  }
   function applyAvatarToEl(el, initial, value){
     if(!el) return;
     const preset = getPreset(value);
@@ -2076,35 +2065,12 @@
       el.style.background = preset.bg;
       el.textContent = preset.symbol;
       el.classList.add('avatar-symbol');
-    } else if(value && (value.startsWith('data:') || value.startsWith('http'))){
-      // Alte, vor dem Umstieg auf Presets hochgeladene Bilder bleiben sichtbar,
-      // können aber nicht mehr neu angelegt werden.
-      el.style.background = 'none';
-      el.style.backgroundImage = `url(${value})`;
-      el.textContent = '';
-      el.classList.remove('avatar-symbol');
     } else {
       el.style.backgroundImage = '';
       el.style.background = value;
       el.textContent = initial;
       el.classList.remove('avatar-symbol');
     }
-  }
-
-  // Speichert das Profilbild zusätzlich in Supabase (Spalte "avatar_url" auf "profiles"),
-  // damit Freunde und andere Geräte es ebenfalls sehen. dataUrl = null löscht das Bild wieder.
-  // Voraussetzung: Spalte "avatar_url" (text) auf "profiles" + in der "public_profiles"-View.
-  let avatarSyncSupported = true;
-  async function syncAvatarToProfile(dataUrl){
-    if(!currentUserId || !avatarSyncSupported) return;
-    const { error } = await supabaseClient.from('profiles').update({ avatar_url: dataUrl }).eq('id', currentUserId);
-    if(error){
-      avatarSyncSupported = false;
-      console.error('Profilbild konnte nicht mit dem Account synchronisiert werden (fehlt die Spalte "avatar_url"?):', error);
-      showToast('Profilbild wurde lokal gespeichert, aber nicht mit deinem Account synchronisiert.');
-      return;
-    }
-    if(currentProfile) currentProfile.avatar_url = dataUrl;
   }
 
   // --- Login/Register modal logic ---
@@ -2897,15 +2863,9 @@
     }
     let { data: profile, error } = await supabaseClient
       .from('profiles')
-      .select('name, chips, gender, username, username_changed_at, avatar_url')
+      .select('name, chips, gender, username, username_changed_at')
       .eq('id', user.id)
       .single();
-    if(error){
-      // "avatar_url"-Spalte existiert evtl. noch nicht — ohne sie nochmal versuchen.
-      const noAvatar = await supabaseClient.from('profiles').select('name, chips, gender, username, username_changed_at').eq('id', user.id).single();
-      profile = noAvatar.data;
-      error = noAvatar.error;
-    }
     if(error){
       // "gender"/"username"-Spalte existiert evtl. noch nicht in der profiles-Tabelle — ohne sie nochmal
       // versuchen, damit der Login trotzdem funktioniert.
@@ -2918,13 +2878,8 @@
     currentUserId = user.id;
     currentUserEmail = user.email;
     isAdmin = admin;
-    // Lokal (in diesem Browser) gespeicherter Wert hat Vorrang vor Supabase:
-    // Die Cloud-Synchronisierung nach einem Zuschnitt läuft asynchron im Hintergrund,
-    // daher kann Supabase kurz nach dem Speichern noch den alten Wert liefern (z. B. bei
-    // einem schnellen Seiten-Reload). Lokal ist immer die aktuellste Version vorhanden.
-    // Nur wenn dieser Browser gar keine lokale Kopie hat (z. B. neues Gerät), wird auf
-    // den Supabase-Wert zurückgefallen.
-    avatarDataUrl = loadAvatarForUser(currentUserId) || profile.avatar_url;
+    // Profilbild-Auswahl ist rein sitzungsbasiert und wird beim Login nicht wiederhergestellt.
+    avatarDataUrl = null;
     await loadNotifications();
     renderAuthArea(profile, user.email);
     enforceUsername(profile);
@@ -2970,9 +2925,6 @@
     if(avatarPreset){
       avatarStyle = `style="background:${avatarPreset.bg};font-family:var(--font-display);font-style:italic;"`;
       avatarInner = avatarPreset.symbol;
-    } else if(avatarDataUrl && (avatarDataUrl.startsWith('data:') || avatarDataUrl.startsWith('http'))){
-      avatarStyle = `style="background-image:url(${avatarDataUrl})"`;
-      avatarInner = '';
     } else {
       avatarStyle = `style="background:${selectedColor}"`;
       avatarInner = initial;
@@ -3047,11 +2999,9 @@
       document.querySelectorAll('.swatch').forEach(s => s.classList.remove('selected'));
       sw.classList.add('selected');
       avatarDataUrl = null;
-      if(currentUserId) saveAvatarForUser(currentUserId, null);
       const initial = currentProfile ? currentProfile.name.charAt(0).toUpperCase() : 'H';
       updateAvatarPreviews(initial, grad);
       renderAuthArea(currentProfile, currentUserEmail);
-      await syncAvatarToProfile(null);
     });
     colorSwatches.appendChild(sw);
   });
@@ -3373,9 +3323,6 @@
     document.getElementById('genderHint').textContent = '';
     document.getElementById('pwForm').reset();
 
-    // Lokaler Wert hat Vorrang (siehe loadProfile) — verhindert, dass ein gerade
-    // gespeicherter Zuschnitt beim Öffnen der Einstellungen kurzzeitig wieder verschwindet.
-    avatarDataUrl = currentUserId ? (loadAvatarForUser(currentUserId) || currentProfile?.avatar_url) : null;
     renderRailBadges();
 
     // Admin-Tab nur für Admin-Konten im Sicherheits-/Navigationsbereich einblenden
@@ -3437,18 +3384,16 @@
   document.getElementById('avatarPickerClose').addEventListener('click', closeAvatarPicker);
   avatarPickerOverlay.addEventListener('click', e => { if(e.target === avatarPickerOverlay) closeAvatarPicker(); });
 
-  async function removeAvatar(){
+  function removeAvatar(){
     avatarDataUrl = null;
-    if(currentUserId) saveAvatarForUser(currentUserId, null);
     const initial = currentProfile ? currentProfile.name.charAt(0).toUpperCase() : 'H';
     updateAvatarPreviews(initial, selectedColor);
     renderAuthArea(currentProfile, currentUserEmail);
     showToast('Profilbild entfernt.');
-    await syncAvatarToProfile(null);
   }
   document.getElementById('avatarPickerRemoveBtn').addEventListener('click', removeAvatar);
-  document.getElementById('avatarModalRemoveBtn').addEventListener('click', async () => {
-    await removeAvatar();
+  document.getElementById('avatarModalRemoveBtn').addEventListener('click', () => {
+    removeAvatar();
     renderAvatarModalGrid();
   });
 
@@ -3461,14 +3406,12 @@
       el.style.background = preset.bg;
       el.textContent = preset.symbol;
       el.title = 'Als Profilbild wählen';
-      el.addEventListener('click', async () => {
+      el.addEventListener('click', () => {
         avatarDataUrl = preset.id;
-        if(currentUserId) saveAvatarForUser(currentUserId, preset.id);
         updateAvatarPreviews('', preset.id);
         renderAuthArea(currentProfile, currentUserEmail);
         showToast('Profilbild aktualisiert.');
         closeAvatarPicker();
-        await syncAvatarToProfile(preset.id);
       });
       avatarModalGrid.appendChild(el);
     });
@@ -3797,29 +3740,17 @@
 
   function initials(name){ return (name || '?').charAt(0).toUpperCase(); }
 
-  function friendAvatarHTML(name, avatarUrl){
-    const preset = getPreset(avatarUrl);
-    if(preset){
-      return `<div class="avatar" style="background:${preset.bg};font-family:var(--font-display);font-style:italic;">${preset.symbol}</div>`;
-    }
-    if(avatarUrl && (avatarUrl.startsWith('data:') || avatarUrl.startsWith('http'))){
-      return `<div class="avatar" style="background-image:url(${avatarUrl});background-size:cover;background-position:center;"></div>`;
-    }
+  function friendAvatarHTML(name){
     return `<div class="avatar" style="background:linear-gradient(135deg,var(--accent-hi),var(--felt))">${initials(name)}</div>`;
   }
 
-  // Holt öffentliche Profildaten (id, username, name, avatar_url) zu einer Liste von User-IDs.
+  // Holt öffentliche Profildaten (id, username, name) zu einer Liste von User-IDs.
   async function fetchPublicProfiles(ids){
     if(!ids.length) return {};
-    let { data, error } = await supabaseClient
+    const { data, error } = await supabaseClient
       .from('public_profiles')
-      .select('id, username, name, avatar_url')
+      .select('id, username, name')
       .in('id', ids);
-    if(error){
-      // "avatar_url" evtl. noch nicht in der public_profiles-View — ohne sie nochmal versuchen.
-      const fallback = await supabaseClient.from('public_profiles').select('id, username, name').in('id', ids);
-      data = fallback.data; error = fallback.error;
-    }
     if(error){ console.error(error); return {}; }
     const map = {};
     (data || []).forEach(p => { map[p.id] = p; });
@@ -3874,7 +3805,7 @@
     const listEl = document.getElementById('fpanelList');
     listEl.innerHTML = friendsCache.friends.length ? friendsCache.friends.map(f => `
       <div class="friend-row">
-        ${friendAvatarHTML(f.name || f.username, f.avatar_url)}
+        ${friendAvatarHTML(f.name || f.username)}
         <div class="fr-info">
           <div class="fr-username">@${f.username}</div>
           <div class="fr-name">${f.name || ''}</div>
@@ -3887,7 +3818,7 @@
     const inEl = document.getElementById('fpanelIncoming');
     inEl.innerHTML = friendsCache.incoming.length ? friendsCache.incoming.map(f => `
       <div class="friend-row">
-        ${friendAvatarHTML(f.name || f.username, f.avatar_url)}
+        ${friendAvatarHTML(f.name || f.username)}
         <div class="fr-info">
           <div class="fr-username">@${f.username}</div>
           <div class="fr-name">${f.name || ''}</div>
@@ -3901,7 +3832,7 @@
     const outEl = document.getElementById('fpanelOutgoing');
     outEl.innerHTML = friendsCache.outgoing.length ? friendsCache.outgoing.map(f => `
       <div class="friend-row">
-        ${friendAvatarHTML(f.name || f.username, f.avatar_url)}
+        ${friendAvatarHTML(f.name || f.username)}
         <div class="fr-info">
           <div class="fr-username">@${f.username}</div>
           <div class="fr-name">Angefragt</div>
@@ -3967,7 +3898,7 @@
     if(!currentUserId) return;
     let { data, error } = await supabaseClient
       .from('public_profiles')
-      .select('id, username, name, avatar_url')
+      .select('id, username, name')
       .ilike('username', `%${q}%`)
       .not('username', 'is', null)
       .limit(8);
@@ -3992,7 +3923,7 @@
     }
     resultsEl.innerHTML = results.map(p => `
       <div class="friend-row">
-        ${friendAvatarHTML(p.name || p.username, p.avatar_url)}
+        ${friendAvatarHTML(p.name || p.username)}
         <div class="fr-info">
           <div class="fr-username">@${p.username}</div>
           <div class="fr-name">${p.name || ''}</div>
