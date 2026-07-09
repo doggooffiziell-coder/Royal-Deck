@@ -1427,7 +1427,7 @@
   }
 
   // --- Wartungsmodus: hier auf true/false schalten ---
-  const MAINTENANCE_MODE = false;
+  const MAINTENANCE_MODE = true;
 
   async function loadProfile(){
     const { data: { user } } = await supabaseClient.auth.getUser();
