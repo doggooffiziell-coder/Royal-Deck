@@ -2531,9 +2531,12 @@
   }
 
   async function setMaintenanceMode(value){
+    // Wartungsmodus und Coming-Soon-Modus schließen sich gegenseitig aus:
+    // beim Aktivieren des einen wird der andere automatisch deaktiviert.
+    const payload = value ? { maintenance_mode: true, coming_soon_mode: false } : { maintenance_mode: false };
     const { error } = await supabaseClient
       .from('app_settings')
-      .update({ maintenance_mode: value })
+      .update(payload)
       .eq('id', 1);
     return error;
   }
@@ -2602,9 +2605,12 @@
   }
 
   async function setComingSoonMode(value){
+    // Wartungsmodus und Coming-Soon-Modus schließen sich gegenseitig aus:
+    // beim Aktivieren des einen wird der andere automatisch deaktiviert.
+    const payload = value ? { coming_soon_mode: true, maintenance_mode: false } : { coming_soon_mode: false };
     const { error } = await supabaseClient
       .from('app_settings')
-      .update({ coming_soon_mode: value })
+      .update(payload)
       .eq('id', 1);
     return error;
   }
@@ -2913,6 +2919,13 @@
     maintenanceMode = newValue;
     hint.textContent = newValue ? 'Wartungsmodus wurde aktiviert.' : 'Wartungsmodus wurde deaktiviert.';
     showToast(newValue ? 'Wartungsmodus aktiviert.' : 'Wartungsmodus deaktiviert.');
+
+    // Coming-Soon-Modus wurde ggf. serverseitig automatisch deaktiviert — UI nachziehen.
+    if(newValue && comingSoonMode){
+      comingSoonMode = false;
+      comingSoonToggle.checked = false;
+      document.getElementById('comingSoonToggleHint').textContent = 'Automatisch deaktiviert (nicht gleichzeitig mit Wartungsmodus möglich).';
+    }
   });
 
   // --- Admin: Coming-Soon-Modus-Umschalter ---
@@ -2932,6 +2945,13 @@
     comingSoonMode = newValue;
     hint.textContent = newValue ? 'Coming-Soon-Modus wurde aktiviert.' : 'Coming-Soon-Modus wurde deaktiviert.';
     showToast(newValue ? 'Coming-Soon-Modus aktiviert.' : 'Coming-Soon-Modus deaktiviert.');
+
+    // Wartungsmodus wurde ggf. serverseitig automatisch deaktiviert — UI nachziehen.
+    if(newValue && maintenanceMode){
+      maintenanceMode = false;
+      maintenanceToggle.checked = false;
+      document.getElementById('maintenanceToggleHint').textContent = 'Automatisch deaktiviert (nicht gleichzeitig mit Coming-Soon-Modus möglich).';
+    }
   });
 
   // --- Admin: Wartungs-Whitelist verwalten ---
