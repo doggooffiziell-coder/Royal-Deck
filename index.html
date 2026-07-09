@@ -2940,6 +2940,13 @@
 
     screen.style.position = 'fixed';
     screen.style.display = 'flex';
+
+    const content = screen.querySelector('.maint-content');
+    if(content){
+      content.classList.remove('soon-page-in');
+      void content.offsetWidth;
+      content.classList.add('soon-page-in');
+    }
   }
 
   function hideMaintenancePreview(){
@@ -3004,6 +3011,15 @@
 
     screen.style.position = 'fixed';
     screen.style.display = 'flex';
+
+    // Auch in der Admin-Vorschau soll die kurze Öffnungs-Animation laufen — hier bei
+    // jedem Klick auf "Vorschau ansehen" erneut, damit man sie sich gezielt anschauen kann.
+    const content = screen.querySelector('.soon-content');
+    if(content){
+      content.classList.remove('soon-page-in');
+      void content.offsetWidth;
+      content.classList.add('soon-page-in');
+    }
   }
 
   function hideComingSoonPreview(){
@@ -3081,6 +3097,7 @@
   // nicht bei jedem erneuten loadProfile() (z.B. durch Realtime-Updates) und nicht beim Zurück-Tabben.
   let comingSoonScreenShown = false;
   let maintenanceScreenShown = false;
+  let mainAppShown = false;
 
   async function loadProfile(){
     const { data: { user } } = await supabaseClient.auth.getUser();
@@ -3140,6 +3157,19 @@
     document.querySelector('.sidebar').style.display = '';
     document.querySelector('.main').style.display = '';
     document.getElementById('bootGate').style.display = 'none';
+
+    // Gleiche kurze Öffnungs-Animation wie bei Wartungs-/Coming-Soon-Screen, hier fürs
+    // Hauptmenü — läuft nur einmal beim tatsächlichen Laden der Seite, nicht bei jedem
+    // erneuten loadProfile() (z.B. nach Profil-Änderungen, Freundschaftsanfragen etc.).
+    if(!mainAppShown){
+      mainAppShown = true;
+      [document.querySelector('.sidebar'), document.querySelector('.main')].forEach(el => {
+        if(!el) return;
+        el.classList.remove('soon-page-in');
+        void el.offsetWidth;
+        el.classList.add('soon-page-in');
+      });
+    }
 
     if(!user){
       currentUserId = null; currentUserEmail = null; isAdmin = false;
