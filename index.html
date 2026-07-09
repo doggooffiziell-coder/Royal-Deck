@@ -1008,6 +1008,7 @@
   }
   .soon-desc{color:var(--muted);font-size:13.5px;line-height:1.65;margin-bottom:24px;}
   .soon-desc strong{color:var(--text);font-weight:600;}
+  .soon-desc-note{font-size:12px;color:var(--faint);margin-top:-14px;}
   .soon-divider{
     width:64px;height:1px;margin-bottom:26px;
     background:linear-gradient(90deg,transparent,var(--accent-dim),transparent);
@@ -1421,6 +1422,7 @@
     <h1 class="soon-title">Royal Deck</h1>
     <div class="soon-subtitle">launcht bald<span class="soon-dots">…</span></div>
     <p class="soon-desc">Wir legen letzte Hand an die Tische, bevor der Saal öffnet.<br>Schau bald wieder vorbei — <strong>es lohnt sich</strong>.</p>
+    <p class="soon-desc soon-desc-note">Eine vorab Registrierung ist bereits möglich, gewährt jedoch derzeit noch keinerlei Zugriff auf die Seite.</p>
     <div class="soon-divider"></div>
 
     <div class="maint-login-row" id="soonAuthRow">
@@ -2981,16 +2983,17 @@
   });
 
   // --- Login/Logout direkt vom Coming-Soon-Bildschirm aus ---
-  function renderComingSoonAuthRow(email){
+  function renderComingSoonAuthRow(email, displayName){
     const row = document.getElementById('soonAuthRow');
     const statusLine = document.getElementById('soonStatusLine');
     if(email){
-      row.innerHTML = `<button type="button" class="maint-logout-link" id="soonLogoutBtn">Abmelden (${email})</button>`;
+      const label = displayName || email;
+      row.innerHTML = `<button type="button" class="maint-logout-link" id="soonLogoutBtn">Abmelden (${label})</button>`;
       document.getElementById('soonLogoutBtn').addEventListener('click', async () => {
         await logout();
         await loadProfile();
       });
-      statusLine.textContent = 'Dieses Konto hat aktuell keine Whitelist-Berechtigung.';
+      statusLine.textContent = `Angemeldet als ${label} — dieses Konto hat aktuell keine Whitelist-Berechtigung.`;
     } else {
       row.innerHTML = `<button type="button" class="maint-login-btn" id="soonLoginBtn">Anmelden</button>`;
       document.getElementById('soonLoginBtn').addEventListener('click', () => openModal('login'));
@@ -3043,7 +3046,12 @@
       document.getElementById('comingSoonScreen').style.display = 'flex';
       document.querySelector('.sidebar').style.display = 'none';
       document.querySelector('.main').style.display = 'none';
-      renderComingSoonAuthRow(user?.email || null);
+      let soonDisplayName = null;
+      if(user){
+        const { data: soonProfile } = await supabaseClient.from('profiles').select('name').eq('id', user.id).single();
+        soonDisplayName = soonProfile?.name || null;
+      }
+      renderComingSoonAuthRow(user?.email || null, soonDisplayName);
       document.getElementById('bootGate').style.display = 'none';
       return;
     }
