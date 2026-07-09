@@ -1764,6 +1764,22 @@
 
             <div class="lux-card wide">
               <div class="card-title">
+                <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5zm-7 19c0-3.9 3.1-7 7-7s7 3.1 7 7z"/></svg>
+                Whitelist für Coming Soon
+              </div>
+              <p class="card-note">
+                Konten mit diesen E-Mail-Adressen können sich während des Coming-Soon-Modus trotzdem anmelden und die Seite nutzen.
+              </p>
+              <div class="wl-add-row">
+                <input id="wlEmailInputSoon" type="email" placeholder="z. B. name@mail.com">
+                <button type="button" id="wlAddBtnSoon">Hinzufügen</button>
+              </div>
+              <div class="hint" id="wlHintSoon"></div>
+              <div class="wl-list" id="wlListSoon"></div>
+            </div>
+
+            <div class="lux-card wide">
+              <div class="card-title">
                 <svg viewBox="0 0 24 24"><path d="M19.4 13a7.9 7.9 0 000-2l2.1-1.6-2-3.4-2.5 1a8 8 0 00-1.7-1L14.9 3H9.1l-.4 2.9a8 8 0 00-1.7 1l-2.5-1-2 3.4L4.6 11a7.9 7.9 0 000 2l-2.1 1.6 2 3.4 2.5-1a8 8 0 001.7 1l.4 2.9h5.8l.4-2.9a8 8 0 001.7-1l2.5 1 2-3.4z"/></svg>
                 Admin-Zugriff verwalten
               </div>
@@ -1982,6 +1998,18 @@
     }, () => {
       loadProfile();
       if(isAdmin) loadWhitelist();
+    })
+    .subscribe();
+
+  supabaseClient
+    .channel('coming_soon_whitelist_changes')
+    .on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'coming_soon_whitelist'
+    }, () => {
+      loadProfile();
+      if(isAdmin) loadComingSoonWhitelist();
     })
     .subscribe();
 
@@ -2609,6 +2637,14 @@
     return !!data;
   }
 
+  // Analog zur Wartungs-Whitelist, aber für den Coming-Soon-Modus.
+  async function isComingSoonWhitelistedEmail(email){
+    if(!email) return false;
+    const { data, error } = await supabaseClient.rpc('is_coming_soon_whitelisted', { check_email: email });
+    if(error){ console.error(error); return false; }
+    return !!data;
+  }
+
   // --- Wartungsbildschirm-Vorschau (nur visuell, ändert nichts am echten Wartungsstatus) ---
   function showMaintenancePreview(){
     const screen = document.getElementById('maintenanceScreen');
@@ -2722,7 +2758,7 @@
         await logout();
         await loadProfile();
       });
-      statusLine.textContent = 'Dieses Konto hat keinen Admin-Zugriff.';
+      statusLine.textContent = 'Dieses Konto hat aktuell keine Whitelist-Berechtigung.';
     } else {
       row.innerHTML = `<button type="button" class="maint-login-btn" id="soonLoginBtn">Anmelden</button>`;
       document.getElementById('soonLoginBtn').addEventListener('click', () => openModal('login'));
@@ -2767,7 +2803,8 @@
       return;
     }
 
-    if(comingSoonMode && !admin){
+    const comingSoonWhitelisted = admin ? true : await isComingSoonWhitelistedEmail(user?.email);
+    if(comingSoonMode && !comingSoonWhitelisted){
       document.getElementById('maintenanceScreen').style.display = 'none';
       document.getElementById('comingSoonScreen').style.display = 'flex';
       document.querySelector('.sidebar').style.display = 'none';
@@ -3108,6 +3145,87 @@
     await loadWhitelist();
   });
 
+  // --- Admin: Coming-Soon-Whitelist verwalten (analog zur Wartungs-Whitelist) ---
+  async function loadComingSoonWhitelist(){
+    const list = document.getElementById('wlListSoon');
+    if(!isAdmin){ list.innerHTML = ''; return; }
+    const { data, error } = await supabaseClient
+      .from('coming_soon_whitelist')
+      .select('id, email, active')
+      .order('created_at', { ascending: true });
+    if(error){
+      list.innerHTML = `<div class="wl-empty">Fehler beim Laden: ${error.message}</div>`;
+      return;
+    }
+    if(!data || data.length === 0){
+      list.innerHTML = `<div class="wl-empty">Noch keine E-Mails auf der Whitelist.</div>`;
+      return;
+    }
+    list.innerHTML = data.map(row => `
+      <div class="wl-item ${row.active === false ? 'inactive' : ''}" data-id="${row.id}">
+        <span class="wl-email">${row.email}</span>
+        <div class="wl-actions">
+          <label class="switch sm" title="${row.active === false ? 'Zugriff sperren' : 'Zugriff erlauben'}">
+            <input type="checkbox" class="wl-active-toggle" ${row.active === false ? '' : 'checked'}>
+            <span class="slider"></span>
+          </label>
+          <div class="wl-remove" title="Komplett entfernen">
+            <svg viewBox="0 0 24 24"><path d="M18.3 5.7L12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7 2.9 18.3 9.2 12 2.9 5.7 4.3 4.3l6.3 6.3 6.3-6.3z"/></svg>
+          </div>
+        </div>
+      </div>`).join('');
+    list.querySelectorAll('.wl-active-toggle').forEach(toggle => {
+      toggle.addEventListener('change', async () => {
+        const item = toggle.closest('.wl-item');
+        const id = item.dataset.id;
+        const newActive = toggle.checked;
+        toggle.disabled = true;
+        const { error: toggleError } = await supabaseClient
+          .from('coming_soon_whitelist')
+          .update({ active: newActive })
+          .eq('id', id);
+        toggle.disabled = false;
+        if(toggleError){ showToast(toggleError.message); toggle.checked = !newActive; return; }
+        item.classList.toggle('inactive', !newActive);
+        showToast(newActive ? 'Zugriff wieder erlaubt.' : 'Zugriff gesperrt.');
+      });
+    });
+    list.querySelectorAll('.wl-remove').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const item = btn.closest('.wl-item');
+        const id = item.dataset.id;
+        const { error: delError } = await supabaseClient.from('coming_soon_whitelist').delete().eq('id', id);
+        if(delError){ showToast(delError.message); return; }
+        showToast('E-Mail entfernt.');
+        await loadComingSoonWhitelist();
+      });
+    });
+  }
+
+  document.getElementById('wlAddBtnSoon').addEventListener('click', async () => {
+    const input = document.getElementById('wlEmailInputSoon');
+    const hint = document.getElementById('wlHintSoon');
+    const btn = document.getElementById('wlAddBtnSoon');
+    const email = input.value.trim();
+    hint.textContent = '';
+    if(!email){
+      hint.textContent = 'Bitte eine E-Mail-Adresse eingeben.';
+      return;
+    }
+    btn.disabled = true;
+    btn.textContent = 'Füge hinzu...';
+    const { error } = await supabaseClient.from('coming_soon_whitelist').insert({ email: email.toLowerCase() });
+    btn.disabled = false;
+    btn.textContent = 'Hinzufügen';
+    if(error){
+      hint.textContent = error.message.includes('duplicate') ? 'Diese E-Mail ist bereits auf der Whitelist.' : error.message;
+      return;
+    }
+    input.value = '';
+    hint.textContent = 'E-Mail hinzugefügt.';
+    await loadComingSoonWhitelist();
+  });
+
   // --- Admin: Admin-Zugriff verwalten (per Benutzername oder E-Mail) ---
   async function loadAdminList(){
     const list = document.getElementById('adminList');
@@ -3210,6 +3328,7 @@
       comingSoonToggle.checked = comingSoonMode;
       document.getElementById('comingSoonToggleHint').textContent = '';
       loadWhitelist();
+      loadComingSoonWhitelist();
       loadAdminList();
     }
 
