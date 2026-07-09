@@ -538,6 +538,22 @@
   .divider-label:before,.divider-label:after{content:"";flex:1;height:1px;background:var(--border);}
 
   .lux-card .card-note{color:var(--muted);font-size:12px;line-height:1.6;margin-bottom:14px;}
+
+  .avatar-picker{display:flex;align-items:center;gap:20px;}
+  .avatar-picker-preview{
+    width:64px;height:64px;border-radius:50%;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--text);font-weight:600;font-size:22px;font-family:var(--font-display);font-style:italic;
+    background-size:cover;background-position:center;
+    border:1px solid var(--accent-dim);box-shadow:0 0 0 3px rgba(212,175,106,.14);
+  }
+  .avatar-picker-actions{display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-width:0;}
+  .avatar-picker-actions .submit.ghost{width:auto;height:40px;padding:0 18px;margin:0;}
+  .avatar-picker-remove{
+    background:none;border:none;padding:0;color:var(--muted);font-size:12px;font-weight:600;
+    cursor:pointer;font-family:var(--font-body);transition:.15s;
+  }
+  .avatar-picker-remove:hover{color:var(--danger);}
   .lux-card button.submit{margin-top:14px;}
   .lux-card button.submit.ghost{
     background:var(--surface-2);color:var(--text);
@@ -1271,6 +1287,26 @@
           <!-- Profil pane -->
           <div class="settings-pane active" id="pane-profile">
             <div class="pane-heading">Profil</div>
+
+            <div class="lux-card wide">
+              <div class="card-title">
+                <svg viewBox="0 0 24 24"><path d="M12 9a3.5 3.5 0 100 7 3.5 3.5 0 000-7zM9 3L7.5 5H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.5L15 3z"/></svg>
+                Profilbild anpassen
+              </div>
+              <p class="card-note">Lade ein eigenes Foto hoch oder bleib bei einer Avatarfarbe weiter unten.</p>
+              <div class="avatar-picker">
+                <div class="avatar-picker-preview" id="avatarPickerPreview">H</div>
+                <div class="avatar-picker-actions">
+                  <button type="button" class="submit ghost" id="avatarPickerBtn">
+                    <svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:currentColor;vertical-align:-3px;margin-right:6px;"><path d="M12 9a3.5 3.5 0 100 7 3.5 3.5 0 000-7zM9 3L7.5 5H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.5L15 3z"/></svg>
+                    Bild auswählen
+                  </button>
+                  <button type="button" class="avatar-picker-remove" id="avatarPickerRemoveBtn">Profilbild entfernen</button>
+                  <div class="field-hint" style="margin-top:2px;">JPG oder PNG, wird automatisch zugeschnitten.</div>
+                </div>
+              </div>
+            </div>
+
             <div class="lux-card">
               <div class="card-title">
                 <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5z"/></svg>
@@ -1646,8 +1682,8 @@
   function applyAvatarToEl(el, initial, colorOrImage){
     if(!el) return;
     if(colorOrImage && colorOrImage.startsWith('data:')){
+      el.style.background = 'none';
       el.style.backgroundImage = `url(${colorOrImage})`;
-      el.style.background = '';
       el.textContent = '';
     } else {
       el.style.backgroundImage = '';
@@ -2413,7 +2449,13 @@
   const panes = document.querySelectorAll('.settings-pane');
   const colorSwatches = document.getElementById('colorSwatches');
   const bigAvatar = document.getElementById('bigAvatar');
+  const avatarPickerPreview = document.getElementById('avatarPickerPreview');
   let selectedColor = AVATAR_COLORS[0];
+
+  function updateAvatarPreviews(initial, colorOrImage){
+    applyAvatarToEl(bigAvatar, initial, colorOrImage);
+    applyAvatarToEl(avatarPickerPreview, initial, colorOrImage);
+  }
 
   AVATAR_COLORS.forEach((grad, i) => {
     const sw = document.createElement('div');
@@ -2426,7 +2468,7 @@
       avatarDataUrl = null;
       if(currentUserId) saveAvatarForUser(currentUserId, null);
       const initial = currentProfile ? currentProfile.name.charAt(0).toUpperCase() : 'H';
-      applyAvatarToEl(bigAvatar, initial, grad);
+      updateAvatarPreviews(initial, grad);
       renderAuthArea(currentProfile, currentUserEmail);
       await syncAvatarToProfile(null);
     });
@@ -2672,7 +2714,7 @@
       document.getElementById('settingsHandle').textContent = currentProfile.username ? '@' + currentProfile.username : 'Kein Benutzername';
       renderUsernameChangeCard();
       const initial = currentProfile.name.charAt(0).toUpperCase();
-      applyAvatarToEl(bigAvatar, initial, avatarDataUrl || selectedColor);
+      updateAvatarPreviews(initial, avatarDataUrl || selectedColor);
     }
     document.getElementById('settingsEmail').textContent = email || '—';
     settingsOverlay.classList.add('open');
@@ -2682,6 +2724,18 @@
   // --- Profilbild hochladen (wird lokal komprimiert und im Browser gespeichert) ---
   document.getElementById('avatarUploadTrigger').addEventListener('click', () => {
     document.getElementById('avatarFileInput').click();
+  });
+  document.getElementById('avatarPickerBtn').addEventListener('click', () => {
+    document.getElementById('avatarFileInput').click();
+  });
+  document.getElementById('avatarPickerRemoveBtn').addEventListener('click', async () => {
+    avatarDataUrl = null;
+    if(currentUserId) saveAvatarForUser(currentUserId, null);
+    const initial = currentProfile ? currentProfile.name.charAt(0).toUpperCase() : 'H';
+    updateAvatarPreviews(initial, selectedColor);
+    renderAuthArea(currentProfile, currentUserEmail);
+    showToast('Profilbild entfernt.');
+    await syncAvatarToProfile(null);
   });
   document.getElementById('avatarFileInput').addEventListener('change', e => {
     const input = e.target;
@@ -2715,7 +2769,7 @@
           const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
           avatarDataUrl = dataUrl;
           if(currentUserId) saveAvatarForUser(currentUserId, dataUrl);
-          applyAvatarToEl(bigAvatar, '', dataUrl);
+          updateAvatarPreviews('', dataUrl);
           renderAuthArea(currentProfile, currentUserEmail);
           showToast('Profilbild aktualisiert.');
           syncAvatarToProfile(dataUrl);
