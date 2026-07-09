@@ -724,7 +724,7 @@
     display:flex;align-items:center;justify-content:space-between;gap:10px;
     background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:8px 10px 8px 13px;
   }
-  .wl-item .wl-email{font-size:12.5px;color:var(--text);font-family:var(--font-mono);
+  .wl-item .wl-email{font-size:13px;color:var(--text);font-family:var(--font-body);font-weight:500;
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .wl-item .wl-remove{
     flex-shrink:0;width:24px;height:24px;border-radius:6px;background:transparent;border:1px solid var(--border);
@@ -1228,10 +1228,10 @@
   const SUPABASE_ANON_KEY = 'sb_publishable_0ZvwrcL4AuFobJGdyARmhA_KfchINLa';
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // Live-Update: reagiert sofort, wenn sich maintenance_mode in der DB ändert
+  // Live-Update: reagiert sofort, wenn sich maintenance_mode oder die Whitelist in der DB ändert
   // (kein Reload nötig, gilt für alle verbundenen Clients).
-  // Wichtig: Realtime muss in Supabase für die Tabelle "app_settings" aktiviert sein
-  // (Dashboard -> Database -> Replication -> app_settings einschalten).
+  // Wichtig: Realtime muss in Supabase für "app_settings" UND "maintenance_whitelist" aktiviert sein
+  // (Dashboard -> Database -> Publications -> supabase_realtime -> beide Tabellen einschalten).
   supabaseClient
     .channel('app_settings_changes')
     .on('postgres_changes', {
@@ -1241,6 +1241,18 @@
       filter: 'id=eq.1'
     }, () => {
       loadProfile();
+    })
+    .subscribe();
+
+  supabaseClient
+    .channel('maintenance_whitelist_changes')
+    .on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'maintenance_whitelist'
+    }, () => {
+      loadProfile();
+      if(isAdmin) loadWhitelist();
     })
     .subscribe();
 
