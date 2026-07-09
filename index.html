@@ -1880,12 +1880,24 @@
           <div class="settings-pane active" id="pane-profile">
             <div class="pane-heading">Profil</div>
 
-            <div class="lux-card wide">
-              <div class="card-title">
-                <svg viewBox="0 0 24 24"><path d="M12 9a3.5 3.5 0 100 7 3.5 3.5 0 000-7zM9 3L7.5 5H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.5L15 3z"/></svg>
-                Profilbild anpassen
+            <div class="adm-console" id="profileConsole" style="grid-column:1/-1;">
+              <div class="adm-console-grid"></div>
+              <div class="adm-console-dot"></div>
+              <div class="adm-console-text">
+                <div class="adm-console-eyebrow">Konto-Übersicht</div>
+                <div class="adm-console-label" id="profConsoleLabel">Level 1 · 0 Punkte</div>
+                <div class="adm-console-desc" id="profConsoleDesc">Standard-Konto</div>
               </div>
-              <p class="card-note">Wähl dein Symbol – die Farbe stellst du unten bei Avatarfarbe ein.</p>
+            </div>
+
+            <div class="adm-card wide" style="grid-column:1/-1;">
+              <div class="adm-card-head">
+                <div class="adm-card-icon">
+                  <svg viewBox="0 0 24 24"><path d="M12 9a3.5 3.5 0 100 7 3.5 3.5 0 000-7zM9 3L7.5 5H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.5L15 3z"/></svg>
+                </div>
+                <div class="adm-card-title">Profilbild anpassen</div>
+              </div>
+              <p class="adm-card-note">Wähl dein Symbol – die Farbe stellst du unten bei Avatarfarbe ein.</p>
               <div class="avatar-picker">
                 <div class="avatar-picker-preview" id="avatarPickerPreview">H</div>
                 <div class="avatar-picker-actions" style="flex:1;gap:10px;">
@@ -1898,66 +1910,91 @@
               </div>
             </div>
 
-            <div class="lux-card">
-              <div class="card-title">
-                <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5z"/></svg>
-                Anzeigename
-              </div>
-              <p class="card-note">Wie du am Tisch für andere sichtbar bist.</p>
-              <form id="profileNameForm">
-                <input id="profileName" placeholder="Dein Anzeigename" maxlength="12">
-                <div class="error" id="profileError"></div>
-                <div class="hint" id="profileHint"></div>
-                <button type="submit" class="submit" id="profileSubmitBtn">Änderungen speichern</button>
-              </form>
-            </div>
-
-            <div class="lux-card">
-              <div class="card-title">
-                <svg viewBox="0 0 24 24"><path d="M16 11c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3 1.3 3 3 3zm-8 0c1.7 0 3-1.3 3-3S9.7 5 8 5 5 6.3 5 8s1.3 3 3 3z"/></svg>
-                Benutzername
-              </div>
-              <p class="card-note">Dein einzigartiger Benutzername – so finden dich andere in der Freunde-Suche, nicht über deinen Anzeigenamen.</p>
-              <form id="usernameChangeForm">
-                <div class="u-wrap">
-                  <span class="u-prefix">@</span>
-                  <input id="usernameChangeInput" placeholder="neuer Benutzername" autocomplete="off" maxlength="20" style="padding-left:26px;">
+            <div class="adm-grid-2" style="grid-column:1/-1;">
+              <div class="adm-card">
+                <div class="adm-card-head">
+                  <div class="adm-card-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5z"/></svg>
+                  </div>
+                  <div class="adm-card-title">Anzeigename</div>
                 </div>
-                <div class="error" id="usernameChangeError"></div>
-                <div class="hint" id="usernameChangeHint"></div>
-                <button type="submit" class="submit" id="usernameChangeBtn">Benutzername ändern</button>
-              </form>
+                <p class="adm-card-note">Wie du am Tisch für andere sichtbar bist.</p>
+                <form id="profileNameForm">
+                  <input id="profileName" placeholder="Dein Anzeigename" maxlength="12">
+                  <div class="error" id="profileError"></div>
+                  <div class="hint" id="profileHint"></div>
+                  <button type="submit" class="submit" id="profileSubmitBtn">Änderungen speichern</button>
+                </form>
+              </div>
+
+              <div class="adm-card">
+                <div class="adm-card-head">
+                  <div class="adm-card-icon">
+                    <svg viewBox="0 0 24 24"><path d="M16 11c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3 1.3 3 3 3zm-8 0c1.7 0 3-1.3 3-3S9.7 5 8 5 5 6.3 5 8s1.3 3 3 3z"/></svg>
+                  </div>
+                  <div class="adm-card-title">Benutzername</div>
+                </div>
+                <p class="adm-card-note">Dein einzigartiger Benutzername – so finden dich andere in der Freunde-Suche.</p>
+                <form id="usernameChangeForm">
+                  <div class="u-wrap">
+                    <span class="u-prefix">@</span>
+                    <input id="usernameChangeInput" placeholder="neuer Benutzername" autocomplete="off" maxlength="20" style="padding-left:26px;">
+                  </div>
+                  <div class="error" id="usernameChangeError"></div>
+                  <div class="hint" id="usernameChangeHint"></div>
+                  <button type="submit" class="submit" id="usernameChangeBtn">Benutzername ändern</button>
+                </form>
+              </div>
             </div>
 
-            <div class="lux-card">
-              <div class="card-title">
-                <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/></svg>
-                Avatarfarbe
+            <div class="adm-grid-2" style="grid-column:1/-1;">
+              <div class="adm-card" data-accent="muted">
+                <div class="adm-card-head">
+                  <div class="adm-card-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/></svg>
+                  </div>
+                  <div class="adm-card-title">Avatarfarbe</div>
+                </div>
+                <p class="adm-card-note">Wird verwendet, solange kein eigenes Profilbild hinterlegt ist.</p>
+                <div class="swatches" id="colorSwatches"></div>
               </div>
-              <p class="card-note">Wird verwendet, solange kein eigenes Profilbild hinterlegt ist.</p>
-              <div class="swatches" id="colorSwatches"></div>
-            </div>
 
-            <div class="lux-card">
-              <div class="card-title">
-                <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5zm-7 19c0-3.9 3.1-7 7-7s7 3.1 7 7z"/></svg>
-                Geschlecht
+              <div class="adm-card" data-accent="muted">
+                <div class="adm-card-head">
+                  <div class="adm-card-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5zm-7 19c0-3.9 3.1-7 7-7s7 3.1 7 7z"/></svg>
+                  </div>
+                  <div class="adm-card-title">Geschlecht</div>
+                </div>
+                <div class="gender-select" id="settingsGenderSelect">
+                  <div class="gender-opt" data-gender="m">Männlich</div>
+                  <div class="gender-opt" data-gender="w">Weiblich</div>
+                </div>
+                <div class="hint" id="genderHint"></div>
               </div>
-              <div class="gender-select" id="settingsGenderSelect">
-                <div class="gender-opt" data-gender="m">Männlich</div>
-                <div class="gender-opt" data-gender="w">Weiblich</div>
-              </div>
-              <div class="hint" id="genderHint"></div>
             </div>
           </div>
 
           <!-- Sicherheit pane -->
           <div class="settings-pane" id="pane-security">
             <div class="pane-heading">Sicherheit</div>
-            <div class="lux-card">
-              <div class="card-title">
-                <svg viewBox="0 0 24 24"><path d="M12 2l7 3v6c0 5-3.4 8.7-7 10-3.6-1.3-7-5-7-10V5z"/></svg>
-                Passwort ändern
+
+            <div class="adm-console" id="securityConsole" style="grid-column:1/-1;">
+              <div class="adm-console-grid"></div>
+              <div class="adm-console-dot"></div>
+              <div class="adm-console-text">
+                <div class="adm-console-eyebrow">Sicherheits-Center</div>
+                <div class="adm-console-label">Konto geschützt</div>
+                <div class="adm-console-desc">Passwort-Login aktiv – verwalte hier deinen Zugriff.</div>
+              </div>
+            </div>
+
+            <div class="adm-card wide" style="grid-column:1/-1;">
+              <div class="adm-card-head">
+                <div class="adm-card-icon">
+                  <svg viewBox="0 0 24 24"><path d="M12 2l7 3v6c0 5-3.4 8.7-7 10-3.6-1.3-7-5-7-10V5z"/></svg>
+                </div>
+                <div class="adm-card-title">Passwort ändern</div>
               </div>
               <form id="pwForm">
                 <label>Neues Passwort</label>
@@ -1970,12 +2007,14 @@
               </form>
             </div>
 
-            <div class="lux-card">
-              <div class="card-title">
-                <svg viewBox="0 0 24 24"><path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-9h-1V6a5 5 0 00-10 0v2H6a2 2 0 00-2 2v9a2 2 0 002 2h12a2 2 0 002-2v-9a2 2 0 00-2-2zM9 6a3 3 0 016 0v2H9z"/></svg>
-                Zugriff verloren?
+            <div class="adm-card wide" data-accent="muted" style="grid-column:1/-1;">
+              <div class="adm-card-head">
+                <div class="adm-card-icon">
+                  <svg viewBox="0 0 24 24"><path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-9h-1V6a5 5 0 00-10 0v2H6a2 2 0 00-2 2v9a2 2 0 002 2h12a2 2 0 002-2v-9a2 2 0 00-2-2zM9 6a3 3 0 016 0v2H9z"/></svg>
+                </div>
+                <div class="adm-card-title">Zugriff verloren?</div>
               </div>
-              <p class="card-note">
+              <p class="adm-card-note">
                 Wir senden dir einen Link an deine hinterlegte E-Mail, mit dem du dein Passwort
                 zurücksetzen kannst, ohne das aktuelle zu kennen.
               </p>
@@ -3775,6 +3814,17 @@
     wrap.innerHTML = html;
   }
 
+  // Befüllt die "Konto-Übersicht"-Konsole oben im Profil-Tab mit Level, Punkten & Konto-Typ.
+  function updateProfileConsole(){
+    const label = document.getElementById('profConsoleLabel');
+    const desc = document.getElementById('profConsoleDesc');
+    if(!label || !desc || !currentProfile) return;
+    const chips = currentProfile.chips || 0;
+    const level = Math.max(1, Math.floor(chips / 100));
+    label.textContent = `Level ${level} · ${chips.toLocaleString('de-DE')} Punkte`;
+    desc.textContent = isAdmin ? 'Admin-Konto — voller Zugriff' : 'Standard-Konto';
+  }
+
   document.querySelectorAll('#settingsGenderSelect .gender-opt').forEach(opt => {
     opt.addEventListener('click', async () => {
       if(!currentUserId) return;
@@ -4128,6 +4178,7 @@
     document.getElementById('pwForm').reset();
 
     renderRailBadges();
+    updateProfileConsole();
 
     // Admin-Tab nur für Admin-Konten im Sicherheits-/Navigationsbereich einblenden
     const adminTab = document.querySelector('.stab[data-spane="admin"]');
