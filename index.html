@@ -2001,7 +2001,7 @@
           Willkommen zurück
         </div>
 
-        <h1 id="heroGreeting">Hallo, Gast!</h1>
+        <h1 id="heroGreeting"></h1>
         <p>Entdecke neue Erlebnisse und spiel mit deinen Freunden am Tisch.</p>
         <button id="heroCta">Jetzt entdecken</button>
       </div>
@@ -3249,7 +3249,7 @@
     heroGreeting.textContent = '';
     heroGreeting.classList.add('hero-greeting-typing');
     let i = 0;
-    const speed = 32;
+    const speed = 95;
     (function step(){
       heroGreeting.textContent = text.slice(0, i);
       if(i <= text.length){
