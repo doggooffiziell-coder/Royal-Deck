@@ -4014,9 +4014,19 @@
     const overlay = document.getElementById('updateOverlay');
     if(!overlay || overlay.classList.contains('show')) return;
     overlay.classList.add('show');
-    // Feste Anzeigedauer von 10–12 Sekunden, danach automatisch neu laden.
-    const delay = 10000 + Math.random() * 2000;
-    setTimeout(() => { window.location.reload(); }, delay);
+    console.log('[deploy-watcher] Update-Screen angezeigt um', new Date().toISOString());
+    const shownAt = Date.now();
+    const MIN_SHOW_MS = 11000; // exakt 11 Sekunden Mindestanzeige
+    // Statt blind auf ein einzelnes setTimeout zu vertrauen (das durch Tab-Drosselung
+    // im Hintergrund verzögert, aber nie zu früh feuert), wird hier per Intervall
+    // die tatsächlich vergangene Zeit geprüft — sicherer bei Hintergrund-Tabs etc.
+    const checkTimer = setInterval(() => {
+      if(Date.now() - shownAt >= MIN_SHOW_MS){
+        clearInterval(checkTimer);
+        console.log('[deploy-watcher] Reload nach', Date.now() - shownAt, 'ms');
+        window.location.reload();
+      }
+    }, 250);
   }
 
   async function checkForDeploy(){
