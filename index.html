@@ -358,11 +358,11 @@
   .user-chip .uname{font-size:13px;font-weight:600;color:var(--text);}
   .dropdown{
     position:absolute;top:48px;right:0;background:var(--surface);border:1px solid var(--border);border-radius:10px;
-    box-shadow:0 12px 30px rgba(0,0,0,.45);min-width:170px;display:none;overflow:hidden;z-index:50;
+    box-shadow:0 12px 30px rgba(0,0,0,.45);min-width:230px;display:none;overflow:hidden;z-index:50;
   }
   .dropdown.open{display:block;}
-  .dropdown div{padding:11px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:9px;color:var(--text);transition:.12s;}
-  .dropdown div:hover{background:var(--surface-2);color:var(--accent-hi);}
+  .dropdown .dd-menu div{padding:11px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:9px;color:var(--text);transition:.12s;}
+  .dropdown .dd-menu div:hover{background:var(--surface-2);color:var(--accent-hi);}
   .dropdown svg{width:14px;height:14px;fill:currentColor;}
 
   /* icon button dropdowns (notifications / mail) */
@@ -378,8 +378,9 @@
   .panel-item:hover{background:var(--surface-2);}
   .panel-icon{
     width:30px;height:30px;border-radius:8px;background:var(--surface-2);display:flex;align-items:center;
-    justify-content:center;font-size:14px;flex-shrink:0;
+    justify-content:center;flex-shrink:0;
   }
+  .panel-icon svg{width:14px;height:14px;fill:var(--accent-hi);}
   .panel-title{font-size:12.5px;font-weight:600;color:var(--text);}
   .panel-sub{font-size:11.5px;color:var(--muted);margin-top:2px;}
   .panel-empty{padding:20px 16px;font-size:12.5px;color:var(--muted);text-align:center;line-height:1.5;}
@@ -390,8 +391,9 @@
   }
   .dropdown .dd-head .avatar{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;
     justify-content:center;color:#f3f6fc;font-weight:600;font-size:14px;flex-shrink:0;}
-  .dropdown .dd-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px;}
-  .dropdown .dd-level{font-size:11px;color:var(--muted);margin-top:2px;font-family:var(--font-mono);}
+  .dropdown .dd-info{min-width:0;flex:1;}
+  .dropdown .dd-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .dropdown .dd-level{font-size:11px;color:var(--muted);margin-top:3px;font-family:var(--font-mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .dropdown .dd-menu{padding:6px;}
   .dropdown .dd-menu div{border-radius:7px;padding:9px 10px;}
 </style>
@@ -441,15 +443,15 @@
         <div class="dropdown panel-dropdown" id="notifDropdown">
           <div class="panel-head">Benachrichtigungen</div>
           <div class="panel-item">
-            <div class="panel-icon">🎉</div>
+            <div class="panel-icon"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg></div>
             <div><div class="panel-title">Willkommen!</div><div class="panel-sub">Dein Konto wurde erstellt.</div></div>
           </div>
           <div class="panel-item">
-            <div class="panel-icon">🃏</div>
+            <div class="panel-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-1.2 14.6L6.4 12.2l1.4-1.4 2.9 2.9 6-6 1.5 1.4z"/></svg></div>
             <div><div class="panel-title">Neu: Blackjack</div><div class="panel-sub">Jetzt am Tisch verfügbar.</div></div>
           </div>
           <div class="panel-item">
-            <div class="panel-icon">⭐</div>
+            <div class="panel-icon"><svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5zm-7 19c0-3.9 3.1-7 7-7s7 3.1 7 7z"/></svg></div>
             <div><div class="panel-title">Nächstes Level</div><div class="panel-sub">Sammle Punkte, um aufzusteigen.</div></div>
           </div>
         </div>
@@ -931,7 +933,7 @@
         <div class="dropdown" id="dropdown">
           <div class="dd-head">
             <div class="avatar">${initial}</div>
-            <div>
+            <div class="dd-info">
               <div class="dd-name">${profile.name}</div>
               <div class="dd-level">Level ${level} · ${chips.toLocaleString('de-DE')} Punkte</div>
             </div>
