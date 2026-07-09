@@ -916,7 +916,8 @@
     font-weight:600;font-size:13px;cursor:pointer;font-family:var(--font-body);transition:.15s;
   }
   .maint-login-btn:hover{background:var(--accent-hi);}
-  .maint-status-line{font-size:12px;color:var(--muted);margin-top:14px;}
+  .maint-status-line{font-size:12px;color:var(--muted);margin-top:14px;text-align:center;line-height:1.6;}
+  .maint-status-line strong{color:var(--accent-hi);font-weight:600;}
   .maint-logout-link{
     background:none;border:none;color:var(--accent-hi);font-size:12px;font-weight:600;cursor:pointer;margin-top:8px;
   }
@@ -983,6 +984,14 @@
   @keyframes soonFloat{
     0%,100%{transform:translateY(0) rotate(-1deg);}
     50%{transform:translateY(-8px) rotate(1deg);}
+  }
+
+  /* --------- personalisierte Begrüßung für eingeloggte Nutzer, über dem "Royal Deck"-Titel --------- */
+  .soon-user-greeting{display:flex;flex-direction:column;align-items:center;margin-bottom:2px;}
+  .soon-user-greeting .hero-eyebrow{justify-content:center;margin-bottom:10px;}
+  .soon-greeting-title{
+    font-family:var(--font-display);font-style:italic;font-size:24px;font-weight:600;
+    color:var(--text);letter-spacing:-.2px;margin-bottom:2px;
   }
 
   .soon-title{
@@ -1417,6 +1426,14 @@
           <circle cx="20" cy="9.2" r="1.1" fill="var(--accent-hi)"/>
         </svg>
       </div>
+    </div>
+
+    <div class="soon-user-greeting" id="soonGreetingWrap" style="display:none;">
+      <div class="hero-eyebrow">
+        <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>
+        Willkommen zurück
+      </div>
+      <h2 class="soon-greeting-title" id="soonGreetingText">Hallo!</h2>
     </div>
 
     <h1 class="soon-title">Royal Deck</h1>
@@ -2986,15 +3003,20 @@
   function renderComingSoonAuthRow(email, displayName){
     const row = document.getElementById('soonAuthRow');
     const statusLine = document.getElementById('soonStatusLine');
+    const greetingWrap = document.getElementById('soonGreetingWrap');
+    const greetingTextEl = document.getElementById('soonGreetingText');
     if(email){
       const label = displayName || email;
+      greetingTextEl.textContent = greetingText(displayName || 'Gast');
+      greetingWrap.style.display = 'flex';
       row.innerHTML = `<button type="button" class="maint-logout-link" id="soonLogoutBtn">Abmelden (${label})</button>`;
       document.getElementById('soonLogoutBtn').addEventListener('click', async () => {
         await logout();
         await loadProfile();
       });
-      statusLine.textContent = `Angemeldet als ${label} — dieses Konto hat aktuell keine Whitelist-Berechtigung.`;
+      statusLine.innerHTML = `<div>Angemeldet als <strong>${label}</strong></div><div>Dieses Konto hat aktuell keine Whitelist-Berechtigung.</div>`;
     } else {
+      greetingWrap.style.display = 'none';
       row.innerHTML = `<button type="button" class="maint-login-btn" id="soonLoginBtn">Anmelden</button>`;
       document.getElementById('soonLoginBtn').addEventListener('click', () => openModal('login'));
       statusLine.textContent = '';
