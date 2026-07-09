@@ -3677,8 +3677,12 @@
       document.getElementById('dropdown').classList.toggle('open', willOpen);
       document.getElementById('userChip').classList.toggle('active', willOpen);
     });
-    document.getElementById('logoutBtn').addEventListener('click', logout);
-    document.getElementById('openSettingsBtn').addEventListener('click', () => {
+    document.getElementById('logoutBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      logout();
+    });
+    document.getElementById('openSettingsBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
       document.getElementById('dropdown').classList.remove('open');
       document.getElementById('userChip').classList.remove('active');
       openSettings(email);
