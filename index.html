@@ -554,13 +554,19 @@
   /* icon button dropdowns (notifications / mail) */
   .icon-btn-wrap{position:relative;}
   .panel-dropdown{
-    width:280px;right:-8px;padding:6px 0;
+    width:280px;right:-8px;padding:6px 0;transition:width .18s ease;
   }
+  .panel-dropdown.expanded{width:420px;}
+  #notifBody, #mailBody{max-height:380px;overflow-y:auto;transition:max-height .18s ease;}
+  .panel-dropdown.expanded #notifBody{max-height:600px;}
+  #notifBody::-webkit-scrollbar, #mailBody::-webkit-scrollbar{width:8px;}
+  #notifBody::-webkit-scrollbar-thumb, #mailBody::-webkit-scrollbar-thumb{background:var(--border);border-radius:6px;}
   .panel-head{
     padding:12px 16px 10px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
     color:var(--faint);border-bottom:1px solid var(--border);margin-bottom:4px;
-    display:flex;align-items:center;justify-content:space-between;
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
   }
+  .panel-head-btns{display:flex;align-items:center;gap:6px;flex-shrink:0;}
   .panel-head-admin-btn{
     width:22px;height:22px;border-radius:6px;background:var(--surface-2);border:1px solid var(--border);
     color:var(--accent-hi);display:flex;align-items:center;justify-content:center;cursor:pointer;
@@ -568,6 +574,13 @@
   }
   .panel-head-admin-btn:hover{border-color:var(--accent-dim);background:var(--accent-soft);}
   .panel-head-admin-btn svg{width:12px;height:12px;fill:currentColor;}
+  .panel-head-expand-btn{
+    width:22px;height:22px;border-radius:6px;background:var(--surface-2);border:1px solid var(--border);
+    color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;
+    transition:.15s;flex-shrink:0;
+  }
+  .panel-head-expand-btn:hover{border-color:var(--accent-dim);color:var(--accent-hi);background:var(--accent-soft);}
+  .panel-head-expand-btn svg{width:12px;height:12px;fill:currentColor;}
 
   .admin-compose{padding:14px 16px 16px;border-bottom:1px solid var(--border);}
   .admin-compose .ac-label{
@@ -1168,7 +1181,9 @@
           <svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 4l-8 5-8-5V6l8 5 8-5z"/></svg>
         </div>
         <div class="dropdown panel-dropdown" id="mailDropdown">
-          <div class="panel-head">Nachrichten</div>
+          <div class="panel-head" id="mailPanelHead">
+            <span>Nachrichten</span>
+          </div>
           <div id="mailBody"></div>
         </div>
       </div>
@@ -1717,22 +1732,64 @@
       </div>`;
   }
 
+  const PANEL_EXPAND_KEY = 'rd_panel_expanded';
+  function isPanelExpanded(){
+    try { return localStorage.getItem(PANEL_EXPAND_KEY) === '1'; } catch(e){ return false; }
+  }
+  function setPanelExpanded(val){
+    try { localStorage.setItem(PANEL_EXPAND_KEY, val ? '1' : '0'); } catch(e){}
+    document.querySelectorAll('.panel-dropdown').forEach(el => el.classList.toggle('expanded', val));
+    document.querySelectorAll('.panel-head-expand-btn').forEach(btn => {
+      btn.title = val ? 'Ansicht verkleinern' : 'Ansicht vergrößern';
+      btn.innerHTML = val
+        ? '<svg viewBox="0 0 24 24"><path d="M9 9H4v2h7V4H9v5zm6 6h5v-2h-7v7h2v-5zM4 15h5v-2H4v2zm11-6V4h-2v7h7V9h-5z"/></svg>'
+        : '<svg viewBox="0 0 24 24"><path d="M9 4H4v5h2V6h3V4zm6 0v2h3v3h2V4h-5zM6 15H4v5h5v-2H6v-3zm12 3h-3v2h5v-5h-2v3z"/></svg>';
+    });
+  }
+  function expandBtnHTML(){
+    const expanded = isPanelExpanded();
+    return `<div class="panel-head-expand-btn" data-expand-btn title="${expanded ? 'Ansicht verkleinern' : 'Ansicht vergrößern'}">
+      ${expanded
+        ? '<svg viewBox="0 0 24 24"><path d="M9 9H4v2h7V4H9v5zm6 6h5v-2h-7v7h2v-5zM4 15h5v-2H4v2zm11-6V4h-2v7h7V9h-5z"/></svg>'
+        : '<svg viewBox="0 0 24 24"><path d="M9 4H4v5h2V6h3V4zm6 0v2h3v3h2V4h-5zM6 15H4v5h5v-2H6v-3zm12 3h-3v2h5v-5h-2v3z"/></svg>'}
+    </div>`;
+  }
+  function wireExpandBtn(container){
+    container.querySelector('[data-expand-btn]')?.addEventListener('click', e => {
+      e.stopPropagation();
+      setPanelExpanded(!isPanelExpanded());
+    });
+  }
+
   function renderNotifPanelHead(){
     const head = document.getElementById('notifPanelHead');
     if(!head) return;
     if(isAdmin && currentProfile){
       head.innerHTML = `
         <span>Benachrichtigungen</span>
-        <div class="panel-head-admin-btn" id="notifAdminBtn" title="Neue Benachrichtigung an alle senden">
-          <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"/></svg>
+        <div class="panel-head-btns">
+          ${expandBtnHTML()}
+          <div class="panel-head-admin-btn" id="notifAdminBtn" title="Neue Benachrichtigung an alle senden">
+            <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"/></svg>
+          </div>
         </div>`;
       document.getElementById('notifAdminBtn').addEventListener('click', () => {
         document.getElementById('notifBody').style.display = 'none';
         renderAdminComposeForm();
       });
     } else {
-      head.innerHTML = `<span>Benachrichtigungen</span>`;
+      head.innerHTML = `<span>Benachrichtigungen</span><div class="panel-head-btns">${expandBtnHTML()}</div>`;
     }
+    wireExpandBtn(head);
+    document.getElementById('notifDropdown').classList.toggle('expanded', isPanelExpanded());
+  }
+
+  function renderMailPanelHead(){
+    const head = document.getElementById('mailPanelHead');
+    if(!head) return;
+    head.innerHTML = `<span>Nachrichten</span><div class="panel-head-btns">${expandBtnHTML()}</div>`;
+    wireExpandBtn(head);
+    document.getElementById('mailDropdown').classList.toggle('expanded', isPanelExpanded());
   }
 
   function renderAdminComposeForm(){
@@ -1829,6 +1886,7 @@
   }
 
   function renderMailBody(){
+    renderMailPanelHead();
     const body = document.getElementById('mailBody');
     if(!currentProfile){
       body.innerHTML = loggedOutPanelHTML('mail');
@@ -1983,16 +2041,8 @@
         try {
           await supabaseClient.from('profiles').update({ gender: selectedGenderAuth }).eq('id', data.user.id);
         } catch(e){ console.error(e); }
-        // Persönliche Willkommens-Benachrichtigung für den neuen Account anlegen.
-        try {
-          await supabaseClient.from('notifications').insert({
-            title: 'Willkommen',
-            sub: `Willkommen bei Royal-Deck, ${name}!`,
-            body: `Du hast soeben ein neues Konto bei Royal-Deck erstellt, wir heißen dich herzlich willkommen! Schau dich gerne um, füge Freunde hinzu und leg direkt am Tisch los. Falls du Fragen hast, findest du Hilfe jederzeit in den Einstellungen.`,
-            created_by: data.user.id,
-            target_user_id: data.user.id
-          });
-        } catch(e){ console.error(e); }
+        // Hinweis: die Willkommens-Benachrichtigung wird per DB-Trigger auf auth.users angelegt,
+        // nicht hier im Client — das funktioniert dann auch zuverlässig mit E-Mail-Bestätigung.
         closeModal();
         await loadProfile();
       } else {
