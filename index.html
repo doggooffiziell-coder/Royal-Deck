@@ -412,12 +412,12 @@
     position:relative;width:108px;height:108px;margin:0 auto 14px;cursor:pointer;
   }
   .rail-avatar-wrap:before{
-    content:"";position:absolute;inset:-5px;border-radius:50%;z-index:0;
+    content:"";position:absolute;inset:-5px;border-radius:28px;z-index:0;
     background:conic-gradient(from 180deg,var(--accent-dim),var(--accent-hi),var(--accent-dim));
     opacity:.7;
   }
   .rail-avatar-wrap .big-avatar{
-    width:108px;height:108px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    width:108px;height:108px;border-radius:24px;display:flex;align-items:center;justify-content:center;
     color:var(--text);font-weight:600;font-size:36px;font-family:var(--font-display);font-style:italic;
     box-shadow:0 0 0 3px var(--sidebar);background-size:cover;background-position:center;
     overflow:hidden;position:relative;z-index:1;
@@ -547,7 +547,7 @@
 
   .avatar-picker{display:flex;align-items:center;gap:20px;}
   .avatar-picker-preview{
-    width:96px;height:96px;border-radius:50%;flex-shrink:0;
+    width:96px;height:96px;border-radius:22px;flex-shrink:0;
     display:flex;align-items:center;justify-content:center;
     color:var(--text);font-weight:600;font-size:32px;font-family:var(--font-display);font-style:italic;
     background-size:cover;background-position:center;
@@ -582,7 +582,7 @@
   .avatar-modal-grid::-webkit-scrollbar{width:6px;}
   .avatar-modal-grid::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
   .avatar-option{
-    width:52px;height:52px;border-radius:50%;cursor:pointer;border:2px solid transparent;
+    width:52px;height:52px;border-radius:16px;cursor:pointer;border:2px solid transparent;
     display:flex;align-items:center;justify-content:center;position:relative;
     font-family:'Segoe UI Symbol','Noto Sans Symbol','Arial Unicode MS',Arial,sans-serif;
     font-style:normal;font-weight:600;font-size:21px;color:var(--accent-hi);line-height:1;
@@ -2044,7 +2044,15 @@
     'linear-gradient(135deg,#ff6b6b,#c0392b)',
     'linear-gradient(135deg,#8b96a5,#2a3542)',
     'linear-gradient(135deg,#8e2de2,#4a00e0)',
-    'linear-gradient(135deg,#ffb347,#ff5e62)'
+    'linear-gradient(135deg,#ffb347,#ff5e62)',
+    'linear-gradient(135deg,#11998e,#38ef7d)',
+    'linear-gradient(135deg,#ff416c,#ff4b2b)',
+    'linear-gradient(135deg,#1c4830,#0f2c1d)',
+    'linear-gradient(135deg,#c1443c,#7a241f)',
+    'linear-gradient(135deg,#4a5568,#1a202c)',
+    'linear-gradient(135deg,#f7971e,#ffd200)',
+    'linear-gradient(135deg,#5f2c82,#49a09d)',
+    'linear-gradient(135deg,#c9a05b,#8a6a35)'
   ];
 
   // --- Vorgefertigte Profilbilder (Symbol, Farbe kommt separat aus der Avatarfarbe) ---
@@ -2931,25 +2939,21 @@
     const initial = profile.name.charAt(0).toUpperCase();
     const chips = profile.chips || 0;
     const avatarPreset = getPreset(avatarDataUrl);
-    let avatarStyle, avatarInner;
-    if(avatarPreset){
-      avatarStyle = `style="background:${selectedColor};font-family:var(--font-display);font-style:italic;"`;
-      avatarInner = avatarPreset.symbol;
-    } else {
-      avatarStyle = `style="background:${selectedColor}"`;
-      avatarInner = initial;
-    }
+    const avatarClass = avatarPreset ? ' avatar-symbol' : '';
+    const avatarStyle = `style="background:${selectedColor}"`;
+    const avatarInner = avatarPreset ? avatarPreset.symbol : initial;
+    updateAvatarPreviews(initial);
     const adminTagHTML = `<span class="admin-access-tag"><svg viewBox="0 0 24 24"><path d="M5 16L3 6l5.5 4L12 4l3.5 6L21 6l-2 10H5zm0 2h14v2H5z"/></svg>Adminzugriff</span>`;
     authArea.innerHTML = `
       <div class="user-chip" id="userChip">
-        <div class="avatar" ${avatarStyle}>${avatarInner}</div>
+        <div class="avatar${avatarClass}" ${avatarStyle}>${avatarInner}</div>
         <div class="uname-stack">
           <span class="uname">${profile.name}</span>
           ${isAdmin ? adminTagHTML : ''}
         </div>
         <div class="dropdown" id="dropdown">
           <div class="dd-head">
-            <div class="avatar" ${avatarStyle}>${avatarInner}</div>
+            <div class="avatar${avatarClass}" ${avatarStyle}>${avatarInner}</div>
             <div class="dd-info">
               <div class="dd-name">${profile.name}</div>
               ${isAdmin ? adminTagHTML : ''}
