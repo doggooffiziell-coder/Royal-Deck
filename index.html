@@ -2892,12 +2892,18 @@
       }
     }
     if(error){ console.error(error); renderAuthArea(null); return; }
+    const userChanged = currentUserId !== user.id;
     currentProfile = profile;
     currentUserId = user.id;
     currentUserEmail = user.email;
     isAdmin = admin;
-    // Profilbild-Auswahl ist rein sitzungsbasiert und wird beim Login nicht wiederhergestellt.
-    avatarDataUrl = null;
+    // Profilbild-Auswahl ist rein sitzungsbasiert und wird nicht in der DB gespeichert —
+    // sie soll aber innerhalb derselben Sitzung erhalten bleiben und nur bei echtem
+    // Nutzerwechsel (z.B. Logout/Login mit anderem Account) zurückgesetzt werden.
+    if(userChanged){
+      avatarDataUrl = null;
+      selectedColor = AVATAR_COLORS[0];
+    }
     await loadNotifications();
     renderAuthArea(profile, user.email);
     enforceUsername(profile);
