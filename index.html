@@ -425,12 +425,58 @@
   .dropdown .dd-level{font-size:11px;color:var(--muted);margin-top:3px;font-family:var(--font-mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .dropdown .dd-menu{padding:6px;}
   .dropdown .dd-menu div{border-radius:7px;padding:9px 10px;}
+
+  /* signed-out state inside notification / mail panels */
+  .panel-loggedout{
+    padding:26px 20px 24px;text-align:center;
+  }
+  .panel-loggedout .lo-icon{
+    width:40px;height:40px;border-radius:10px;background:var(--surface-2);border:1px solid var(--border);
+    display:flex;align-items:center;justify-content:center;margin:0 auto 14px;
+  }
+  .panel-loggedout .lo-icon svg{width:18px;height:18px;fill:var(--accent-hi);}
+  .panel-loggedout .lo-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;}
+  .panel-loggedout .lo-text{font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:16px;}
+  .panel-loggedout .lo-btn{
+    width:100%;height:36px;border:none;border-radius:8px;background:var(--accent);color:#f3f6fc;
+    font-weight:600;font-size:12.5px;cursor:pointer;font-family:var(--font-body);transition:.15s;
+  }
+  .panel-loggedout .lo-btn:hover{background:var(--accent-hi);}
+
+  /* --------- brand mark (sidebar) --------- */
+  .brand{
+    width:44px;height:44px;border-radius:11px;margin-bottom:22px;position:relative;
+    background:linear-gradient(150deg,#151b25,#1c2431 60%,#222b3a);
+    border:1px solid var(--border);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .brand:after{
+    content:"";position:absolute;inset:0;border-radius:11px;box-shadow:inset 0 0 0 1px rgba(79,127,224,.16);
+  }
+  .brand svg{width:22px;height:22px;position:relative;z-index:1;}
+
+  /* --------- expanded sidebar sections --------- */
+  .nav-divider{
+    width:34px;height:1px;background:var(--border-soft);margin:8px 0;flex-shrink:0;
+  }
+  .nav-group-label{
+    font-size:8.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--faint);
+    text-align:center;margin:2px 0 2px;flex-shrink:0;
+  }
+  .nav-item.soon{position:relative;}
+  .nav-item.soon:after{
+    content:"";position:absolute;top:8px;right:10px;width:6px;height:6px;border-radius:50%;
+    background:var(--brass);box-shadow:0 0 0 2px var(--sidebar);
+  }
+  .sidebar-bottom{margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:8px;}
 </style>
 </head>
 <body>
 
 <div class="sidebar">
-  <div class="logo">R</div>
+  <div class="brand" title="Royal Table">
+    <svg viewBox="0 0 24 24"><path fill="var(--accent-hi)" d="M12 2l2.6 5.9 6.4.6-4.8 4.3 1.5 6.3L12 15.8 6.3 19.1l1.5-6.3-4.8-4.3 6.4-.6z" opacity="0.9"/></svg>
+  </div>
   <div class="nav-item active">
     <svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9h-5v-6H11v6H6v-9H3z"/></svg>
     <span>Home</span>
@@ -447,9 +493,24 @@
     <svg viewBox="0 0 24 24"><path d="M4 4h16v12H5.2L4 17.2zm2 3v2h12V7zm0 4v2h8v-2z"/></svg>
     <span>Chat</span>
   </div>
+
+  <div class="nav-divider"></div>
+  <div class="nav-group-label">Konto</div>
+
   <div class="nav-item">
-    <svg viewBox="0 0 24 24"><path d="M19.4 13a7.9 7.9 0 000-2l2.1-1.6-2-3.4-2.5 1a8 8 0 00-1.7-1L14.9 3H9.1l-.4 2.9a8 8 0 00-1.7 1l-2.5-1-2 3.4L4.6 11a7.9 7.9 0 000 2l-2.1 1.6 2 3.4 2.5-1a8 8 0 001.7 1l.4 2.9h5.8l.4-2.9a8 8 0 001.7-1l2.5 1 2-3.4z"/></svg>
-    <span>Mehr</span>
+    <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>
+    <span>Rangliste</span>
+  </div>
+  <div class="nav-item soon">
+    <svg viewBox="0 0 24 24"><path d="M20 6h-2.2l-1.5-2H7.7L6.2 6H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm-8 12a5 5 0 110-10 5 5 0 010 10z"/></svg>
+    <span>Belohnungen</span>
+  </div>
+
+  <div class="sidebar-bottom">
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M19.4 13a7.9 7.9 0 000-2l2.1-1.6-2-3.4-2.5 1a8 8 0 00-1.7-1L14.9 3H9.1l-.4 2.9a8 8 0 00-1.7 1l-2.5-1-2 3.4L4.6 11a7.9 7.9 0 000 2l-2.1 1.6 2 3.4 2.5-1a8 8 0 001.7 1l.4 2.9h5.8l.4-2.9a8 8 0 001.7-1l2.5 1 2-3.4z"/></svg>
+      <span>Mehr</span>
+    </div>
   </div>
 </div>
 
@@ -481,7 +542,7 @@
         </div>
         <div class="dropdown panel-dropdown" id="mailDropdown">
           <div class="panel-head">Nachrichten</div>
-          <div class="panel-empty">Noch keine Nachrichten. Füge Freunde hinzu, um zu chatten.</div>
+          <div id="mailBody"></div>
         </div>
       </div>
 
@@ -765,6 +826,7 @@
   const modalSub = document.getElementById('modalSub');
   const pointsDisplay = document.getElementById('pointsDisplay');
   let mode = 'login';
+  let currentProfile = null;
 
   // --- Notification inbox (Roblox-artiges Lesen/Zurück/Archivieren) ---
   const notifications = [
@@ -790,14 +852,44 @@
 
   function updateNotifBadge(){
     const badge = document.getElementById('notifBadge');
-    const unread = notifications.filter(n => !n.read).length;
     if(!badge) return;
+    if(!currentProfile){ badge.style.display = 'none'; return; }
+    const unread = notifications.filter(n => !n.read).length;
     if(unread > 0){ badge.textContent = unread; badge.style.display = 'flex'; }
     else { badge.style.display = 'none'; }
   }
 
+  function loggedOutPanelHTML(kind){
+    const copy = kind === 'mail'
+      ? {
+          title: 'Du bist derzeit abgemeldet',
+          text: 'Melde dich mit deinem Konto an, um Nachrichten von deinen Freunden zu empfangen und zu versenden.',
+          icon: '<svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 4l-8 5-8-5V6l8 5 8-5z"/></svg>'
+        }
+      : {
+          title: 'Du bist derzeit abgemeldet',
+          text: 'Melde dich mit deinem Konto an, um Benachrichtigungen zu erhalten.',
+          icon: '<svg viewBox="0 0 24 24"><path d="M12 22a2 2 0 002-2h-4a2 2 0 002 2zm6-6v-5a6 6 0 10-12 0v5l-2 2v1h16v-1z"/></svg>'
+        };
+    return `
+      <div class="panel-loggedout">
+        <div class="lo-icon">${copy.icon}</div>
+        <div class="lo-title">${copy.title}</div>
+        <div class="lo-text">${copy.text}</div>
+        <button type="button" class="lo-btn" id="loginFrom${kind === 'mail' ? 'Mail' : 'Notif'}Panel">Jetzt anmelden</button>
+      </div>`;
+  }
+
   function renderNotifList(){
     const body = document.getElementById('notifBody');
+    if(!currentProfile){
+      body.innerHTML = loggedOutPanelHTML('notif');
+      document.getElementById('loginFromNotifPanel')?.addEventListener('click', () => {
+        document.getElementById('notifDropdown').classList.remove('open');
+        openModal('login');
+      });
+      return;
+    }
     if(notifications.length === 0){
       body.innerHTML = `<div class="panel-empty-list">Keine Benachrichtigungen.</div>`;
       return;
@@ -814,6 +906,19 @@
     body.querySelectorAll('.panel-item').forEach(el => {
       el.addEventListener('click', () => openNotif(parseInt(el.dataset.id, 10)));
     });
+  }
+
+  function renderMailBody(){
+    const body = document.getElementById('mailBody');
+    if(!currentProfile){
+      body.innerHTML = loggedOutPanelHTML('mail');
+      document.getElementById('loginFromMailPanel')?.addEventListener('click', () => {
+        document.getElementById('mailDropdown').classList.remove('open');
+        openModal('login');
+      });
+      return;
+    }
+    body.innerHTML = `<div class="panel-empty">Noch keine Nachrichten. Füge Freunde hinzu, um zu chatten.</div>`;
   }
 
   function openNotif(id){
@@ -849,6 +954,7 @@
   }
 
   renderNotifList();
+  renderMailBody();
   updateNotifBadge();
 
   // --- Notification & mail panel toggles ---
@@ -862,8 +968,8 @@
       if(willOpen){ dd.classList.add('open'); if(onOpen) onOpen(); }
     });
   }
-  setupPanelToggle('notifBtn', 'notifDropdown');
-  setupPanelToggle('mailBtn', 'mailDropdown');
+  setupPanelToggle('notifBtn', 'notifDropdown', renderNotifList);
+  setupPanelToggle('mailBtn', 'mailDropdown', renderMailBody);
   document.addEventListener('click', e => {
     if(!e.target.closest('.icon-btn-wrap')){
       document.querySelectorAll('.panel-dropdown').forEach(d => d.classList.remove('open'));
@@ -983,8 +1089,6 @@
     renderAuthArea(null);
   }
 
-  let currentProfile = null;
-
   async function loadProfile(){
     const { data: { user } } = await supabaseClient.auth.getUser();
     if(!user){ renderAuthArea(null); return; }
@@ -1013,13 +1117,18 @@
 
   function renderAuthArea(profile, email){
     if(!profile){
+      currentProfile = null;
       pointsDisplay.style.display = 'none';
       updateHeroGreeting('Gast');
       authArea.innerHTML = `<button id="loginBtn" style="background:var(--accent);color:#f3f6fc;border:none;
         padding:9px 20px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;font-family:var(--font-body);">Anmelden</button>`;
       document.getElementById('loginBtn').addEventListener('click', () => openModal('login'));
+      updateNotifBadge();
+      renderNotifList();
+      renderMailBody();
       return;
     }
+    currentProfile = profile;
     updateHeroGreeting(profile.name);
     pointsDisplay.style.display = 'flex';
     const level = Math.max(1, Math.floor((profile.chips || 0) / 100));
@@ -1063,6 +1172,9 @@
         document.getElementById('dropdown')?.classList.remove('open');
       }
     });
+    updateNotifBadge();
+    renderNotifList();
+    renderMailBody();
   }
 
   // --- Settings modal ---
