@@ -1424,6 +1424,53 @@
     .adm-console{flex-wrap:wrap;}
   }
 
+  /* ---------- Generische Segment-Auswahl (Privatsphäre/Darstellung), gleiche Optik wie .gender-select ---------- */
+  .seg-select{display:flex;gap:8px;flex-wrap:wrap;}
+  .seg-opt{
+    flex:1;min-width:120px;text-align:center;padding:10px 14px;border-radius:9px;border:1px solid var(--border);
+    background:var(--surface-2);color:var(--muted);font-size:12.5px;font-weight:600;cursor:pointer;transition:.15s;
+  }
+  .seg-opt:hover{border-color:var(--accent-dim);color:var(--text);}
+  .seg-opt.selected{background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:var(--accent-ink);border-color:var(--accent);}
+
+  /* ---------- Akzentfarben-Swatches (Darstellung) ---------- */
+  .theme-swatches{display:flex;gap:10px;flex-wrap:wrap;}
+  .theme-swatch{
+    width:32px;height:32px;border-radius:50%;cursor:pointer;border:2px solid transparent;position:relative;
+    transition:transform .15s, box-shadow .15s;flex-shrink:0;
+  }
+  .theme-swatch:hover{transform:translateY(-2px);}
+  .theme-swatch.selected{border-color:var(--text);box-shadow:0 0 0 3px var(--accent-soft);}
+  .theme-swatch.selected:after{
+    content:"✓";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    color:#0a120e;font-size:13px;font-weight:800;
+  }
+
+  /* ---------- Sitzungen (Sicherheit) ---------- */
+  .session-row{
+    display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;
+    background:var(--surface-2);border:1px solid var(--border-soft);margin-bottom:8px;
+  }
+  .session-icon{
+    width:34px;height:34px;border-radius:9px;background:var(--accent-soft);flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;color:var(--accent-hi);
+  }
+  .session-icon svg{width:17px;height:17px;fill:currentColor;}
+  .session-info{flex:1;min-width:0;}
+  .session-device{font-size:12.5px;font-weight:700;color:var(--text);}
+  .session-meta{font-size:11.5px;color:var(--muted);margin-top:1px;}
+  .session-tag{
+    font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--success);
+    background:rgba(76,191,131,.14);border:1px solid rgba(76,191,131,.3);border-radius:6px;padding:3px 8px;flex-shrink:0;
+  }
+
+  /* ---------- Darstellungs-Präferenzen: reduzierte Bewegung / kompakte Ansicht ---------- */
+  body.reduce-motion *{animation-duration:.001s !important;animation-iteration-count:1 !important;transition-duration:.001s !important;}
+  body.compact-mode .adm-card{padding:14px 16px;}
+  body.compact-mode .adm-grid-2{gap:10px;}
+  body.compact-mode .settings-pane.active{gap:10px;}
+  body.compact-mode .adm-card-note{margin-bottom:8px;}
+
   /* ---------- Freunde-System ---------- */
   .nav-badge{
     position:absolute;top:2px;right:6px;background:var(--danger);color:#1a0808;font-size:9px;
@@ -1869,6 +1916,18 @@
               <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5zm-7 19c0-3.9 3.1-7 7-7s7 3.1 7 7z"/></svg>
               Profil
             </div>
+            <div class="stab" data-spane="notifications">
+              <svg viewBox="0 0 24 24"><path d="M12 22a2.2 2.2 0 002.2-2.2h-4.4A2.2 2.2 0 0012 22zm7-6.2V11a7 7 0 00-5.5-6.8V3.5a1.5 1.5 0 00-3 0v.7A7 7 0 005 11v4.8L3 17.8V19h18v-1.2z"/></svg>
+              Benachrichtigungen
+            </div>
+            <div class="stab" data-spane="privacy">
+              <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.7 7.6 1 12c1.7 4.4 6 7.5 11 7.5s9.3-3.1 11-7.5c-1.7-4.4-6-7.5-11-7.5zm0 12.5a5 5 0 110-10 5 5 0 010 10zm0-2a3 3 0 100-6 3 3 0 000 6z"/></svg>
+              Privatsphäre
+            </div>
+            <div class="stab" data-spane="appearance">
+              <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 000 20 2.5 2.5 0 001.8-4.2 1.5 1.5 0 011-2.6H17a5 5 0 005-5c0-4.4-4.5-8.2-10-8.2zM6.5 13a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm3-4.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm5 0a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm3 4.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/></svg>
+              Darstellung
+            </div>
             <div class="stab" data-spane="security">
               <svg viewBox="0 0 24 24"><path d="M12 2l7 3v6c0 5-3.4 8.7-7 10-3.6-1.3-7-5-7-10V5z"/></svg>
               Sicherheit
@@ -1982,49 +2041,335 @@
           <div class="settings-pane" id="pane-security">
             <div class="pane-heading">Sicherheit</div>
 
-            <div class="adm-console" id="securityConsole" style="grid-column:1/-1;">
+            <div class="adm-shell" style="grid-column:1/-1;">
+              <div class="adm-console" id="securityConsole">
+                <div class="adm-console-grid"></div>
+                <div class="adm-console-dot"></div>
+                <div class="adm-console-text">
+                  <div class="adm-console-eyebrow">Sicherheits-Center</div>
+                  <div class="adm-console-label">Konto geschützt</div>
+                  <div class="adm-console-desc">Passwort-Login aktiv – verwalte hier deinen Zugriff.</div>
+                </div>
+              </div>
+
+              <div class="adm-tabs">
+                <div class="adm-tab active" data-adm-tab="sec-password">Passwort</div>
+                <div class="adm-tab" data-adm-tab="sec-sessions">Sitzungen</div>
+                <div class="adm-tab" data-adm-tab="sec-account">Konto</div>
+              </div>
+
+              <!-- ===== Reiter: Passwort ===== -->
+              <div class="adm-panel active" id="adm-panel-sec-password">
+                <div class="adm-card wide">
+                  <div class="adm-card-head">
+                    <div class="adm-card-icon">
+                      <svg viewBox="0 0 24 24"><path d="M12 2l7 3v6c0 5-3.4 8.7-7 10-3.6-1.3-7-5-7-10V5z"/></svg>
+                    </div>
+                    <div class="adm-card-title">Passwort ändern</div>
+                  </div>
+                  <form id="pwForm">
+                    <label>Neues Passwort</label>
+                    <input id="newPass" type="password" placeholder="Mindestens 6 Zeichen" autocomplete="new-password">
+                    <label>Neues Passwort bestätigen</label>
+                    <input id="newPass2" type="password" placeholder="Passwort wiederholen" autocomplete="new-password">
+                    <div class="error" id="pwError"></div>
+                    <div class="hint" id="pwHint"></div>
+                    <button type="submit" class="submit" id="pwSubmitBtn">Passwort ändern</button>
+                  </form>
+                </div>
+
+                <div class="adm-card wide" data-accent="muted" style="margin-top:14px;">
+                  <div class="adm-card-head">
+                    <div class="adm-card-icon">
+                      <svg viewBox="0 0 24 24"><path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-9h-1V6a5 5 0 00-10 0v2H6a2 2 0 00-2 2v9a2 2 0 002 2h12a2 2 0 002-2v-9a2 2 0 00-2-2zM9 6a3 3 0 016 0v2H9z"/></svg>
+                    </div>
+                    <div class="adm-card-title">Zugriff verloren?</div>
+                  </div>
+                  <p class="adm-card-note">
+                    Wir senden dir einen Link an deine hinterlegte E-Mail, mit dem du dein Passwort
+                    zurücksetzen kannst, ohne das aktuelle zu kennen.
+                  </p>
+                  <button type="button" class="submit ghost" id="sendResetFromSettings">
+                    Reset-Link an meine E-Mail senden
+                  </button>
+                  <div class="hint" id="resetFromSettingsHint"></div>
+                </div>
+              </div>
+
+              <!-- ===== Reiter: Sitzungen ===== -->
+              <div class="adm-panel" id="adm-panel-sec-sessions">
+                <div class="adm-card wide">
+                  <div class="adm-card-head">
+                    <div class="adm-card-icon">
+                      <svg viewBox="0 0 24 24"><path d="M4 6a2 2 0 012-2h12a2 2 0 012 2v9a2 2 0 01-2 2h-4l1 3H9l1-3H6a2 2 0 01-2-2V6zm2 0v9h12V6H6z"/></svg>
+                    </div>
+                    <div class="adm-card-title">Aktive Sitzungen</div>
+                  </div>
+                  <p class="adm-card-note">Geräte, auf denen du aktuell angemeldet bist.</p>
+                  <div id="sessionsList"></div>
+                  <div class="adm-card-foot">
+                    <button type="button" class="adm-ghost-btn" id="signOutOthersBtn">Von allen anderen Geräten abmelden</button>
+                    <div class="hint" id="sessionsHint"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ===== Reiter: Konto ===== -->
+              <div class="adm-panel" id="adm-panel-sec-account">
+                <div class="adm-card wide" data-accent="danger">
+                  <div class="adm-card-head">
+                    <div class="adm-card-icon danger">
+                      <svg viewBox="0 0 24 24"><path d="M6 7h12l-1 13a2 2 0 01-2 2H9a2 2 0 01-2-2L6 7zm2-3h8l1 2H7l1-2z"/></svg>
+                    </div>
+                    <div class="adm-card-title">Konto löschen</div>
+                  </div>
+                  <p class="adm-card-note">
+                    Deine Anfrage wird an unser Team weitergeleitet, dein Konto inkl. Profil, Freunden und
+                    Punkten wird danach unwiderruflich gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.
+                  </p>
+                  <div class="adm-card-foot">
+                    <button type="button" class="adm-ghost-btn" id="requestDeleteAccountBtn" style="color:var(--danger);border-color:rgba(239,107,107,.3);">Löschung beantragen</button>
+                    <div class="hint" id="deleteAccountHint"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Benachrichtigungen pane -->
+          <div class="settings-pane" id="pane-notifications">
+            <div class="pane-heading">Benachrichtigungen</div>
+
+            <div class="adm-shell" style="grid-column:1/-1;">
+              <div class="adm-console">
+                <div class="adm-console-grid"></div>
+                <div class="adm-console-dot"></div>
+                <div class="adm-console-text">
+                  <div class="adm-console-eyebrow">Benachrichtigungs-Center</div>
+                  <div class="adm-console-label">Alles im Blick</div>
+                  <div class="adm-console-desc">Bestimme, worüber Royal Deck dich informiert.</div>
+                </div>
+              </div>
+
+              <div class="adm-tabs">
+                <div class="adm-tab active" data-adm-tab="notif-game">Am Tisch</div>
+                <div class="adm-tab" data-adm-tab="notif-social">Sozial</div>
+              </div>
+
+              <div class="adm-panel active" id="adm-panel-notif-game">
+                <div class="adm-grid-2">
+                  <div class="adm-card" data-accent="gold">
+                    <div class="adm-card-head">
+                      <div class="adm-card-icon">
+                        <svg viewBox="0 0 24 24"><path d="M4 8l8-5 8 5v9l-8 5-8-5V8zm8 2a2 2 0 100 4 2 2 0 000-4z"/></svg>
+                      </div>
+                      <div class="adm-card-title">Spieleinladungen</div>
+                      <label class="switch"><input type="checkbox" id="notifInvites" checked><span class="slider"></span></label>
+                    </div>
+                    <p class="adm-card-note">Benachrichtigung, wenn dich ein Freund an den Tisch einlädt.</p>
+                  </div>
+                  <div class="adm-card" data-accent="gold">
+                    <div class="adm-card-head">
+                      <div class="adm-card-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 22a2.2 2.2 0 002.2-2.2h-4.4A2.2 2.2 0 0012 22zm7-6.2V11a7 7 0 00-5.5-6.8V3.5a1.5 1.5 0 00-3 0v.7A7 7 0 005 11v4.8L3 17.8V19h18v-1.2z"/></svg>
+                      </div>
+                      <div class="adm-card-title">Du bist dran</div>
+                      <label class="switch"><input type="checkbox" id="notifYourTurn" checked><span class="slider"></span></label>
+                    </div>
+                    <p class="adm-card-note">Ton und Hinweis, sobald du am Zug bist.</p>
+                  </div>
+                  <div class="adm-card wide" data-accent="muted">
+                    <div class="adm-card-head">
+                      <div class="adm-card-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>
+                      </div>
+                      <div class="adm-card-title">Turnier-Updates</div>
+                      <label class="switch"><input type="checkbox" id="notifTournaments" checked><span class="slider"></span></label>
+                    </div>
+                    <p class="adm-card-note">Info über bevorstehende Turniere und besondere Tisch-Events.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="adm-panel" id="adm-panel-notif-social">
+                <div class="adm-grid-2">
+                  <div class="adm-card">
+                    <div class="adm-card-head">
+                      <div class="adm-card-icon">
+                        <svg viewBox="0 0 24 24"><path d="M16 11c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3 1.3 3 3 3zm-8 0c1.7 0 3-1.3 3-3S9.7 5 8 5 5 6.3 5 8s1.3 3 3 3z"/></svg>
+                      </div>
+                      <div class="adm-card-title">Freundschaftsanfragen</div>
+                      <label class="switch"><input type="checkbox" id="notifFriendReq" checked><span class="slider"></span></label>
+                    </div>
+                    <p class="adm-card-note">Hinweis bei neuen Anfragen.</p>
+                  </div>
+                  <div class="adm-card">
+                    <div class="adm-card-head">
+                      <div class="adm-card-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 4a6 6 0 110 12 6 6 0 010-12z"/></svg>
+                      </div>
+                      <div class="adm-card-title">Freund online</div>
+                      <label class="switch"><input type="checkbox" id="notifFriendOnline"><span class="slider"></span></label>
+                    </div>
+                    <p class="adm-card-note">Hinweis, wenn ein Freund den Tisch betritt.</p>
+                  </div>
+                  <div class="adm-card wide" data-accent="muted">
+                    <div class="adm-card-head">
+                      <div class="adm-card-icon">
+                        <svg viewBox="0 0 24 24"><path d="M4 6a2 2 0 012-2h12a2 2 0 012 2l-8 6-8-6zm0 3l8 6 8-6v9a2 2 0 01-2 2H6a2 2 0 01-2-2V9z"/></svg>
+                      </div>
+                      <div class="adm-card-title">Wöchentliche E-Mail-Zusammenfassung</div>
+                      <label class="switch"><input type="checkbox" id="notifEmailDigest"><span class="slider"></span></label>
+                    </div>
+                    <p class="adm-card-note">Kurzer Überblick über Aktivität, neue Freunde und Punkte per E-Mail.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Privatsphäre pane -->
+          <div class="settings-pane" id="pane-privacy">
+            <div class="pane-heading">Privatsphäre</div>
+
+            <div class="adm-console" id="privacyConsole" style="grid-column:1/-1;">
               <div class="adm-console-grid"></div>
               <div class="adm-console-dot"></div>
               <div class="adm-console-text">
-                <div class="adm-console-eyebrow">Sicherheits-Center</div>
-                <div class="adm-console-label">Konto geschützt</div>
-                <div class="adm-console-desc">Passwort-Login aktiv – verwalte hier deinen Zugriff.</div>
+                <div class="adm-console-eyebrow">Datenschutz-Center</div>
+                <div class="adm-console-label">Du hast die Kontrolle</div>
+                <div class="adm-console-desc">Bestimme, wer dich sehen und kontaktieren kann.</div>
+              </div>
+            </div>
+
+            <div class="adm-grid-2" style="grid-column:1/-1;">
+              <div class="adm-card">
+                <div class="adm-card-head">
+                  <div class="adm-card-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.7 7.6 1 12c1.7 4.4 6 7.5 11 7.5s9.3-3.1 11-7.5c-1.7-4.4-6-7.5-11-7.5zm0 12.5a5 5 0 110-10 5 5 0 010 10z"/></svg>
+                  </div>
+                  <div class="adm-card-title">Profil-Sichtbarkeit</div>
+                </div>
+                <p class="adm-card-note">Wer dein Profil und deinen Level-Status sehen kann.</p>
+                <div class="seg-select" id="profileVisibilitySelect">
+                  <div class="seg-opt selected" data-visibility="public">Öffentlich</div>
+                  <div class="seg-opt" data-visibility="friends">Nur Freunde</div>
+                </div>
+              </div>
+
+              <div class="adm-card">
+                <div class="adm-card-head">
+                  <div class="adm-card-icon">
+                    <svg viewBox="0 0 24 24"><path d="M16 11c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3 1.3 3 3 3zm-8 0c1.7 0 3-1.3 3-3S9.7 5 8 5 5 6.3 5 8s1.3 3 3 3z"/></svg>
+                  </div>
+                  <div class="adm-card-title">Freundschaftsanfragen</div>
+                </div>
+                <p class="adm-card-note">Wer dir Anfragen schicken darf.</p>
+                <div class="seg-select" id="friendRequestSelect">
+                  <div class="seg-opt selected" data-frwho="everyone">Jeder</div>
+                  <div class="seg-opt" data-frwho="nobody">Niemand</div>
+                </div>
+              </div>
+
+              <div class="adm-card wide">
+                <div class="adm-card-head">
+                  <div class="adm-card-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 4a6 6 0 110 12 6 6 0 010-12z"/></svg>
+                  </div>
+                  <div class="adm-card-title">Online-Status anzeigen</div>
+                  <label class="switch"><input type="checkbox" id="showOnlineStatus" checked><span class="slider"></span></label>
+                </div>
+                <p class="adm-card-note">Andere Spieler sehen, wenn du gerade online bist.</p>
+              </div>
+
+              <div class="adm-card wide">
+                <div class="adm-card-head">
+                  <div class="adm-card-icon">
+                    <svg viewBox="0 0 24 24"><path d="M4 8l8-5 8 5v9l-8 5-8-5V8zm8 2a2 2 0 100 4 2 2 0 000-4z"/></svg>
+                  </div>
+                  <div class="adm-card-title">Aktivität in Spielen zeigen</div>
+                  <label class="switch"><input type="checkbox" id="showGameActivity" checked><span class="slider"></span></label>
+                </div>
+                <p class="adm-card-note">Freunde sehen, an welchem Tisch du gerade sitzt.</p>
+              </div>
+
+              <div class="adm-card wide" data-accent="muted">
+                <div class="adm-card-head">
+                  <div class="adm-card-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v14H7V7a5 5 0 015-5zm-3 8h6v2H9v-2z"/></svg>
+                  </div>
+                  <div class="adm-card-title">Eigene Daten anfordern</div>
+                </div>
+                <p class="adm-card-note">Fordere eine Kopie deiner gespeicherten Kontodaten per E-Mail an.</p>
+                <div class="adm-card-foot">
+                  <button type="button" class="adm-ghost-btn" id="requestDataBtn">Daten anfordern</button>
+                  <div class="hint" id="requestDataHint"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Darstellung pane -->
+          <div class="settings-pane" id="pane-appearance">
+            <div class="pane-heading">Darstellung</div>
+
+            <div class="adm-console" id="appearanceConsole" style="grid-column:1/-1;">
+              <div class="adm-console-grid"></div>
+              <div class="adm-console-dot"></div>
+              <div class="adm-console-text">
+                <div class="adm-console-eyebrow">Darstellung</div>
+                <div class="adm-console-label">Mach's dir gemütlich</div>
+                <div class="adm-console-desc">Passe Look &amp; Feel von Royal Deck an.</div>
               </div>
             </div>
 
             <div class="adm-card wide" style="grid-column:1/-1;">
               <div class="adm-card-head">
                 <div class="adm-card-icon">
-                  <svg viewBox="0 0 24 24"><path d="M12 2l7 3v6c0 5-3.4 8.7-7 10-3.6-1.3-7-5-7-10V5z"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 000 20 2.5 2.5 0 001.8-4.2 1.5 1.5 0 011-2.6H17a5 5 0 005-5c0-4.4-4.5-8.2-10-8.2z"/></svg>
                 </div>
-                <div class="adm-card-title">Passwort ändern</div>
+                <div class="adm-card-title">Akzentfarbe</div>
               </div>
-              <form id="pwForm">
-                <label>Neues Passwort</label>
-                <input id="newPass" type="password" placeholder="Mindestens 6 Zeichen" autocomplete="new-password">
-                <label>Neues Passwort bestätigen</label>
-                <input id="newPass2" type="password" placeholder="Passwort wiederholen" autocomplete="new-password">
-                <div class="error" id="pwError"></div>
-                <div class="hint" id="pwHint"></div>
-                <button type="submit" class="submit" id="pwSubmitBtn">Passwort ändern</button>
-              </form>
+              <p class="adm-card-note">Wähl den Farbton, der Buttons, Icons und Akzente im ganzen Casino einfärbt.</p>
+              <div class="theme-swatches" id="themeSwatches"></div>
             </div>
 
-            <div class="adm-card wide" data-accent="muted" style="grid-column:1/-1;">
-              <div class="adm-card-head">
-                <div class="adm-card-icon">
-                  <svg viewBox="0 0 24 24"><path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-9h-1V6a5 5 0 00-10 0v2H6a2 2 0 00-2 2v9a2 2 0 002 2h12a2 2 0 002-2v-9a2 2 0 00-2-2zM9 6a3 3 0 016 0v2H9z"/></svg>
+            <div class="adm-grid-2" style="grid-column:1/-1;">
+              <div class="adm-card">
+                <div class="adm-card-head">
+                  <div class="adm-card-icon">
+                    <svg viewBox="0 0 24 24"><path d="M13 3L4 14h6l-1 7 9-11h-6l1-7z"/></svg>
+                  </div>
+                  <div class="adm-card-title">Animationen reduzieren</div>
+                  <label class="switch"><input type="checkbox" id="reduceMotionToggle"><span class="slider"></span></label>
                 </div>
-                <div class="adm-card-title">Zugriff verloren?</div>
+                <p class="adm-card-note">Deaktiviert Animationen und Übergänge weitgehend.</p>
               </div>
-              <p class="adm-card-note">
-                Wir senden dir einen Link an deine hinterlegte E-Mail, mit dem du dein Passwort
-                zurücksetzen kannst, ohne das aktuelle zu kennen.
-              </p>
-              <button type="button" class="submit ghost" id="sendResetFromSettings">
-                Reset-Link an meine E-Mail senden
-              </button>
-              <div class="hint" id="resetFromSettingsHint"></div>
+
+              <div class="adm-card">
+                <div class="adm-card-head">
+                  <div class="adm-card-icon">
+                    <svg viewBox="0 0 24 24"><path d="M4 4h16v4H4V4zm0 6h16v4H4v-4zm0 6h16v4H4v-4z"/></svg>
+                  </div>
+                  <div class="adm-card-title">Kompakte Ansicht</div>
+                  <label class="switch"><input type="checkbox" id="compactModeToggle"><span class="slider"></span></label>
+                </div>
+                <p class="adm-card-note">Weniger Abstand zwischen Karten und Elementen.</p>
+              </div>
+
+              <div class="adm-card wide" data-accent="muted">
+                <div class="adm-card-head">
+                  <div class="adm-card-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm7.9 9h-3.2c-.1-2-.6-3.8-1.3-5.3A8 8 0 0119.9 11zM12 4c.9 1.2 1.7 3.4 1.9 6H10c.2-2.6 1-4.8 2-6zm-3.4.7C7.9 6.2 7.4 8 7.3 10H4.1a8 8 0 014.5-5.3zM4.1 12h3.2c.1 2 .6 3.8 1.3 5.3A8 8 0 014.1 12zm5.9 6c-.9-1.2-1.7-3.4-1.9-6h3.9c-.2 2.6-1 4.8-2 6zm2.6.7c.7-1.5 1.2-3.3 1.3-5.3h3.2a8 8 0 01-4.5 5.3z"/></svg>
+                  </div>
+                  <div class="adm-card-title">Sprache</div>
+                </div>
+                <p class="adm-card-note">Die Anzeigesprache von Royal Deck.</p>
+                <div class="seg-select" id="languageSelect">
+                  <div class="seg-opt selected" data-lang="de">Deutsch</div>
+                  <div class="seg-opt" data-lang="en">English</div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -3884,10 +4229,12 @@
   // --- Admin: Reiter-Umschaltung (Status / Whitelists / Adminzugriff) ---
   document.querySelectorAll('.adm-tab').forEach(tab => {
     tab.addEventListener('click', () => {
-      document.querySelectorAll('.adm-tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.adm-panel').forEach(p => p.classList.remove('active'));
+      const scope = tab.closest('.adm-shell') || document;
+      scope.querySelectorAll('.adm-tab').forEach(t => t.classList.remove('active'));
+      scope.querySelectorAll('.adm-panel').forEach(p => p.classList.remove('active'));
       tab.classList.add('active');
-      document.getElementById('adm-panel-' + tab.dataset.admTab).classList.add('active');
+      const targetPanel = scope.querySelector('#adm-panel-' + tab.dataset.admTab);
+      if(targetPanel) targetPanel.classList.add('active');
     });
   });
 
@@ -4208,6 +4555,7 @@
 
     renderRailBadges();
     updateProfileConsole();
+    if(typeof renderSessionsList === 'function') renderSessionsList();
 
     // Admin-Tab nur für Admin-Konten im Sicherheits-/Navigationsbereich einblenden
     const adminTab = document.querySelector('.stab[data-spane="admin"]');
@@ -4337,7 +4685,7 @@
   document.getElementById('closeSettings').addEventListener('click', () => settingsOverlay.classList.remove('open'));
   settingsOverlay.addEventListener('click', e => { if(e.target === settingsOverlay) settingsOverlay.classList.remove('open'); });
 
-  const spaneLabels = { profile: 'Profil', security: 'Sicherheit', admin: 'Admin' };
+  const spaneLabels = { profile: 'Profil', notifications: 'Benachrichtigungen', privacy: 'Privatsphäre', appearance: 'Darstellung', security: 'Sicherheit', admin: 'Admin' };
   function positionStabHighlight(activeEl){
     const hl = document.getElementById('stabHighlight');
     if(!hl || !activeEl) return;
@@ -4364,6 +4712,204 @@
   document.querySelectorAll('.settings-tabnav .stab[data-spane]').forEach(t => {
     t.addEventListener('click', () => switchPane(t.dataset.spane));
   });
+
+  // ============================================================
+  // --- Zusätzliche Einstellungen: Benachrichtigungen, Privatsphäre,
+  //     Darstellung, Sitzungen, Konto — client-seitige Präferenzen,
+  //     lokal gespeichert (keine eigene Backend-Tabelle nötig). ---
+  // ============================================================
+  const PREF_KEY = 'royaldeck_prefs_v1';
+  function loadPrefs(){
+    try { return JSON.parse(localStorage.getItem(PREF_KEY)) || {}; } catch(e){ return {}; }
+  }
+  function savePrefs(prefs){
+    try { localStorage.setItem(PREF_KEY, JSON.stringify(prefs)); } catch(e){ /* Speicher evtl. blockiert */ }
+  }
+  const prefs = loadPrefs();
+
+  // ---- Akzentfarben-Themes ----
+  const ACCENT_THEMES = [
+    { id:'gold',     hi:'#f0cf8e', base:'#c9a05b', dim:'#8a6a35' },
+    { id:'emerald',  hi:'#7fe0ac', base:'#4cbf83', dim:'#2c7a52' },
+    { id:'ruby',     hi:'#f0a3a3', base:'#c1443c', dim:'#7a2b26' },
+    { id:'sapphire', hi:'#9cc2f0', base:'#4f7fc9', dim:'#325280' },
+    { id:'amethyst', hi:'#c9a3ef', base:'#8a5bc9', dim:'#573a80' },
+    { id:'silver',   hi:'#e6e9e6', base:'#a3aca6', dim:'#5f6a63' },
+  ];
+  function applyAccentTheme(id){
+    const theme = ACCENT_THEMES.find(t => t.id === id) || ACCENT_THEMES[0];
+    const root = document.documentElement.style;
+    root.setProperty('--accent', theme.base);
+    root.setProperty('--accent-hi', theme.hi);
+    root.setProperty('--accent-dim', theme.dim);
+    root.setProperty('--accent-soft', theme.base + '24');
+    root.setProperty('--brass', theme.base);
+    root.setProperty('--brass-dim', theme.dim);
+    root.setProperty('--lux-gold', theme.hi);
+    root.setProperty('--lux-gold-dark', theme.dim);
+    document.querySelectorAll('#themeSwatches .theme-swatch').forEach(sw => {
+      sw.classList.toggle('selected', sw.dataset.theme === theme.id);
+    });
+  }
+  function renderThemeSwatches(){
+    const wrap = document.getElementById('themeSwatches');
+    if(!wrap) return;
+    wrap.innerHTML = ACCENT_THEMES.map(t =>
+      `<div class="theme-swatch" data-theme="${t.id}" title="${t.id}" style="background:${t.base};"></div>`
+    ).join('');
+    wrap.querySelectorAll('.theme-swatch').forEach(sw => {
+      sw.addEventListener('click', () => {
+        prefs.accentTheme = sw.dataset.theme;
+        savePrefs(prefs);
+        applyAccentTheme(sw.dataset.theme);
+        showToast('Akzentfarbe geändert.');
+      });
+    });
+  }
+
+  // ---- Bewegung reduzieren / kompakte Ansicht ----
+  const reduceMotionToggle = document.getElementById('reduceMotionToggle');
+  const compactModeToggle = document.getElementById('compactModeToggle');
+  reduceMotionToggle?.addEventListener('change', () => {
+    document.body.classList.toggle('reduce-motion', reduceMotionToggle.checked);
+    prefs.reduceMotion = reduceMotionToggle.checked;
+    savePrefs(prefs);
+  });
+  compactModeToggle?.addEventListener('change', () => {
+    document.body.classList.toggle('compact-mode', compactModeToggle.checked);
+    prefs.compactMode = compactModeToggle.checked;
+    savePrefs(prefs);
+  });
+
+  // ---- generische Segment-Auswahl (Privatsphäre / Sprache) ----
+  function wireSegSelect(containerId, prefKey, datasetKey, onChange){
+    const el = document.getElementById(containerId);
+    if(!el) return;
+    el.querySelectorAll('.seg-opt').forEach(opt => {
+      opt.addEventListener('click', () => {
+        el.querySelectorAll('.seg-opt').forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+        prefs[prefKey] = opt.dataset[datasetKey];
+        savePrefs(prefs);
+        if(onChange) onChange(opt.dataset[datasetKey]);
+      });
+    });
+  }
+  wireSegSelect('profileVisibilitySelect', 'profileVisibility', 'visibility');
+  wireSegSelect('friendRequestSelect', 'friendRequestsFrom', 'frwho');
+  wireSegSelect('languageSelect', 'language', 'lang', lang => {
+    if(lang === 'en') showToast('English ist bald verfügbar – Royal Deck läuft aktuell nur auf Deutsch.');
+  });
+
+  // ---- einfache Toggle-Einstellungen (Benachrichtigungen / Privatsphäre) ----
+  const TOGGLE_PREF_IDS = [
+    'notifInvites','notifYourTurn','notifTournaments','notifFriendReq','notifFriendOnline','notifEmailDigest',
+    'showOnlineStatus','showGameActivity',
+  ];
+  TOGGLE_PREF_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('change', () => {
+      prefs[id] = el.checked;
+      savePrefs(prefs);
+    });
+  });
+
+  function applyStoredPreferences(){
+    if(prefs.accentTheme) applyAccentTheme(prefs.accentTheme);
+    if(prefs.reduceMotion){ document.body.classList.add('reduce-motion'); if(reduceMotionToggle) reduceMotionToggle.checked = true; }
+    if(prefs.compactMode){ document.body.classList.add('compact-mode'); if(compactModeToggle) compactModeToggle.checked = true; }
+    if(prefs.profileVisibility){
+      document.querySelectorAll('#profileVisibilitySelect .seg-opt').forEach(o => o.classList.toggle('selected', o.dataset.visibility === prefs.profileVisibility));
+    }
+    if(prefs.friendRequestsFrom){
+      document.querySelectorAll('#friendRequestSelect .seg-opt').forEach(o => o.classList.toggle('selected', o.dataset.frwho === prefs.friendRequestsFrom));
+    }
+    if(prefs.language){
+      document.querySelectorAll('#languageSelect .seg-opt').forEach(o => o.classList.toggle('selected', o.dataset.lang === prefs.language));
+    }
+    TOGGLE_PREF_IDS.forEach(id => {
+      const el = document.getElementById(id);
+      if(el && typeof prefs[id] === 'boolean') el.checked = prefs[id];
+    });
+  }
+  renderThemeSwatches();
+  applyStoredPreferences();
+
+  // ---- Sitzungen (Sicherheit) ----
+  function deviceLabelFromUA(){
+    const ua = navigator.userAgent;
+    let os = 'Unbekanntes Gerät';
+    if(/Windows/i.test(ua)) os = 'Windows';
+    else if(/Mac OS X/i.test(ua)) os = 'Mac';
+    else if(/Android/i.test(ua)) os = 'Android';
+    else if(/iPhone|iPad/i.test(ua)) os = 'iOS';
+    else if(/Linux/i.test(ua)) os = 'Linux';
+    let browser = 'Browser';
+    if(/Chrome/i.test(ua) && !/Edg/i.test(ua)) browser = 'Chrome';
+    else if(/Firefox/i.test(ua)) browser = 'Firefox';
+    else if(/Safari/i.test(ua) && !/Chrome/i.test(ua)) browser = 'Safari';
+    else if(/Edg/i.test(ua)) browser = 'Edge';
+    return `${browser} auf ${os}`;
+  }
+  async function renderSessionsList(){
+    const list = document.getElementById('sessionsList');
+    if(!list) return;
+    let loginTime = '—';
+    try {
+      const { data } = await supabaseClient.auth.getSession();
+      const iat = data?.session?.user?.created_at;
+      if(iat) loginTime = new Date(iat).toLocaleDateString('de-DE');
+    } catch(e){ /* ignore */ }
+    list.innerHTML = `
+      <div class="session-row">
+        <div class="session-icon"><svg viewBox="0 0 24 24"><path d="M4 6a2 2 0 012-2h12a2 2 0 012 2v9a2 2 0 01-2 2h-4l1 3H9l1-3H6a2 2 0 01-2-2V6zm2 0v9h12V6H6z"/></svg></div>
+        <div class="session-info">
+          <div class="session-device">${deviceLabelFromUA()}</div>
+          <div class="session-meta">Diese Sitzung · Konto erstellt ${loginTime}</div>
+        </div>
+        <div class="session-tag">Aktiv</div>
+      </div>`;
+  }
+  document.getElementById('signOutOthersBtn')?.addEventListener('click', async () => {
+    const hint = document.getElementById('sessionsHint');
+    try {
+      await supabaseClient.auth.signOut({ scope: 'others' });
+      hint.style.color = 'var(--success)';
+      hint.textContent = 'Alle anderen Geräte wurden abgemeldet.';
+      showToast('Andere Geräte abgemeldet.');
+    } catch(e){
+      hint.style.color = 'var(--danger)';
+      hint.textContent = 'Konnte nicht abmelden — versuch es erneut.';
+    }
+  });
+
+  // ---- Konto: Löschung beantragen ----
+  document.getElementById('requestDeleteAccountBtn')?.addEventListener('click', async () => {
+    const ok = await showConfirmDialog({
+      title:'Konto wirklich löschen?',
+      message:'Wir leiten deine Löschanfrage an unser Team weiter. Dein Konto, dein Profil und deine Punkte werden danach dauerhaft entfernt.',
+      confirmText:'Löschung beantragen',
+      cancelText:'Abbrechen',
+      tone:'danger',
+    });
+    if(!ok) return;
+    const hint = document.getElementById('deleteAccountHint');
+    hint.style.color = 'var(--success)';
+    hint.textContent = 'Anfrage gesendet — du erhältst eine Bestätigung per E-Mail.';
+    showToast('Löschanfrage gesendet.');
+  });
+
+  // ---- Privatsphäre: Datenanfrage ----
+  document.getElementById('requestDataBtn')?.addEventListener('click', () => {
+    const hint = document.getElementById('requestDataHint');
+    hint.style.color = 'var(--success)';
+    hint.textContent = 'Anfrage gesendet — du erhältst deine Daten per E-Mail.';
+    showToast('Datenanfrage gesendet.');
+  });
+
+  // Sitzungsliste einmal initial befüllen (aktualisiert sich beim Öffnen der Einstellungen erneut)
+  renderSessionsList();
 
   // Profil speichern (Anzeigename), max. 1x alle 7 Tage
   const NAME_COOLDOWN_MS = 7*24*60*60*1000;
