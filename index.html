@@ -788,11 +788,11 @@
 
   /* Pflicht-Username-Overlay: kann nicht weggeklickt werden */
   .modal.username-modal{width:400px;}
-  .username-modal .u-prefix{
+  .u-prefix{
     position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--faint);font-size:13.5px;font-weight:600;
   }
-  .username-modal .u-wrap{position:relative;}
-  .username-modal .u-wrap input{padding-left:26px;}
+  .u-wrap{position:relative;}
+  .u-wrap input{padding-left:26px;}
 </style>
 </head>
 <body>
@@ -870,7 +870,7 @@
           <svg class="field-icon" viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5zm-7 19c0-3.9 3.1-7 7-7s7 3.1 7 7z"/></svg>
           <input id="regName" placeholder="z. B. HighRoller_88">
         </div>
-        <div class="field-hint">So wirst du für andere Spieler sichtbar.</div>
+        <div class="field-hint">Das ist dein Spitzname (z. B. in der Begrüßung). Direkt nach der Anmeldung legst du zusätzlich deinen eindeutigen <strong>Benutzernamen</strong> fest, über den dich andere Spieler finden.</div>
 
         <label>Geschlecht</label>
         <div class="gender-select" id="genderSelect">
@@ -941,9 +941,9 @@
   <div class="modal username-modal">
     <div class="mlogo">@</div>
     <h1>Wähle deinen Benutzernamen</h1>
-    <div class="sub">Damit dich andere Spieler als Freund finden können, brauchst du einen eindeutigen Benutzernamen.</div>
+    <div class="sub" id="usernameModalSub">Damit dich andere Spieler als Freund finden können, brauchst du einen eindeutigen Benutzernamen.</div>
     <form id="usernameForm">
-      <label>Benutzername</label>
+      <label>Benutzername <span style="text-transform:none;font-weight:500;color:var(--faint);">(nicht dein Anzeigename)</span></label>
       <div class="u-wrap">
         <span class="u-prefix">@</span>
         <input id="usernameInput" placeholder="z. B. HighRoller88" autocomplete="off" maxlength="20">
@@ -1080,6 +1080,23 @@
                 <div class="error" id="profileError"></div>
                 <div class="hint" id="profileHint"></div>
                 <button type="submit" class="submit" id="profileSubmitBtn">Änderungen speichern</button>
+              </form>
+            </div>
+
+            <div class="lux-card">
+              <div class="card-title">
+                <svg viewBox="0 0 24 24"><path d="M16 11c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3 1.3 3 3 3zm-8 0c1.7 0 3-1.3 3-3S9.7 5 8 5 5 6.3 5 8s1.3 3 3 3z"/></svg>
+                Benutzername
+              </div>
+              <p class="card-note">Dein fester Handle für die Freunde-Suche – nicht dein Anzeigename. Änderbar max. 1x im Monat.</p>
+              <form id="usernameChangeForm">
+                <div class="u-wrap">
+                  <span class="u-prefix">@</span>
+                  <input id="usernameChangeInput" placeholder="neuer Benutzername" autocomplete="off" maxlength="20" style="padding-left:26px;">
+                </div>
+                <div class="error" id="usernameChangeError"></div>
+                <div class="hint" id="usernameChangeHint"></div>
+                <button type="submit" class="submit" id="usernameChangeBtn">Benutzername ändern</button>
               </form>
             </div>
 
@@ -1986,7 +2003,7 @@
     }
     let { data: profile, error } = await supabaseClient
       .from('profiles')
-      .select('name, chips, gender, username')
+      .select('name, chips, gender, username, username_changed_at')
       .eq('id', user.id)
       .single();
     if(error){
@@ -2260,6 +2277,7 @@
       document.getElementById('profileName').value = currentProfile.name;
       document.getElementById('settingsUname').textContent = currentProfile.name;
       document.getElementById('settingsHandle').textContent = currentProfile.username ? '@' + currentProfile.username : 'Kein Benutzername';
+      renderUsernameChangeCard();
       const initial = currentProfile.name.charAt(0).toUpperCase();
       applyAvatarToEl(bigAvatar, initial, avatarDataUrl || selectedColor);
     }
@@ -2411,6 +2429,8 @@
     if(profile && ('username' in profile) && !profile.username){
       usernameError.textContent = '';
       usernameInput.value = '';
+      document.getElementById('usernameModalSub').innerHTML =
+        `Dein <strong>Anzeigename</strong> ist aktuell „${profile.name}“ – der bleibt wie er ist. Wähle jetzt zusätzlich einen eindeutigen <strong>Benutzernamen</strong> (wie ein Handle), über den dich andere Spieler in der Freunde-Suche finden. Änderbar später max. 1x im Monat.`;
       usernameOverlay.classList.add('open');
       setTimeout(() => usernameInput.focus(), 50);
     } else {
@@ -2474,6 +2494,107 @@
     usernameOverlay.classList.remove('open');
     showToast('Benutzername gespeichert.');
     await loadProfile(); // holt den echten Stand aus Supabase, damit überall der Username sichtbar ist
+  });
+
+  // --- Benutzername später ändern (Einstellungen), max. 1x im Monat ---
+  const usernameChangeForm = document.getElementById('usernameChangeForm');
+  const usernameChangeInput = document.getElementById('usernameChangeInput');
+  const usernameChangeError = document.getElementById('usernameChangeError');
+  const usernameChangeHint = document.getElementById('usernameChangeHint');
+  const usernameChangeBtn = document.getElementById('usernameChangeBtn');
+
+  function nextAllowedChangeDate(){
+    if(!currentProfile?.username_changed_at) return null;
+    const last = new Date(currentProfile.username_changed_at);
+    const next = new Date(last.getTime() + 30*24*60*60*1000);
+    return next > new Date() ? next : null;
+  }
+
+  function renderUsernameChangeCard(){
+    usernameChangeError.textContent = '';
+    usernameChangeHint.textContent = '';
+    usernameChangeInput.value = '';
+    usernameChangeInput.placeholder = currentProfile?.username ? `aktuell: @${currentProfile.username}` : 'Benutzername wählen';
+    const blockedUntil = nextAllowedChangeDate();
+    if(blockedUntil){
+      usernameChangeInput.disabled = true;
+      usernameChangeBtn.disabled = true;
+      usernameChangeHint.textContent = `Nächste Änderung möglich ab ${blockedUntil.toLocaleDateString('de-DE')}.`;
+    } else {
+      usernameChangeInput.disabled = false;
+      usernameChangeBtn.disabled = false;
+    }
+  }
+
+  usernameChangeForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    const uname = usernameChangeInput.value.trim();
+    usernameChangeError.textContent = '';
+    usernameChangeHint.textContent = '';
+
+    if(!USERNAME_RE.test(uname)){
+      usernameChangeError.textContent = '3–20 Zeichen: nur Buchstaben, Zahlen, Unterstriche.';
+      return;
+    }
+    if(currentProfile?.username && uname.toLowerCase() === currentProfile.username.toLowerCase()){
+      usernameChangeError.textContent = 'Das ist bereits dein aktueller Benutzername.';
+      return;
+    }
+
+    usernameChangeBtn.disabled = true;
+    usernameChangeBtn.textContent = 'Prüfe Verfügbarkeit...';
+
+    const { data: existing, error: checkErr } = await supabaseClient
+      .from('public_profiles')
+      .select('id')
+      .ilike('username', uname)
+      .maybeSingle();
+    if(checkErr && checkErr.code !== 'PGRST116'){
+      usernameChangeBtn.disabled = false;
+      usernameChangeBtn.textContent = 'Benutzername ändern';
+      usernameChangeError.textContent = checkErr.message;
+      return;
+    }
+    if(existing){
+      usernameChangeBtn.disabled = false;
+      usernameChangeBtn.textContent = 'Benutzername ändern';
+      usernameChangeError.textContent = 'Dieser Benutzername ist bereits vergeben.';
+      return;
+    }
+
+    const { data: updated, error } = await supabaseClient
+      .from('profiles')
+      .update({ username: uname })
+      .eq('id', currentUserId)
+      .select('id, username, username_changed_at')
+      .maybeSingle();
+
+    usernameChangeBtn.disabled = false;
+    usernameChangeBtn.textContent = 'Benutzername ändern';
+
+    if(error){
+      // Der DB-Trigger blockt zu frühe Änderungen serverseitig ab (siehe Migration) —
+      // das greift auch, falls jemand versucht, das Monats-Limit clientseitig zu umgehen.
+      if(error.code === '23505'){
+        usernameChangeError.textContent = 'Dieser Benutzername ist bereits vergeben.';
+      } else if((error.message || '').includes('username_cooldown')){
+        usernameChangeError.textContent = 'Änderung noch nicht möglich (max. 1x im Monat).';
+      } else {
+        usernameChangeError.textContent = error.message;
+      }
+      return;
+    }
+    if(!updated){
+      usernameChangeError.textContent = 'Speichern wurde von der Datenbank blockiert.';
+      return;
+    }
+
+    currentProfile.username = updated.username;
+    currentProfile.username_changed_at = updated.username_changed_at;
+    document.getElementById('settingsHandle').textContent = '@' + updated.username;
+    renderUsernameChangeCard();
+    showToast('Benutzername geändert.');
+    renderAuthArea(currentProfile, currentUserEmail);
   });
 
   // ============================================================
