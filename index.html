@@ -2881,11 +2881,20 @@
       .eq('id', user.id)
       .single();
     if(error){
-      // "gender"/"username"-Spalte existiert evtl. noch nicht in der profiles-Tabelle — ohne sie nochmal
-      // versuchen, damit der Login trotzdem funktioniert.
-      const fallback = await supabaseClient.from('profiles').select('name, chips').eq('id', user.id).single();
-      profile = fallback.data;
-      error = fallback.error;
+      // Eine der neueren Spalten (gender/username/…_changed_at) existiert evtl. noch nicht
+      // in der profiles-Tabelle. Stufenweise abbauen statt gleich auf "name, chips" zu springen,
+      // damit vorhandene Spalten (z.B. username_changed_at) nicht grundlos verloren gehen.
+      const attempts = [
+        'name, chips, gender, username, username_changed_at',
+        'name, chips, gender, username',
+        'name, chips'
+      ];
+      for(const cols of attempts){
+        const fallback = await supabaseClient.from('profiles').select(cols).eq('id', user.id).single();
+        profile = fallback.data;
+        error = fallback.error;
+        if(!error) break;
+      }
     }
     if(error){ console.error(error); renderAuthArea(null); return; }
     currentProfile = profile;
