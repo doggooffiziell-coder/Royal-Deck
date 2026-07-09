@@ -370,21 +370,37 @@
   .rail-badge.admin svg{fill:var(--accent-hi);}
 
   .settings-tabnav{
-    display:flex;flex-direction:column;gap:3px;margin-top:26px;
+    position:relative;
+    display:flex;flex-direction:column;gap:5px;margin-top:26px;flex:1;
     padding-top:20px;border-top:1px solid var(--border-soft);
   }
-  .settings-tabnav .stab{
-    display:flex;align-items:center;gap:10px;position:relative;
-    padding:10px 12px;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;
-    border-radius:9px;transition:.15s;
+  .stab-highlight{
+    position:absolute;left:0;width:100%;border-radius:11px;z-index:0;pointer-events:none;
+    background:var(--accent-soft);box-shadow:inset 0 0 0 1px rgba(79,127,224,.25);
+    transition:transform .28s cubic-bezier(.16,1,.3,1),height .28s cubic-bezier(.16,1,.3,1),background .2s,box-shadow .2s;
   }
-  .settings-tabnav .stab svg{width:13px;height:13px;fill:currentColor;opacity:.85;flex-shrink:0;}
-  .settings-tabnav .stab.active{color:var(--accent-hi);background:var(--accent-soft);}
+  .stab-highlight.danger{background:rgba(239,107,107,.16);box-shadow:inset 0 0 0 1px rgba(239,107,107,.35);}
+  .settings-tabnav .stab{
+    display:flex;align-items:center;gap:11px;position:relative;z-index:1;
+    padding:13px 14px;font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer;
+    border-radius:11px;transition:color .2s;
+  }
+  .settings-tabnav .stab svg{width:15px;height:15px;fill:currentColor;opacity:.85;flex-shrink:0;}
+  .settings-tabnav .stab.active{color:var(--accent-hi);}
   .settings-tabnav .stab.active:before{
     content:"";position:absolute;left:-20px;top:50%;transform:translateY(-50%);
-    width:3px;height:16px;border-radius:2px;background:var(--accent-hi);
+    width:3px;height:18px;border-radius:2px;background:var(--accent-hi);
   }
-  .settings-tabnav .stab:hover{color:var(--text);background:rgba(255,255,255,.035);}
+  .settings-tabnav .stab:hover{color:var(--text);}
+
+  .settings-tabnav .stab[data-spane="admin"]{
+    margin-top:auto;color:var(--danger);
+    background:rgba(239,107,107,.12);border:1px solid rgba(239,107,107,.22);
+  }
+  .settings-tabnav .stab[data-spane="admin"] svg{fill:var(--danger);}
+  .settings-tabnav .stab[data-spane="admin"]:hover{background:rgba(239,107,107,.18);color:var(--danger);}
+  .settings-tabnav .stab[data-spane="admin"].active{background:rgba(239,107,107,.22);border-color:rgba(239,107,107,.4);color:#ffdada;}
+  .settings-tabnav .stab[data-spane="admin"].active:before{background:var(--danger);}
 
   /* ---- right side: dashboard grid ---- */
   .settings-main{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--bg);}
@@ -420,6 +436,8 @@
     .rail-avatar-wrap{margin:0;}
     .settings-tabnav{flex-direction:row;flex:1 1 100%;margin-top:16px;padding-top:16px;overflow-x:auto;}
     .settings-tabnav .stab.active:before{display:none;}
+    .stab-highlight{display:none;}
+    .settings-tabnav .stab[data-spane="admin"]{margin-top:0;margin-left:auto;}
     .settings-pane.active{grid-template-columns:1fr;}
   }
 
@@ -1109,7 +1127,8 @@
           <div class="rail-id-email" id="settingsEmail">—</div>
           <div class="rail-badges" id="railBadges"></div>
 
-          <div class="settings-tabnav">
+          <div class="settings-tabnav" id="settingsTabnav">
+            <div class="stab-highlight" id="stabHighlight"></div>
             <div class="stab active" data-spane="profile">
               <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5zm-7 19c0-3.9 3.1-7 7-7s7 3.1 7 7z"/></svg>
               Profil
@@ -1492,6 +1511,22 @@
       el.style.background = colorOrImage;
       el.textContent = initial;
     }
+  }
+
+  // Speichert das Profilbild zusätzlich in Supabase (Spalte "avatar_url" auf "profiles"),
+  // damit Freunde und andere Geräte es ebenfalls sehen. dataUrl = null löscht das Bild wieder.
+  // Voraussetzung: Spalte "avatar_url" (text) auf "profiles" + in der "public_profiles"-View.
+  let avatarSyncSupported = true;
+  async function syncAvatarToProfile(dataUrl){
+    if(!currentUserId || !avatarSyncSupported) return;
+    const { error } = await supabaseClient.from('profiles').update({ avatar_url: dataUrl }).eq('id', currentUserId);
+    if(error){
+      avatarSyncSupported = false;
+      console.error('Profilbild konnte nicht mit dem Account synchronisiert werden (fehlt die Spalte "avatar_url"?):', error);
+      showToast('Profilbild wurde lokal gespeichert, aber nicht mit deinem Account synchronisiert.');
+      return;
+    }
+    if(currentProfile) currentProfile.avatar_url = dataUrl;
   }
 
   // --- Login/Register modal logic ---
@@ -2060,9 +2095,15 @@
     }
     let { data: profile, error } = await supabaseClient
       .from('profiles')
-      .select('name, chips, gender, username, username_changed_at')
+      .select('name, chips, gender, username, username_changed_at, avatar_url')
       .eq('id', user.id)
       .single();
+    if(error){
+      // "avatar_url"-Spalte existiert evtl. noch nicht — ohne sie nochmal versuchen.
+      const noAvatar = await supabaseClient.from('profiles').select('name, chips, gender, username, username_changed_at').eq('id', user.id).single();
+      profile = noAvatar.data;
+      error = noAvatar.error;
+    }
     if(error){
       // "gender"/"username"-Spalte existiert evtl. noch nicht in der profiles-Tabelle — ohne sie nochmal
       // versuchen, damit der Login trotzdem funktioniert.
@@ -2075,7 +2116,7 @@
     currentUserId = user.id;
     currentUserEmail = user.email;
     isAdmin = admin;
-    avatarDataUrl = loadAvatarForUser(currentUserId);
+    avatarDataUrl = profile.avatar_url || loadAvatarForUser(currentUserId);
     await loadNotifications();
     renderAuthArea(profile, user.email);
     enforceUsername(profile);
@@ -2174,7 +2215,7 @@
     const sw = document.createElement('div');
     sw.className = 'swatch' + (i === 0 ? ' selected' : '');
     sw.style.background = grad;
-    sw.addEventListener('click', () => {
+    sw.addEventListener('click', async () => {
       selectedColor = grad;
       document.querySelectorAll('.swatch').forEach(s => s.classList.remove('selected'));
       sw.classList.add('selected');
@@ -2183,6 +2224,7 @@
       const initial = currentProfile ? currentProfile.name.charAt(0).toUpperCase() : 'H';
       applyAvatarToEl(bigAvatar, initial, grad);
       renderAuthArea(currentProfile, currentUserEmail);
+      await syncAvatarToProfile(null);
     });
     colorSwatches.appendChild(sw);
   });
@@ -2300,7 +2342,7 @@
     document.getElementById('genderHint').textContent = '';
     document.getElementById('pwForm').reset();
 
-    avatarDataUrl = currentUserId ? loadAvatarForUser(currentUserId) : null;
+    avatarDataUrl = currentUserId ? (currentProfile?.avatar_url || loadAvatarForUser(currentUserId)) : null;
     renderRailBadges();
 
     // Admin-Tab nur für Admin-Konten im Sicherheits-/Navigationsbereich einblenden
@@ -2370,6 +2412,7 @@
         applyAvatarToEl(bigAvatar, '', dataUrl);
         renderAuthArea(currentProfile, currentUserEmail);
         showToast('Profilbild aktualisiert.');
+        syncAvatarToProfile(dataUrl);
       };
       img.src = evt.target.result;
     };
@@ -2379,11 +2422,24 @@
   settingsOverlay.addEventListener('click', e => { if(e.target === settingsOverlay) settingsOverlay.classList.remove('open'); });
 
   const spaneLabels = { profile: 'Profil', security: 'Sicherheit', admin: 'Admin' };
+  function positionStabHighlight(activeEl){
+    const hl = document.getElementById('stabHighlight');
+    if(!hl || !activeEl) return;
+    hl.style.height = activeEl.offsetHeight + 'px';
+    hl.style.transform = `translateY(${activeEl.offsetTop}px)`;
+    hl.classList.toggle('danger', activeEl.dataset.spane === 'admin');
+  }
   function switchPane(name){
-    document.querySelectorAll('.settings-tabnav .stab').forEach(t => t.classList.toggle('active', t.dataset.spane === name));
+    let activeTab = null;
+    document.querySelectorAll('.settings-tabnav .stab').forEach(t => {
+      const isActive = t.dataset.spane === name;
+      t.classList.toggle('active', isActive);
+      if(isActive) activeTab = t;
+    });
     panes.forEach(p => p.classList.toggle('active', p.id === 'pane-' + name));
     const label = document.getElementById('settingsPaneLabel');
     if(label) label.textContent = spaneLabels[name] || name;
+    positionStabHighlight(activeTab);
   }
   document.querySelectorAll('.settings-tabnav .stab[data-spane]').forEach(t => {
     t.addEventListener('click', () => switchPane(t.dataset.spane));
@@ -2666,17 +2722,25 @@
 
   function initials(name){ return (name || '?').charAt(0).toUpperCase(); }
 
-  function friendAvatarHTML(name){
+  function friendAvatarHTML(name, avatarUrl){
+    if(avatarUrl){
+      return `<div class="avatar" style="background-image:url(${avatarUrl});background-size:cover;background-position:center;"></div>`;
+    }
     return `<div class="avatar" style="background:linear-gradient(135deg,#4f7fe0,#2a3542)">${initials(name)}</div>`;
   }
 
-  // Holt öffentliche Profildaten (id, username, name) zu einer Liste von User-IDs.
+  // Holt öffentliche Profildaten (id, username, name, avatar_url) zu einer Liste von User-IDs.
   async function fetchPublicProfiles(ids){
     if(!ids.length) return {};
-    const { data, error } = await supabaseClient
+    let { data, error } = await supabaseClient
       .from('public_profiles')
-      .select('id, username, name')
+      .select('id, username, name, avatar_url')
       .in('id', ids);
+    if(error){
+      // "avatar_url" evtl. noch nicht in der public_profiles-View — ohne sie nochmal versuchen.
+      const fallback = await supabaseClient.from('public_profiles').select('id, username, name').in('id', ids);
+      data = fallback.data; error = fallback.error;
+    }
     if(error){ console.error(error); return {}; }
     const map = {};
     (data || []).forEach(p => { map[p.id] = p; });
@@ -2731,7 +2795,7 @@
     const listEl = document.getElementById('fpanelList');
     listEl.innerHTML = friendsCache.friends.length ? friendsCache.friends.map(f => `
       <div class="friend-row">
-        ${friendAvatarHTML(f.name || f.username)}
+        ${friendAvatarHTML(f.name || f.username, f.avatar_url)}
         <div class="fr-info">
           <div class="fr-username">@${f.username}</div>
           <div class="fr-name">${f.name || ''}</div>
@@ -2744,7 +2808,7 @@
     const inEl = document.getElementById('fpanelIncoming');
     inEl.innerHTML = friendsCache.incoming.length ? friendsCache.incoming.map(f => `
       <div class="friend-row">
-        ${friendAvatarHTML(f.name || f.username)}
+        ${friendAvatarHTML(f.name || f.username, f.avatar_url)}
         <div class="fr-info">
           <div class="fr-username">@${f.username}</div>
           <div class="fr-name">${f.name || ''}</div>
@@ -2758,7 +2822,7 @@
     const outEl = document.getElementById('fpanelOutgoing');
     outEl.innerHTML = friendsCache.outgoing.length ? friendsCache.outgoing.map(f => `
       <div class="friend-row">
-        ${friendAvatarHTML(f.name || f.username)}
+        ${friendAvatarHTML(f.name || f.username, f.avatar_url)}
         <div class="fr-info">
           <div class="fr-username">@${f.username}</div>
           <div class="fr-name">Angefragt</div>
@@ -2822,12 +2886,17 @@
   async function runFriendSearch(q){
     const resultsEl = document.getElementById('friendSearchResults');
     if(!currentUserId) return;
-    const { data, error } = await supabaseClient
+    let { data, error } = await supabaseClient
       .from('public_profiles')
-      .select('id, username, name')
+      .select('id, username, name, avatar_url')
       .ilike('username', `%${q}%`)
       .not('username', 'is', null)
       .limit(8);
+    if(error){
+      const fallback = await supabaseClient.from('public_profiles').select('id, username, name')
+        .ilike('username', `%${q}%`).not('username', 'is', null).limit(8);
+      data = fallback.data; error = fallback.error;
+    }
     if(error){ console.error(error); return; }
 
     const knownIds = new Set([
@@ -2844,7 +2913,7 @@
     }
     resultsEl.innerHTML = results.map(p => `
       <div class="friend-row">
-        ${friendAvatarHTML(p.name || p.username)}
+        ${friendAvatarHTML(p.name || p.username, p.avatar_url)}
         <div class="fr-info">
           <div class="fr-username">@${p.username}</div>
           <div class="fr-name">${p.name || ''}</div>
