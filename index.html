@@ -863,6 +863,10 @@
   }
   .switch input:checked + .slider{background:linear-gradient(180deg,var(--accent-hi),var(--accent));box-shadow:inset 0 0 0 1px var(--accent-dim);}
   .switch input:checked + .slider:before{transform:translateX(20px);background:var(--accent-ink);box-shadow:inset 0 0 0 2px rgba(240,211,142,.4);}
+  .switch.sm{width:34px;height:19px;}
+  .switch.sm .slider{border-radius:19px;}
+  .switch.sm .slider:before{height:13px;width:13px;left:3px;bottom:3px;}
+  .switch.sm input:checked + .slider:before{transform:translateX(15px);}
 
   /* --------- admin: whitelist manager --------- */
   .wl-add-row{display:flex;gap:8px;}
@@ -879,8 +883,10 @@
     display:flex;align-items:center;justify-content:space-between;gap:10px;
     background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:8px 10px 8px 13px;
   }
+  .wl-item.inactive{opacity:.55;}
   .wl-item .wl-email{font-size:13px;color:var(--text);font-family:var(--font-body);font-weight:500;
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;}
+  .wl-item .wl-actions{display:flex;align-items:center;gap:10px;flex-shrink:0;}
   .wl-item .wl-remove{
     flex-shrink:0;width:24px;height:24px;border-radius:6px;background:transparent;border:1px solid var(--border);
     color:var(--faint);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s;
@@ -2421,7 +2427,7 @@
     if(!isAdmin){ list.innerHTML = ''; return; }
     const { data, error } = await supabaseClient
       .from('maintenance_whitelist')
-      .select('id, email')
+      .select('id, email, active')
       .order('created_at', { ascending: true });
     if(error){
       list.innerHTML = `<div class="wl-empty">Fehler beim Laden: ${error.message}</div>`;
@@ -2432,12 +2438,34 @@
       return;
     }
     list.innerHTML = data.map(row => `
-      <div class="wl-item" data-id="${row.id}">
+      <div class="wl-item ${row.active === false ? 'inactive' : ''}" data-id="${row.id}">
         <span class="wl-email">${row.email}</span>
-        <div class="wl-remove" title="Entfernen">
-          <svg viewBox="0 0 24 24"><path d="M18.3 5.7L12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7 2.9 18.3 9.2 12 2.9 5.7 4.3 4.3l6.3 6.3 6.3-6.3z"/></svg>
+        <div class="wl-actions">
+          <label class="switch sm" title="${row.active === false ? 'Zugriff sperren' : 'Zugriff erlauben'}">
+            <input type="checkbox" class="wl-active-toggle" ${row.active === false ? '' : 'checked'}>
+            <span class="slider"></span>
+          </label>
+          <div class="wl-remove" title="Komplett entfernen">
+            <svg viewBox="0 0 24 24"><path d="M18.3 5.7L12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7 2.9 18.3 9.2 12 2.9 5.7 4.3 4.3l6.3 6.3 6.3-6.3z"/></svg>
+          </div>
         </div>
       </div>`).join('');
+    list.querySelectorAll('.wl-active-toggle').forEach(toggle => {
+      toggle.addEventListener('change', async () => {
+        const item = toggle.closest('.wl-item');
+        const id = item.dataset.id;
+        const newActive = toggle.checked;
+        toggle.disabled = true;
+        const { error: toggleError } = await supabaseClient
+          .from('maintenance_whitelist')
+          .update({ active: newActive })
+          .eq('id', id);
+        toggle.disabled = false;
+        if(toggleError){ showToast(toggleError.message); toggle.checked = !newActive; return; }
+        item.classList.toggle('inactive', !newActive);
+        showToast(newActive ? 'Zugriff wieder erlaubt.' : 'Zugriff gesperrt.');
+      });
+    });
     list.querySelectorAll('.wl-remove').forEach(btn => {
       btn.addEventListener('click', async () => {
         const item = btn.closest('.wl-item');
