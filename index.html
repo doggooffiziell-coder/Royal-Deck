@@ -188,6 +188,23 @@
   .card .stat{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--faint);margin-top:4px;font-family:var(--font-mono);}
   .card .stat svg{width:10px;height:10px;fill:var(--faint);}
 
+  .card.locked{cursor:default;}
+  .card.locked .thumb{border-style:dashed;}
+  .placeholder-thumb{
+    background:var(--surface);display:flex;align-items:center;justify-content:center;
+  }
+  .lock-icon{width:26px;height:26px;fill:var(--faint);opacity:.6;}
+  .card.locked h3{color:var(--faint);}
+  .card.locked .stat{color:var(--faint);}
+
+  .toast{
+    position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
+    background:var(--surface);border:1px solid var(--border);color:var(--text);
+    padding:12px 20px;border-radius:9px;font-size:13px;font-weight:500;
+    box-shadow:0 12px 30px rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:.22s;z-index:200;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
   @media (max-width:700px){
     .sidebar{width:0;overflow:hidden;border:none;}
     .content{padding:16px;}
@@ -347,6 +364,36 @@
   .dropdown div{padding:11px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:9px;color:var(--text);transition:.12s;}
   .dropdown div:hover{background:var(--surface-2);color:var(--accent-hi);}
   .dropdown svg{width:14px;height:14px;fill:currentColor;}
+
+  /* icon button dropdowns (notifications / mail) */
+  .icon-btn-wrap{position:relative;}
+  .panel-dropdown{
+    width:280px;right:-8px;padding:6px 0;
+  }
+  .panel-head{
+    padding:12px 16px 10px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+    color:var(--faint);border-bottom:1px solid var(--border);margin-bottom:4px;
+  }
+  .panel-item{display:flex;align-items:flex-start;gap:11px;padding:10px 16px;cursor:default;transition:.12s;}
+  .panel-item:hover{background:var(--surface-2);}
+  .panel-icon{
+    width:30px;height:30px;border-radius:8px;background:var(--surface-2);display:flex;align-items:center;
+    justify-content:center;font-size:14px;flex-shrink:0;
+  }
+  .panel-title{font-size:12.5px;font-weight:600;color:var(--text);}
+  .panel-sub{font-size:11.5px;color:var(--muted);margin-top:2px;}
+  .panel-empty{padding:20px 16px;font-size:12.5px;color:var(--muted);text-align:center;line-height:1.5;}
+
+  /* user-chip dropdown header */
+  .dropdown .dd-head{
+    display:flex;align-items:center;gap:10px;padding:13px 14px;border-bottom:1px solid var(--border);
+  }
+  .dropdown .dd-head .avatar{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;
+    justify-content:center;color:#f3f6fc;font-weight:600;font-size:14px;flex-shrink:0;}
+  .dropdown .dd-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px;}
+  .dropdown .dd-level{font-size:11px;color:var(--muted);margin-top:2px;font-family:var(--font-mono);}
+  .dropdown .dd-menu{padding:6px;}
+  .dropdown .dd-menu div{border-radius:7px;padding:9px 10px;}
 </style>
 </head>
 <body>
@@ -382,14 +429,42 @@
       <input placeholder="Spiele, Erlebnisse suchen">
     </div>
     <div class="top-right">
-      <div class="points-chip" id="pointsDisplay"><svg class="star" viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg> Level 1 · 0 Punkte</div>
-      <div class="icon-btn">
-        <svg viewBox="0 0 24 24"><path d="M12 22a2 2 0 002-2h-4a2 2 0 002 2zm6-6v-5a6 6 0 10-12 0v5l-2 2v1h16v-1z"/></svg>
-        <div class="badge">3</div>
+      <div class="points-chip" id="pointsDisplay" title="Dein Level basiert auf deinen Punkten">
+        <svg class="star" viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg> Level 1 · 0 Punkte
       </div>
-      <div class="icon-btn">
-        <svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 4l-8 5-8-5V6l8 5 8-5z"/></svg>
+
+      <div class="icon-btn-wrap">
+        <div class="icon-btn" id="notifBtn">
+          <svg viewBox="0 0 24 24"><path d="M12 22a2 2 0 002-2h-4a2 2 0 002 2zm6-6v-5a6 6 0 10-12 0v5l-2 2v1h16v-1z"/></svg>
+          <div class="badge" id="notifBadge">3</div>
+        </div>
+        <div class="dropdown panel-dropdown" id="notifDropdown">
+          <div class="panel-head">Benachrichtigungen</div>
+          <div class="panel-item">
+            <div class="panel-icon">🎉</div>
+            <div><div class="panel-title">Willkommen!</div><div class="panel-sub">Dein Konto wurde erstellt.</div></div>
+          </div>
+          <div class="panel-item">
+            <div class="panel-icon">🃏</div>
+            <div><div class="panel-title">Neu: Blackjack</div><div class="panel-sub">Jetzt am Tisch verfügbar.</div></div>
+          </div>
+          <div class="panel-item">
+            <div class="panel-icon">⭐</div>
+            <div><div class="panel-title">Nächstes Level</div><div class="panel-sub">Sammle Punkte, um aufzusteigen.</div></div>
+          </div>
+        </div>
       </div>
+
+      <div class="icon-btn-wrap">
+        <div class="icon-btn" id="mailBtn">
+          <svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 4l-8 5-8-5V6l8 5 8-5z"/></svg>
+        </div>
+        <div class="dropdown panel-dropdown" id="mailDropdown">
+          <div class="panel-head">Nachrichten</div>
+          <div class="panel-empty">Noch keine Nachrichten. Füge Freunde hinzu, um zu chatten.</div>
+        </div>
+      </div>
+
       <div id="authArea"></div>
     </div>
   </div>
@@ -547,65 +622,102 @@
         </div>
         <h1 id="heroGreeting">Hallo, Gast!</h1>
         <p>Entdecke neue Erlebnisse und spiel mit deinen Freunden am Tisch.</p>
-        <button>Jetzt entdecken</button>
+        <button id="heroCta">Jetzt entdecken</button>
       </div>
     </div>
 
-    <div class="section-head">
-      <h2>Für dich empfohlen</h2>
-      <a>Alle anzeigen</a>
+    <div class="section-head" id="gamesSection">
+      <h2>Casino Spiele</h2>
+      <a id="allGamesLink">Alle anzeigen</a>
     </div>
     <div class="row" id="row1"></div>
-
-    <div class="section-head">
-      <h2>Beliebt bei Freunden</h2>
-      <a>Alle anzeigen</a>
-    </div>
-    <div class="row" id="row2"></div>
-
-    <div class="section-head">
-      <h2>Neu & angesagt</h2>
-      <a>Alle anzeigen</a>
-    </div>
-    <div class="row" id="row3"></div>
   </div>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script>
+  // Nur zwei echte Spiele — der Rest folgt später als "Bald verfügbar".
   const games = [
-    ["Kartenlegende Royale","#1c1408","#8a6a1a","3,2 Mio."],
-    ["Turnier-Tisch Deluxe","#2a1010","#7a2e2e","1,8 Mio."],
-    ["Glücksrad Deluxe","#241a03","#a8842a","980 Tsd."],
-    ["Symbol-Frenzy","#1c1408","#c69d34","540 Tsd."],
-    ["Kartenlounge","#10141b","#243447","2,1 Mio."],
-    ["Drei-Karten-Duell","#151b25","#2a3542","1,4 Mio."],
-    ["Würfeltisch","#2a1010","#5c1c2e","310 Tsd."],
-    ["Karten-Klassiker","#1a1a1a","#3a3a3a","760 Tsd."],
+    { name:"Poker", suit:"♠", c1:"#151b25", c2:"#2a3542", players:"—", desc:"Texas Hold'em am virtuellen Tisch." },
+    { name:"Blackjack", suit:"♣", c1:"#1c1408", c2:"#8a6a1a", players:"—", desc:"Schlag den Dealer auf 21." },
   ];
+  const PLACEHOLDER_SLOTS = 2; // leere Plätze, bis mehr Spiele folgen
 
-  const icons = ["♠","♥","♦","🎰","♣","♦","🎲","♠"];
-
-  function makeRow(id, seed){
+  function makeRow(id){
     const el = document.getElementById(id);
-    const slice = games.slice(seed,seed+4).concat(games.slice(0,Math.max(0,4-(games.length-seed))));
-    const iconSlice = icons.slice(seed,seed+4).concat(icons.slice(0,Math.max(0,4-(icons.length-seed))));
-    slice.forEach(([name,c1,c2,players],i)=>{
+    el.innerHTML = '';
+    games.forEach(g => {
       const card = document.createElement('div');
-      card.className='card';
+      card.className = 'card';
       card.innerHTML = `
-        <div class="thumb" style="--c1:${c1};--c2:${c2}">
-          <div class="suit">${iconSlice[i]}</div>
+        <div class="thumb" style="--c1:${g.c1};--c2:${g.c2}">
+          <div class="suit">${g.suit}</div>
           <div class="play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
         </div>
-        <h3>${name}</h3>
-        <div class="stat"><svg viewBox="0 0 24 24"><path d="M12 12a5 5 0 100-10 5 5 0 000 10zm0 2c-4 0-8 2-8 5v3h16v-3c0-3-4-5-8-5z"/></svg>${players} Spieler</div>
+        <h3>${g.name}</h3>
+        <div class="stat"><svg viewBox="0 0 24 24"><path d="M12 12a5 5 0 100-10 5 5 0 000 10zm0 2c-4 0-8 2-8 5v3h16v-3c0-3-4-5-8-5z"/></svg>${g.desc}</div>
       `;
+      card.addEventListener('click', () => openGame(g.name));
       el.appendChild(card);
     });
+    for(let i=0;i<PLACEHOLDER_SLOTS;i++){
+      const card = document.createElement('div');
+      card.className = 'card locked';
+      card.innerHTML = `
+        <div class="thumb placeholder-thumb">
+          <svg viewBox="0 0 24 24" class="lock-icon"><path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-9h-1V6a5 5 0 00-10 0v2H6a2 2 0 00-2 2v9a2 2 0 002 2h12a2 2 0 002-2v-9a2 2 0 00-2-2zM9 6a3 3 0 016 0v2H9z"/></svg>
+        </div>
+        <h3>Bald verfügbar</h3>
+        <div class="stat">Neues Spiel folgt</div>
+      `;
+      el.appendChild(card);
+    }
   }
-  makeRow('row1',0);
-  makeRow('row2',3);
-  makeRow('row3',5);
+  makeRow('row1');
+
+  // --- Toast (kurzes Feedback für Aktionen ohne eigene Ansicht) ---
+  let toastTimer = null;
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+  }
+
+  async function openGame(name){
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if(!user){
+      showToast('Melde dich an, um zu spielen.');
+      openModal('login');
+      return;
+    }
+    showToast(`${name}-Tisch wird vorbereitet …`);
+  }
+
+  // Hero-CTA scrollt zu den Spielen
+  document.getElementById('heroCta').addEventListener('click', () => {
+    document.getElementById('gamesSection').scrollIntoView({ behavior:'smooth', block:'start' });
+  });
+  document.getElementById('allGamesLink').addEventListener('click', () => {
+    document.getElementById('gamesSection').scrollIntoView({ behavior:'smooth', block:'start' });
+  });
+
+  // Sidebar-Navigation: Home ist aktiv, restliche Bereiche sind noch nicht gebaut
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      item.classList.add('active');
+      const label = item.querySelector('span')?.textContent;
+      if(label === 'Home'){
+        document.querySelector('.content').scrollTo({ top:0, behavior:'smooth' });
+      } else {
+        showToast(`${label} folgt in Kürze.`);
+      }
+    });
+  });
+
 
   // --- Supabase Setup ---
   const SUPABASE_URL = 'https://tydippnbkkvdohzxplgw.supabase.co';
@@ -633,6 +745,28 @@
   const modalSub = document.getElementById('modalSub');
   const pointsDisplay = document.getElementById('pointsDisplay');
   let mode = 'login';
+
+  // --- Notification & mail panels (functional toggles) ---
+  function setupPanelToggle(btnId, dropdownId, onOpen){
+    const btn = document.getElementById(btnId);
+    const dd = document.getElementById(dropdownId);
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const willOpen = !dd.classList.contains('open');
+      document.querySelectorAll('.panel-dropdown, #dropdown').forEach(d => d.classList.remove('open'));
+      if(willOpen){ dd.classList.add('open'); if(onOpen) onOpen(); }
+    });
+  }
+  setupPanelToggle('notifBtn', 'notifDropdown', () => {
+    const badge = document.getElementById('notifBadge');
+    if(badge) badge.style.display = 'none';
+  });
+  setupPanelToggle('mailBtn', 'mailDropdown');
+  document.addEventListener('click', e => {
+    if(!e.target.closest('.icon-btn-wrap')){
+      document.querySelectorAll('.panel-dropdown').forEach(d => d.classList.remove('open'));
+    }
+  });
 
   function openModal(m){
     mode = m;
@@ -789,18 +923,28 @@
     const level = Math.max(1, Math.floor((profile.chips || 0) / 100));
     pointsDisplay.innerHTML = `<svg class="star" viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg> Level ${level} · ${(profile.chips||0).toLocaleString('de-DE')} Punkte`;
     const initial = profile.name.charAt(0).toUpperCase();
+    const chips = profile.chips || 0;
     authArea.innerHTML = `
       <div class="user-chip" id="userChip">
         <div class="avatar">${initial}</div>
         <span class="uname">${profile.name}</span>
         <div class="dropdown" id="dropdown">
-          <div id="openSettingsBtn">
-            <svg viewBox="0 0 24 24"><path d="M19.4 13a7.9 7.9 0 000-2l2.1-1.6-2-3.4-2.5 1a8 8 0 00-1.7-1L14.9 3H9.1l-.4 2.9a8 8 0 00-1.7 1l-2.5-1-2 3.4L4.6 11a7.9 7.9 0 000 2l-2.1 1.6 2 3.4 2.5-1a8 8 0 001.7 1l.4 2.9h5.8l.4-2.9a8 8 0 001.7-1l2.5 1 2-3.4z"/></svg>
-            Einstellungen
+          <div class="dd-head">
+            <div class="avatar">${initial}</div>
+            <div>
+              <div class="dd-name">${profile.name}</div>
+              <div class="dd-level">Level ${level} · ${chips.toLocaleString('de-DE')} Punkte</div>
+            </div>
           </div>
-          <div id="logoutBtn">
-            <svg viewBox="0 0 24 24"><path d="M16 13v-2H7V8l-5 4 5 4v-3zM20 3H10v2h10v14H10v2h10a2 2 0 002-2V5a2 2 0 00-2-2z"/></svg>
-            Abmelden
+          <div class="dd-menu">
+            <div id="openSettingsBtn">
+              <svg viewBox="0 0 24 24"><path d="M19.4 13a7.9 7.9 0 000-2l2.1-1.6-2-3.4-2.5 1a8 8 0 00-1.7-1L14.9 3H9.1l-.4 2.9a8 8 0 00-1.7 1l-2.5-1-2 3.4L4.6 11a7.9 7.9 0 000 2l-2.1 1.6 2 3.4 2.5-1a8 8 0 001.7 1l.4 2.9h5.8l.4-2.9a8 8 0 001.7-1l2.5 1 2-3.4z"/></svg>
+              Einstellungen
+            </div>
+            <div id="logoutBtn">
+              <svg viewBox="0 0 24 24"><path d="M16 13v-2H7V8l-5 4 5 4v-3zM20 3H10v2h10v14H10v2h10a2 2 0 002-2V5a2 2 0 00-2-2z"/></svg>
+              Abmelden
+            </div>
           </div>
         </div>
       </div>`;
