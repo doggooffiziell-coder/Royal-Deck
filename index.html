@@ -2217,6 +2217,56 @@
   // --- Notification inbox (Broadcasts aus Supabase, pro Nutzer gelesen/archiviert) ---
   // --- Validierungsregeln für Email, Benutzername & Anzeigename ---
   const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+  // --- E-Mail-Qualitätsprüfung bei der Registrierung ---
+  // 1) Bekannte Wegwerf-/Trollmail-Domains sofort blocken (schnell, kein Netzwerk nötig).
+  // 2) Für alles andere per MX-Record prüfen, ob die Domain überhaupt Mail empfangen kann
+  //    (z. B. "epstein.island" hat keinen MX-Eintrag -> wird abgelehnt).
+  //    Nutzt Googles DNS-over-HTTPS, weil das per fetch() direkt aus dem Browser aufrufbar ist.
+  const DISPOSABLE_EMAIL_DOMAINS = [
+    'mailinator.com','guerrillamail.com','guerrillamail.info','sharklasers.com','grr.la',
+    '10minutemail.com','10minutemail.net','temp-mail.org','tempmail.com','tempmail.net',
+    'throwawaymail.com','yopmail.com','yopmail.net','trashmail.com','trashmail.net',
+    'getnada.com','maildrop.cc','dispostable.com','fakeinbox.com','mytemp.email',
+    'moakt.com','mohmal.com','emailondeck.com','spamgourmet.com','mintemail.com',
+    'discard.email','tempinbox.com','mailnesia.com','mailcatch.com','crazymailing.com'
+  ];
+
+  function isDisposableEmailDomain(domain){
+    return DISPOSABLE_EMAIL_DOMAINS.includes(domain.toLowerCase());
+  }
+
+  async function domainHasMailServer(domain){
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 4000);
+      const res = await fetch(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=MX`, {
+        signal: controller.signal
+      });
+      clearTimeout(timeout);
+      if(!res.ok) return true; // Fail-open: DNS-Dienst nicht erreichbar -> echten Nutzer nicht aussperren.
+      const data = await res.json();
+      if(data.Status === 0 && Array.isArray(data.Answer) && data.Answer.length > 0) return true;
+      return false;
+    } catch(e){
+      console.warn('MX-Check fehlgeschlagen, lasse Registrierung sicherheitshalber zu:', e);
+      return true; // Fail-open bei Timeout/Netzwerkfehler.
+    }
+  }
+
+  // Gibt null zurück wenn ok, sonst eine Fehlermeldung zum Anzeigen.
+  async function validateEmailForSignup(email){
+    const domain = email.split('@')[1] || '';
+    if(isDisposableEmailDomain(domain)){
+      return 'Bitte eine echte E-Mail-Adresse verwenden (keine Wegwerf-Adressen).';
+    }
+    const ok = await domainHasMailServer(domain);
+    if(!ok){
+      return 'Diese E-Mail-Domain scheint nicht zu existieren. Bitte prüfe die Adresse.';
+    }
+    return null;
+  }
+
   // Roblox-Style: 3-20 Zeichen, Buchstaben/Zahlen/Unterstrich, kein führender/abschließender/doppelter Unterstrich,
   // mind. ein Buchstabe (nicht nur Zahlen/Unterstriche).
   const USERNAME_CHARSET_RE = /^[a-zA-Z0-9_]{3,20}$/;
@@ -2645,6 +2695,15 @@
       }
       if(!selectedGenderAuth){
         authError.textContent = 'Bitte ein Geschlecht auswählen.';
+        return;
+      }
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Prüfe E-Mail-Adresse...';
+      const emailProblem = await validateEmailForSignup(email);
+      if(emailProblem){
+        authError.textContent = emailProblem;
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Konto erstellen';
         return;
       }
     }
