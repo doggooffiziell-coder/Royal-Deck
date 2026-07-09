@@ -585,8 +585,8 @@
     width:52px;height:52px;border-radius:50%;cursor:pointer;border:2px solid transparent;
     display:flex;align-items:center;justify-content:center;position:relative;
     font-family:'Segoe UI Symbol','Noto Sans Symbol','Arial Unicode MS',Arial,sans-serif;
-    font-style:normal;font-weight:600;font-size:21px;color:var(--text);line-height:1;
-    box-shadow:0 3px 10px rgba(0,0,0,.35), inset 0 0 0 1px rgba(212,175,106,.1);
+    font-style:normal;font-weight:600;font-size:21px;color:var(--accent-hi);line-height:1;
+    background:var(--surface-2);box-shadow:0 3px 10px rgba(0,0,0,.35), inset 0 0 0 1px rgba(212,175,106,.1);
     transition:transform .15s ease, box-shadow .15s ease;
   }
   .avatar-option:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 8px 18px rgba(0,0,0,.45), inset 0 0 0 1px rgba(212,175,106,.18);}
@@ -1602,7 +1602,7 @@
                 <svg viewBox="0 0 24 24"><path d="M12 9a3.5 3.5 0 100 7 3.5 3.5 0 000-7zM9 3L7.5 5H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.5L15 3z"/></svg>
                 Profilbild anpassen
               </div>
-              <p class="card-note">Wähl eines von rund 50 Motiven passend zum Tisch – Kartenzeichen, Würfel, Chips und mehr.</p>
+              <p class="card-note">Wähl dein Symbol – die Farbe stellst du unten bei Avatarfarbe ein.</p>
               <div class="avatar-picker">
                 <div class="avatar-picker-preview" id="avatarPickerPreview">H</div>
                 <div class="avatar-picker-actions" style="flex:1;gap:10px;">
@@ -2047,41 +2047,28 @@
     'linear-gradient(135deg,#ffb347,#ff5e62)'
   ];
 
-  // --- Vorgefertigte Profilbilder (Symbol + Farbverlauf, passend zum Tisch-Thema) ---
-  // Es werden keine eigenen Fotos mehr hochgeladen — stattdessen wählt man eines von
-  // ca. 50 Presets. Die Auswahl gilt nur für die aktuelle Sitzung (kein Speichern/Sync).
+  // --- Vorgefertigte Profilbilder (Symbol, Farbe kommt separat aus der Avatarfarbe) ---
+  // Die Symbolauswahl im Fenster zeigt alle Symbole einheitlich eingefärbt (nur zur Auswahl
+  // der Form). Die tatsächliche Hintergrundfarbe kommt aus der "Avatarfarbe"-Karte in den
+  // Einstellungen und bleibt beim Wechsel des Symbols erhalten (und umgekehrt).
   const AVATAR_SYMBOLS = ['♠','♥','♦','♣','★','♛','⚀','⚅'];
-  const AVATAR_GRADIENTS = [
-    'linear-gradient(135deg,#c9a05b,#8a6a35)',
-    'linear-gradient(135deg,#1c4830,#0f2c1d)',
-    'linear-gradient(135deg,#c1443c,#7a241f)',
-    'linear-gradient(135deg,#4a5568,#1a202c)',
-    'linear-gradient(135deg,#f0cf8e,#c9a05b)'
-  ];
-  const AVATAR_PRESETS = [];
-  AVATAR_SYMBOLS.forEach(symbol => {
-    AVATAR_GRADIENTS.forEach(bg => {
-      AVATAR_PRESETS.push({ id: `preset:${AVATAR_PRESETS.length}`, symbol, bg });
-    });
-  });
+  const AVATAR_PRESETS = AVATAR_SYMBOLS.map((symbol, i) => ({ id: `symbol:${i}`, symbol }));
   function getPreset(value){
-    if(!value || typeof value !== 'string' || !value.startsWith('preset:')) return null;
+    if(!value || typeof value !== 'string' || !value.startsWith('symbol:')) return null;
     return AVATAR_PRESETS[parseInt(value.slice(7), 10)] || null;
   }
 
   // Profilbild-Auswahl gilt nur für die aktuelle Sitzung — kein localStorage, kein Supabase-Sync.
   let avatarDataUrl = null;
-  function applyAvatarToEl(el, initial, value){
+  function applyAvatarToEl(el, initial, value, color){
     if(!el) return;
     const preset = getPreset(value);
+    el.style.backgroundImage = '';
+    el.style.background = color;
     if(preset){
-      el.style.backgroundImage = '';
-      el.style.background = preset.bg;
       el.textContent = preset.symbol;
       el.classList.add('avatar-symbol');
     } else {
-      el.style.backgroundImage = '';
-      el.style.background = value;
       el.textContent = initial;
       el.classList.remove('avatar-symbol');
     }
@@ -2946,7 +2933,7 @@
     const avatarPreset = getPreset(avatarDataUrl);
     let avatarStyle, avatarInner;
     if(avatarPreset){
-      avatarStyle = `style="background:${avatarPreset.bg};font-family:var(--font-display);font-style:italic;"`;
+      avatarStyle = `style="background:${selectedColor};font-family:var(--font-display);font-style:italic;"`;
       avatarInner = avatarPreset.symbol;
     } else {
       avatarStyle = `style="background:${selectedColor}"`;
@@ -3008,9 +2995,9 @@
   const avatarPickerPreview = document.getElementById('avatarPickerPreview');
   let selectedColor = AVATAR_COLORS[0];
 
-  function updateAvatarPreviews(initial, colorOrImage){
-    applyAvatarToEl(bigAvatar, initial, colorOrImage);
-    applyAvatarToEl(avatarPickerPreview, initial, colorOrImage);
+  function updateAvatarPreviews(initial){
+    applyAvatarToEl(bigAvatar, initial, avatarDataUrl, selectedColor);
+    applyAvatarToEl(avatarPickerPreview, initial, avatarDataUrl, selectedColor);
   }
 
   AVATAR_COLORS.forEach((grad, i) => {
@@ -3021,9 +3008,9 @@
       selectedColor = grad;
       document.querySelectorAll('.swatch').forEach(s => s.classList.remove('selected'));
       sw.classList.add('selected');
-      avatarDataUrl = null;
+      // Wichtig: das gewählte Symbol bleibt erhalten, nur die Hintergrundfarbe ändert sich.
       const initial = currentProfile ? currentProfile.name.charAt(0).toUpperCase() : 'H';
-      updateAvatarPreviews(initial, grad);
+      updateAvatarPreviews(initial);
       renderAuthArea(currentProfile, currentUserEmail);
     });
     colorSwatches.appendChild(sw);
@@ -3385,7 +3372,7 @@
       document.getElementById('settingsHandle').textContent = currentProfile.username ? '@' + currentProfile.username : 'Kein Benutzername';
       renderUsernameChangeCard();
       const initial = currentProfile.name.charAt(0).toUpperCase();
-      updateAvatarPreviews(initial, avatarDataUrl || selectedColor);
+      updateAvatarPreviews(initial);
     }
     document.getElementById('settingsEmail').textContent = email || '—';
     settingsOverlay.classList.add('open');
@@ -3411,7 +3398,7 @@
   function removeAvatar(){
     avatarDataUrl = null;
     const initial = currentProfile ? currentProfile.name.charAt(0).toUpperCase() : 'H';
-    updateAvatarPreviews(initial, selectedColor);
+    updateAvatarPreviews(initial);
     renderAuthArea(currentProfile, currentUserEmail);
     showToast('Profilbild entfernt.');
   }
@@ -3427,12 +3414,12 @@
     AVATAR_PRESETS.forEach(preset => {
       const el = document.createElement('div');
       el.className = 'avatar-option' + (avatarDataUrl === preset.id ? ' selected' : '');
-      el.style.background = preset.bg;
       el.textContent = preset.symbol;
       el.title = 'Als Profilbild wählen';
       el.addEventListener('click', () => {
         avatarDataUrl = preset.id;
-        updateAvatarPreviews('', preset.id);
+        const initial = currentProfile ? currentProfile.name.charAt(0).toUpperCase() : '';
+        updateAvatarPreviews(initial);
         renderAuthArea(currentProfile, currentUserEmail);
         showToast('Profilbild aktualisiert.');
         closeAvatarPicker();
