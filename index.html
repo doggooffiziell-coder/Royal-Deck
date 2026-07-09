@@ -554,6 +554,12 @@
 </head>
 <body>
 
+<div id="maintenanceScreen" style="display:none;position:fixed;inset:0;z-index:999;background:#0a0c10;color:#eef1f5;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Inter',sans-serif;text-align:center;padding:20px;">
+  <div style="font-size:40px;margin-bottom:14px;">🛠️</div>
+  <h1 style="font-family:'Fraunces',serif;font-size:24px;margin-bottom:8px;">Wartungsarbeiten</h1>
+  <p style="color:#8993a4;font-size:14px;max-width:360px;">Wir sind kurz am Schrauben. Schau gleich wieder vorbei.</p>
+</div>
+
 <div class="sidebar">
   <div class="brand" title="Royal Table">
     <svg viewBox="0 0 24 24"><path fill="var(--accent-hi)" d="M12 2l2.6 5.9 6.4.6-4.8 4.3 1.5 6.3L12 15.8 6.3 19.1l1.5-6.3-4.8-4.3 6.4-.6z" opacity="0.9"/></svg>
@@ -1420,8 +1426,17 @@
     renderAuthArea(null);
   }
 
+  // --- Wartungsmodus: hier auf true/false schalten ---
+  const MAINTENANCE_MODE = false;
+
   async function loadProfile(){
     const { data: { user } } = await supabaseClient.auth.getUser();
+    if(MAINTENANCE_MODE && !isAdminEmail(user?.email)){
+      document.getElementById('maintenanceScreen').style.display = 'flex';
+      document.querySelector('.sidebar').style.display = 'none';
+      document.querySelector('.main').style.display = 'none';
+      return;
+    }
     if(!user){
       currentUserId = null; currentUserEmail = null; isAdmin = false;
       renderAuthArea(null);
