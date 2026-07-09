@@ -1161,6 +1161,103 @@
   .wl-item .wl-main-badge svg{width:13px;height:13px;fill:currentColor;}
   .wl-empty{font-size:12px;color:var(--faint);padding:6px 2px;}
 
+  /* --------- admin control room (redesign) ---------
+     Eigene, bewusst technischere Optik statt der Gäste-Felt-Karten:
+     ein "Kontrollraum" mit Live-Status-Konsole (Grid-Textur + Puls-LED,
+     spiegelt bewusst die Wartungs-/Coming-Soon-Bildschirme, die hier
+     gesteuert werden) und drei Reitern statt einer langen Karten-Kette. */
+  .adm-shell{grid-column:1/-1;display:flex;flex-direction:column;gap:18px;}
+
+  .adm-console{
+    position:relative;overflow:hidden;display:flex;align-items:center;gap:16px;
+    padding:18px 22px;border-radius:10px;border:1px solid var(--border);
+    background:linear-gradient(160deg,#0c1712,var(--felt) 260%);
+    box-shadow:inset 0 0 0 1px rgba(212,175,106,.05);
+  }
+  .adm-console-grid{
+    position:absolute;inset:0;pointer-events:none;opacity:.5;
+    background-image:linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+    background-size:22px 22px;
+    -webkit-mask-image:linear-gradient(90deg,#000,transparent 85%);
+    mask-image:linear-gradient(90deg,#000,transparent 85%);
+  }
+  .adm-console-dot{
+    position:relative;z-index:1;flex-shrink:0;width:11px;height:11px;border-radius:50%;margin-left:2px;
+    background:var(--success);box-shadow:0 0 0 0 rgba(76,191,131,.6);
+    animation:admPulse 1.8s ease-out infinite;
+  }
+  @keyframes admPulse{
+    0%{box-shadow:0 0 0 0 rgba(76,191,131,.55);}
+    70%{box-shadow:0 0 0 9px rgba(76,191,131,0);}
+    100%{box-shadow:0 0 0 0 rgba(76,191,131,0);}
+  }
+  .adm-console[data-mode="maintenance"] .adm-console-dot{background:var(--danger);animation-name:admPulseDanger;}
+  @keyframes admPulseDanger{
+    0%{box-shadow:0 0 0 0 rgba(193,68,60,.55);}
+    70%{box-shadow:0 0 0 9px rgba(193,68,60,0);}
+    100%{box-shadow:0 0 0 0 rgba(193,68,60,0);}
+  }
+  .adm-console[data-mode="soon"] .adm-console-dot{background:var(--accent-hi);animation-name:admPulseGold;}
+  @keyframes admPulseGold{
+    0%{box-shadow:0 0 0 0 rgba(240,207,142,.55);}
+    70%{box-shadow:0 0 0 9px rgba(240,207,142,0);}
+    100%{box-shadow:0 0 0 0 rgba(240,207,142,0);}
+  }
+  .adm-console-text{position:relative;z-index:1;min-width:0;}
+  .adm-console-eyebrow{font-family:var(--font-mono);font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint);}
+  .adm-console-label{font-family:var(--font-display);font-style:italic;font-size:17px;font-weight:600;color:var(--text);margin-top:2px;}
+  .adm-console[data-mode="maintenance"] .adm-console-label{color:#ffb3ac;}
+  .adm-console[data-mode="soon"] .adm-console-label{color:var(--accent-hi);}
+  .adm-console-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .adm-tabs{display:flex;gap:0;border-bottom:1px solid var(--border-soft);}
+  .adm-tab{
+    font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;
+    color:var(--muted);padding:9px 4px;margin-right:20px;cursor:pointer;position:relative;transition:.15s;
+  }
+  .adm-tab:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:transparent;transition:.2s;}
+  .adm-tab:hover{color:var(--text);}
+  .adm-tab.active{color:var(--accent-hi);}
+  .adm-tab.active:after{background:var(--accent-hi);}
+
+  .adm-panel{display:none;}
+  .adm-panel.active{display:block;animation:modalIn .2s ease;}
+
+  .adm-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start;}
+
+  .adm-card{
+    position:relative;background:var(--surface);border:1px solid var(--border);border-radius:10px;
+    padding:16px 18px;border-left:3px solid var(--accent-dim);
+  }
+  .adm-card[data-accent="muted"]{border-left-color:var(--border);}
+  .adm-card[data-accent="danger"]{border-left-color:var(--danger);}
+  .adm-card.wide{grid-column:1/-1;}
+  .adm-card-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+  .adm-card-icon{
+    width:26px;height:26px;border-radius:7px;background:var(--surface-2);flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;color:var(--accent-hi);
+  }
+  .adm-card-icon svg{width:13px;height:13px;fill:currentColor;}
+  .adm-card-icon.danger{color:var(--danger);}
+  .adm-card-title{font-size:13px;font-weight:700;color:var(--text);flex:1;min-width:0;}
+  .adm-card-note{color:var(--muted);font-size:12px;line-height:1.6;margin-bottom:12px;}
+  .adm-card-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:2px;}
+  .adm-ghost-btn{
+    background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:7px;
+    padding:7px 12px;font-size:11.5px;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:.15s;
+  }
+  .adm-ghost-btn:hover{color:var(--accent-hi);border-color:var(--accent-dim);}
+
+  #pane-admin .wl-list{margin-top:12px;}
+  #pane-admin .wl-item{background:var(--surface-2);}
+
+  @media (max-width:760px){
+    .adm-grid-2{grid-template-columns:1fr;}
+    .adm-tabs{overflow-x:auto;}
+    .adm-console{flex-wrap:wrap;}
+  }
+
   /* ---------- Freunde-System ---------- */
   .nav-badge{
     position:absolute;top:2px;right:6px;background:var(--danger);color:#1a0808;font-size:9px;
@@ -1707,116 +1804,122 @@
           <div class="settings-pane" id="pane-admin">
             <div class="pane-heading">Admin</div>
 
-            <div class="lux-card">
-              <div class="card-title">
-                <svg viewBox="0 0 24 24"><path d="M12 2l7 3v6c0 5-3.4 8.7-7 10-3.6-1.3-7-5-7-10V5z"/></svg>
-                Wartungsmodus
-              </div>
-              <div class="toggle-row">
-                <div>
-                  <div class="toggle-label">Wartungsmodus aktiv</div>
-                  <div class="toggle-desc">Wenn aktiviert, sehen alle Spieler ohne Whitelist-Berechtigung den Wartungsbildschirm.</div>
+            <div class="adm-shell">
+
+              <!-- Live-Status-Konsole: zeigt auf einen Blick, was Spieler gerade sehen -->
+              <div class="adm-console" id="admStatusBar" data-mode="normal">
+                <div class="adm-console-grid"></div>
+                <div class="adm-console-dot"></div>
+                <div class="adm-console-text">
+                  <div class="adm-console-eyebrow">Live-Status</div>
+                  <div class="adm-console-label" id="admStatusLabel">Normaler Betrieb</div>
+                  <div class="adm-console-desc" id="admStatusDesc">Alle Spieler haben vollen Zugriff.</div>
                 </div>
-                <label class="switch">
-                  <input type="checkbox" id="maintenanceToggle">
-                  <span class="slider"></span>
-                </label>
               </div>
-              <div class="hint" id="maintenanceToggleHint"></div>
-            </div>
 
-            <div class="lux-card">
-              <div class="card-title">
-                <svg viewBox="0 0 24 24"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5m0 2h14v2H5v-2z"/></svg>
-                Coming-Soon-Modus
+              <div class="adm-tabs" id="admTabs">
+                <div class="adm-tab active" data-adm-tab="status">Status</div>
+                <div class="adm-tab" data-adm-tab="whitelists">Whitelists</div>
+                <div class="adm-tab" data-adm-tab="admins">Adminzugriff</div>
               </div>
-              <div class="toggle-row">
-                <div>
-                  <div class="toggle-label">Coming-Soon-Modus aktiv</div>
-                  <div class="toggle-desc">Wenn aktiviert, sehen alle Spieler außer Admins den "Royal Deck launcht bald..."-Bildschirm.</div>
+
+              <!-- ===== Reiter: Status ===== -->
+              <div class="adm-panel active" id="adm-panel-status">
+                <div class="adm-grid-2">
+                  <div class="adm-card" data-accent="gold">
+                    <div class="adm-card-head">
+                      <div class="adm-card-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 2l7 3v6c0 5-3.4 8.7-7 10-3.6-1.3-7-5-7-10V5z"/></svg>
+                      </div>
+                      <div class="adm-card-title">Wartungsmodus</div>
+                      <label class="switch">
+                        <input type="checkbox" id="maintenanceToggle">
+                        <span class="slider"></span>
+                      </label>
+                    </div>
+                    <p class="adm-card-note">Spieler ohne Whitelist-Berechtigung sehen den Wartungsbildschirm.</p>
+                    <div class="adm-card-foot">
+                      <button type="button" class="adm-ghost-btn" id="previewMaintenanceBtn">Vorschau ansehen</button>
+                      <div class="hint" id="maintenanceToggleHint"></div>
+                    </div>
+                  </div>
+
+                  <div class="adm-card" data-accent="gold">
+                    <div class="adm-card-head">
+                      <div class="adm-card-icon">
+                        <svg viewBox="0 0 24 24"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5m0 2h14v2H5v-2z"/></svg>
+                      </div>
+                      <div class="adm-card-title">Coming-Soon-Modus</div>
+                      <label class="switch">
+                        <input type="checkbox" id="comingSoonToggle">
+                        <span class="slider"></span>
+                      </label>
+                    </div>
+                    <p class="adm-card-note">Alle außer Admins sehen den "Royal Deck launcht bald…"-Bildschirm.</p>
+                    <div class="adm-card-foot">
+                      <button type="button" class="adm-ghost-btn" id="previewComingSoonBtn">Vorschau ansehen</button>
+                      <div class="hint" id="comingSoonToggleHint"></div>
+                    </div>
+                  </div>
                 </div>
-                <label class="switch">
-                  <input type="checkbox" id="comingSoonToggle">
-                  <span class="slider"></span>
-                </label>
               </div>
-              <div class="hint" id="comingSoonToggleHint"></div>
-            </div>
 
-            <div class="lux-card">
-              <div class="card-title">
-                <svg viewBox="0 0 24 24"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5m0 2h14v2H5v-2z"/></svg>
-                Coming-Soon-Bildschirm
-              </div>
-              <p class="card-note">
-                Zeigt dir eine Vorschau des Bildschirms, den Spieler aktuell sehen, wenn der Coming-Soon-Modus
-                aktiv ist. Die Vorschau ändert nichts am tatsächlichen Status.
-              </p>
-              <button type="button" class="submit ghost" id="previewComingSoonBtn">
-                Coming-Soon-Bildschirm-Vorschau anzeigen
-              </button>
-            </div>
+              <!-- ===== Reiter: Whitelists ===== -->
+              <div class="adm-panel" id="adm-panel-whitelists">
+                <div class="adm-grid-2">
+                  <div class="adm-card" data-accent="muted">
+                    <div class="adm-card-head">
+                      <div class="adm-card-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5zm-7 19c0-3.9 3.1-7 7-7s7 3.1 7 7z"/></svg>
+                      </div>
+                      <div class="adm-card-title">Whitelist – Wartung</div>
+                    </div>
+                    <p class="adm-card-note">Kommen während des Wartungsmodus trotzdem rein.</p>
+                    <div class="wl-add-row">
+                      <input id="wlEmailInput" type="email" placeholder="z. B. name@mail.com">
+                      <button type="button" id="wlAddBtn">Hinzufügen</button>
+                    </div>
+                    <div class="hint" id="wlHint"></div>
+                    <div class="wl-list" id="wlList"></div>
+                  </div>
 
-            <div class="lux-card">
-              <div class="card-title">
-                <svg viewBox="0 0 24 24"><path d="M12 2l7 3v6c0 5-3.4 8.7-7 10-3.6-1.3-7-5-7-10V5z"/></svg>
-                Wartungsbildschirm
+                  <div class="adm-card" data-accent="muted">
+                    <div class="adm-card-head">
+                      <div class="adm-card-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5zm-7 19c0-3.9 3.1-7 7-7s7 3.1 7 7z"/></svg>
+                      </div>
+                      <div class="adm-card-title">Whitelist – Coming Soon</div>
+                    </div>
+                    <p class="adm-card-note">Kommen während des Coming-Soon-Modus trotzdem rein.</p>
+                    <div class="wl-add-row">
+                      <input id="wlEmailInputSoon" type="email" placeholder="z. B. name@mail.com">
+                      <button type="button" id="wlAddBtnSoon">Hinzufügen</button>
+                    </div>
+                    <div class="hint" id="wlHintSoon"></div>
+                    <div class="wl-list" id="wlListSoon"></div>
+                  </div>
+                </div>
               </div>
-              <p class="card-note">
-                Zeigt dir eine Vorschau des Bildschirms, den Spieler aktuell sehen, wenn der Wartungsmodus
-                aktiv ist. Die Vorschau ändert nichts am tatsächlichen Wartungsstatus.
-              </p>
-              <button type="button" class="submit ghost" id="previewMaintenanceBtn">
-                Wartungsbildschirm-Vorschau anzeigen
-              </button>
-            </div>
 
-            <div class="lux-card wide">
-              <div class="card-title">
-                <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5zm-7 19c0-3.9 3.1-7 7-7s7 3.1 7 7z"/></svg>
-                Whitelist für Wartung
+              <!-- ===== Reiter: Adminzugriff ===== -->
+              <div class="adm-panel" id="adm-panel-admins">
+                <div class="adm-card wide" data-accent="danger">
+                  <div class="adm-card-head">
+                    <div class="adm-card-icon danger">
+                      <svg viewBox="0 0 24 24"><path d="M19.4 13a7.9 7.9 0 000-2l2.1-1.6-2-3.4-2.5 1a8 8 0 00-1.7-1L14.9 3H9.1l-.4 2.9a8 8 0 00-1.7 1l-2.5-1-2 3.4L4.6 11a7.9 7.9 0 000 2l-2.1 1.6 2 3.4 2.5-1a8 8 0 001.7 1l.4 2.9h5.8l.4-2.9a8 8 0 001.7-1l2.5 1 2-3.4z"/></svg>
+                    </div>
+                    <div class="adm-card-title">Admin-Zugriff verwalten</div>
+                  </div>
+                  <p class="adm-card-note">Nutzername oder E-Mail eingeben, um Admin-Rechte zu vergeben. Der Haupt-Admin kann nicht entfernt werden.</p>
+                  <div class="wl-add-row">
+                    <input id="adminIdentifierInput" type="text" placeholder="Benutzername oder E-Mail">
+                    <button type="button" id="adminAddBtn">Hinzufügen</button>
+                  </div>
+                  <div class="hint" id="adminHint"></div>
+                  <div class="wl-list" id="adminList"></div>
+                </div>
               </div>
-              <p class="card-note">
-                Konten mit diesen E-Mail-Adressen können sich während des Wartungsmodus trotzdem anmelden und die Seite nutzen.
-              </p>
-              <div class="wl-add-row">
-                <input id="wlEmailInput" type="email" placeholder="z. B. name@mail.com">
-                <button type="button" id="wlAddBtn">Hinzufügen</button>
-              </div>
-              <div class="hint" id="wlHint"></div>
-              <div class="wl-list" id="wlList"></div>
-            </div>
 
-            <div class="lux-card wide">
-              <div class="card-title">
-                <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5zm-7 19c0-3.9 3.1-7 7-7s7 3.1 7 7z"/></svg>
-                Whitelist für Coming Soon
-              </div>
-              <p class="card-note">
-                Konten mit diesen E-Mail-Adressen können sich während des Coming-Soon-Modus trotzdem anmelden und die Seite nutzen.
-              </p>
-              <div class="wl-add-row">
-                <input id="wlEmailInputSoon" type="email" placeholder="z. B. name@mail.com">
-                <button type="button" id="wlAddBtnSoon">Hinzufügen</button>
-              </div>
-              <div class="hint" id="wlHintSoon"></div>
-              <div class="wl-list" id="wlListSoon"></div>
-            </div>
-
-            <div class="lux-card wide">
-              <div class="card-title">
-                <svg viewBox="0 0 24 24"><path d="M19.4 13a7.9 7.9 0 000-2l2.1-1.6-2-3.4-2.5 1a8 8 0 00-1.7-1L14.9 3H9.1l-.4 2.9a8 8 0 00-1.7 1l-2.5-1-2 3.4L4.6 11a7.9 7.9 0 000 2l-2.1 1.6 2 3.4 2.5-1a8 8 0 001.7 1l.4 2.9h5.8l.4-2.9a8 8 0 001.7-1l2.5 1 2-3.4z"/></svg>
-                Admin-Zugriff verwalten
-              </div>
-              <p class="card-note">
-                Gib Nutzernamen oder E-Mail-Adressen ein, um ihnen Admin-Zugriff zu geben. Der Haupt-Admin kann nicht entfernt werden.
-              </p>
-              <div class="wl-add-row">
-                <input id="adminIdentifierInput" type="text" placeholder="Benutzername oder E-Mail">
-                <button type="button" id="adminAddBtn">Hinzufügen</button>
-              </div>
-              <div class="hint" id="adminHint"></div>
-              <div class="wl-list" id="adminList"></div>
             </div>
           </div>
         </div>
@@ -2849,6 +2952,7 @@
     const { data: { user } } = await supabaseClient.auth.getUser();
     maintenanceMode = await fetchMaintenanceMode();
     comingSoonMode = await fetchComingSoonMode();
+    updateAdminStatusConsole();
 
     const admin = await checkIsAdmin(user?.email);
     const whitelisted = admin ? true : await isWhitelistedEmail(user?.email);
@@ -3069,6 +3173,31 @@
     });
   });
 
+  // --- Admin: Live-Status-Konsole im Admin-Panel (zeigt Wartung/Coming-Soon/Normal auf einen Blick) ---
+  function updateAdminStatusConsole(){
+    const bar = document.getElementById('admStatusBar');
+    if(!bar) return;
+    let mode = 'normal', label = 'Normaler Betrieb', desc = 'Alle Spieler haben vollen Zugriff.';
+    if(maintenanceMode){
+      mode = 'maintenance'; label = 'Wartungsmodus aktiv'; desc = 'Nur Konten mit Wartungs-Whitelist kommen rein.';
+    } else if(comingSoonMode){
+      mode = 'soon'; label = 'Coming-Soon-Modus aktiv'; desc = 'Nur Admins & Coming-Soon-Whitelist sehen die Seite.';
+    }
+    bar.dataset.mode = mode;
+    document.getElementById('admStatusLabel').textContent = label;
+    document.getElementById('admStatusDesc').textContent = desc;
+  }
+
+  // --- Admin: Reiter-Umschaltung (Status / Whitelists / Adminzugriff) ---
+  document.querySelectorAll('.adm-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.adm-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.adm-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('adm-panel-' + tab.dataset.admTab).classList.add('active');
+    });
+  });
+
   // --- Admin: Wartungsmodus-Umschalter ---
   const maintenanceToggle = document.getElementById('maintenanceToggle');
   maintenanceToggle.addEventListener('change', async () => {
@@ -3093,6 +3222,7 @@
       comingSoonToggle.checked = false;
       document.getElementById('comingSoonToggleHint').textContent = 'Automatisch deaktiviert (nicht gleichzeitig mit Wartungsmodus möglich).';
     }
+    updateAdminStatusConsole();
   });
 
   // --- Admin: Coming-Soon-Modus-Umschalter ---
@@ -3119,6 +3249,7 @@
       maintenanceToggle.checked = false;
       document.getElementById('maintenanceToggleHint').textContent = 'Automatisch deaktiviert (nicht gleichzeitig mit Coming-Soon-Modus möglich).';
     }
+    updateAdminStatusConsole();
   });
 
   // --- Admin: Wartungs-Whitelist verwalten ---
@@ -3381,6 +3512,7 @@
       document.getElementById('maintenanceToggleHint').textContent = '';
       comingSoonToggle.checked = comingSoonMode;
       document.getElementById('comingSoonToggleHint').textContent = '';
+      updateAdminStatusConsole();
       loadWhitelist();
       loadComingSoonWhitelist();
       loadAdminList();
