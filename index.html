@@ -883,6 +883,85 @@
     padding:6px 12px;border-radius:20px;font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
   }
 
+  /* --------- coming soon screen --------- */
+  #comingSoonScreen{
+    display:none;position:fixed;inset:0;z-index:999;
+    background:
+      radial-gradient(ellipse 900px 700px at 50% 32%, rgba(212,175,106,.13), transparent 60%),
+      radial-gradient(ellipse 800px 500px at 12% 88%, rgba(28,72,48,.55), transparent 60%),
+      radial-gradient(ellipse 800px 500px at 88% 15%, rgba(28,72,48,.42), transparent 60%),
+      var(--bg);
+    color:var(--text);flex-direction:column;align-items:center;justify-content:center;
+    font-family:var(--font-body);text-align:center;padding:20px;overflow:hidden;
+  }
+  .soon-sparkle-field{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+  .soon-sparkle{
+    position:absolute;width:3px;height:3px;border-radius:50%;background:var(--accent-hi);
+    opacity:0;animation:soonSparkle 3.2s ease-in-out infinite;
+  }
+  @keyframes soonSparkle{
+    0%,100%{opacity:0;transform:scale(.4);}
+    50%{opacity:1;transform:scale(1.4);box-shadow:0 0 9px 2px var(--accent-hi);}
+  }
+  .soon-content{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;max-width:460px;}
+
+  .soon-crown-wrap{position:relative;width:170px;height:170px;margin-bottom:6px;display:flex;align-items:center;justify-content:center;}
+  .soon-glow{
+    position:absolute;width:190px;height:190px;border-radius:50%;
+    background:radial-gradient(circle, rgba(212,175,106,.28), transparent 68%);
+    animation:soonGlowPulse 2.8s ease-in-out infinite;
+  }
+  @keyframes soonGlowPulse{
+    0%,100%{transform:scale(.9);opacity:.7;}
+    50%{transform:scale(1.08);opacity:1;}
+  }
+  .soon-crown{position:relative;z-index:1;width:72px;height:72px;animation:soonFloat 4s ease-in-out infinite;
+    filter:drop-shadow(0 8px 20px rgba(212,175,106,.5));}
+  .soon-crown svg{width:100%;height:100%;}
+  @keyframes soonFloat{
+    0%,100%{transform:translateY(0) rotate(-1deg);}
+    50%{transform:translateY(-8px) rotate(1deg);}
+  }
+
+  .soon-title{
+    font-family:var(--font-marquee);font-weight:800;font-size:42px;letter-spacing:1px;
+    text-transform:uppercase;margin:18px 0 4px;line-height:1.05;
+    background:linear-gradient(90deg,var(--accent-dim),var(--accent-hi) 45%,#fff8e6 50%,var(--accent-hi) 55%,var(--accent-dim));
+    background-size:250% 100%;
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:soonShimmer 3.5s linear infinite;
+    filter:drop-shadow(0 0 22px rgba(212,175,106,.35));
+  }
+  @keyframes soonShimmer{
+    0%{background-position:0% 0;}
+    100%{background-position:250% 0;}
+  }
+  .soon-subtitle{
+    font-family:var(--font-display);font-style:italic;font-weight:600;font-size:19px;color:var(--accent-hi);
+    margin-bottom:20px;letter-spacing:.3px;
+  }
+  .soon-dots{display:inline-block;animation:soonDots 1.6s steps(4) infinite;}
+  @keyframes soonDots{
+    0%{opacity:.25;}25%{opacity:.55;}50%{opacity:.85;}75%{opacity:1;}100%{opacity:.25;}
+  }
+  .soon-desc{color:var(--muted);font-size:13.5px;line-height:1.65;margin-bottom:24px;}
+  .soon-desc strong{color:var(--text);font-weight:600;}
+  .soon-divider{
+    width:64px;height:1px;margin-bottom:26px;
+    background:linear-gradient(90deg,transparent,var(--accent-dim),transparent);
+  }
+
+  /* --------- coming soon preview close button --------- */
+  #comingSoonPreviewExit{
+    position:absolute;top:22px;right:22px;
+    display:flex;align-items:center;gap:7px;
+    background:var(--surface);color:var(--text);border:1px solid var(--border);
+    padding:9px 16px;border-radius:8px;font-weight:600;font-size:12.5px;cursor:pointer;
+    font-family:var(--font-body);transition:.15s;
+  }
+  #comingSoonPreviewExit:hover{border-color:var(--accent-dim);color:var(--accent-hi);}
+  #comingSoonPreviewExit svg{width:13px;height:13px;fill:currentColor;}
+
   /* --------- update / redeploy overlay --------- */
   #updateOverlay{
     display:none;position:fixed;inset:0;z-index:3000;
@@ -1138,6 +1217,61 @@
       <button type="button" class="maint-login-btn" id="maintLoginBtn">Anmelden</button>
     </div>
     <div class="maint-status-line" id="maintStatusLine"></div>
+  </div>
+</div>
+
+<div id="comingSoonScreen">
+  <div class="maint-grid"></div>
+  <div class="soon-sparkle-field">
+    <span class="soon-sparkle" style="left:10%;top:20%;animation-delay:.1s;"></span>
+    <span class="soon-sparkle" style="left:88%;top:16%;animation-delay:.9s;"></span>
+    <span class="soon-sparkle" style="left:18%;top:78%;animation-delay:1.6s;"></span>
+    <span class="soon-sparkle" style="left:80%;top:72%;animation-delay:.5s;"></span>
+    <span class="soon-sparkle" style="left:50%;top:12%;animation-delay:2.1s;"></span>
+    <span class="soon-sparkle" style="left:6%;top:48%;animation-delay:1.2s;"></span>
+    <span class="soon-sparkle" style="left:94%;top:52%;animation-delay:1.9s;"></span>
+    <span class="soon-sparkle" style="left:35%;top:88%;animation-delay:.7s;"></span>
+    <span class="soon-sparkle" style="left:65%;top:90%;animation-delay:2.5s;"></span>
+  </div>
+
+  <div class="maint-corner tl"></div>
+  <div class="maint-corner tr"></div>
+  <div class="maint-corner bl"></div>
+  <div class="maint-corner br"></div>
+
+  <div class="soon-content">
+    <div class="maint-status">
+      <span class="dot"></span>
+      Status: Bald verfügbar
+    </div>
+
+    <div class="soon-crown-wrap">
+      <div class="soon-glow"></div>
+      <div class="soon-crown">
+        <svg viewBox="0 0 24 24">
+          <defs>
+            <linearGradient id="soonCrownGrad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="var(--accent-hi)"/>
+              <stop offset="1" stop-color="var(--accent-dim)"/>
+            </linearGradient>
+          </defs>
+          <path fill="url(#soonCrownGrad)" d="M3 19l1.6-9.3L9 13l3-7 3 7 4.4-3.3L21 19H3z"/>
+          <circle cx="12" cy="4.2" r="1.3" fill="var(--accent-hi)"/>
+          <circle cx="4" cy="9.2" r="1.1" fill="var(--accent-hi)"/>
+          <circle cx="20" cy="9.2" r="1.1" fill="var(--accent-hi)"/>
+        </svg>
+      </div>
+    </div>
+
+    <h1 class="soon-title">Royal Deck</h1>
+    <div class="soon-subtitle">launcht bald<span class="soon-dots">…</span></div>
+    <p class="soon-desc">Wir legen letzte Hand an die Tische, bevor der Saal öffnet.<br>Schau bald wieder vorbei — <strong>es lohnt sich</strong>.</p>
+    <div class="soon-divider"></div>
+
+    <div class="maint-login-row" id="soonAuthRow">
+      <button type="button" class="maint-login-btn" id="soonLoginBtn">Anmelden</button>
+    </div>
+    <div class="maint-status-line" id="soonStatusLine"></div>
   </div>
 </div>
 
@@ -1549,6 +1683,38 @@
                 </label>
               </div>
               <div class="hint" id="maintenanceToggleHint"></div>
+            </div>
+
+            <div class="lux-card">
+              <div class="card-title">
+                <svg viewBox="0 0 24 24"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5m0 2h14v2H5v-2z"/></svg>
+                Coming-Soon-Modus
+              </div>
+              <div class="toggle-row">
+                <div>
+                  <div class="toggle-label">Coming-Soon-Modus aktiv</div>
+                  <div class="toggle-desc">Wenn aktiviert, sehen alle Spieler außer Admins den "Royal Deck launcht bald..."-Bildschirm.</div>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="comingSoonToggle">
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="hint" id="comingSoonToggleHint"></div>
+            </div>
+
+            <div class="lux-card">
+              <div class="card-title">
+                <svg viewBox="0 0 24 24"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5m0 2h14v2H5v-2z"/></svg>
+                Coming-Soon-Bildschirm
+              </div>
+              <p class="card-note">
+                Zeigt dir eine Vorschau des Bildschirms, den Spieler aktuell sehen, wenn der Coming-Soon-Modus
+                aktiv ist. Die Vorschau ändert nichts am tatsächlichen Status.
+              </p>
+              <button type="button" class="submit ghost" id="previewComingSoonBtn">
+                Coming-Soon-Bildschirm-Vorschau anzeigen
+              </button>
             </div>
 
             <div class="lux-card">
@@ -2420,6 +2586,86 @@
     showMaintenancePreview();
   });
 
+  // --- Coming-Soon-Modus ---
+  // Analog zum Wartungsmodus, aber ohne Whitelist: nur Admins sehen die App,
+  // alle anderen sehen den "Royal Deck launcht bald..."-Screen.
+  let comingSoonMode = false;
+
+  async function fetchComingSoonMode(){
+    const { data, error } = await supabaseClient
+      .from('app_settings')
+      .select('coming_soon_mode')
+      .eq('id', 1)
+      .maybeSingle();
+    if(error){ console.error(error); return false; }
+    return !!data?.coming_soon_mode;
+  }
+
+  async function setComingSoonMode(value){
+    const { error } = await supabaseClient
+      .from('app_settings')
+      .update({ coming_soon_mode: value })
+      .eq('id', 1);
+    return error;
+  }
+
+  // --- Coming-Soon-Bildschirm-Vorschau (nur visuell, ändert nichts am echten Status) ---
+  function showComingSoonPreview(){
+    const screen = document.getElementById('comingSoonScreen');
+    if(!screen) return;
+
+    if(!document.getElementById('previewTagSoon')){
+      const tag = document.createElement('div');
+      tag.id = 'previewTagSoon';
+      tag.className = 'preview-tag';
+      tag.textContent = 'Vorschau';
+      screen.appendChild(tag);
+    }
+    if(!document.getElementById('comingSoonPreviewExit')){
+      const exitBtn = document.createElement('button');
+      exitBtn.id = 'comingSoonPreviewExit';
+      exitBtn.type = 'button';
+      exitBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M18.3 5.7L12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7 2.9 18.3 9.2 12 2.9 5.7 4.3 4.3l6.3 6.3 6.3-6.3z"/></svg> Vorschau beenden`;
+      exitBtn.addEventListener('click', hideComingSoonPreview);
+      screen.appendChild(exitBtn);
+    }
+
+    screen.style.position = 'fixed';
+    screen.style.display = 'flex';
+  }
+
+  function hideComingSoonPreview(){
+    const screen = document.getElementById('comingSoonScreen');
+    if(!screen) return;
+    screen.style.display = 'none';
+    document.getElementById('previewTagSoon')?.remove();
+    document.getElementById('comingSoonPreviewExit')?.remove();
+  }
+
+  document.getElementById('previewComingSoonBtn').addEventListener('click', () => {
+    settingsOverlay.classList.remove('open');
+    showComingSoonPreview();
+  });
+
+  // --- Login/Logout direkt vom Coming-Soon-Bildschirm aus ---
+  function renderComingSoonAuthRow(email){
+    const row = document.getElementById('soonAuthRow');
+    const statusLine = document.getElementById('soonStatusLine');
+    if(email){
+      row.innerHTML = `<button type="button" class="maint-logout-link" id="soonLogoutBtn">Abmelden (${email})</button>`;
+      document.getElementById('soonLogoutBtn').addEventListener('click', async () => {
+        await logout();
+        await loadProfile();
+      });
+      statusLine.textContent = 'Dieses Konto hat keinen Admin-Zugriff.';
+    } else {
+      row.innerHTML = `<button type="button" class="maint-login-btn" id="soonLoginBtn">Anmelden</button>`;
+      document.getElementById('soonLoginBtn').addEventListener('click', () => openModal('login'));
+      statusLine.textContent = '';
+    }
+  }
+  document.getElementById('soonLoginBtn').addEventListener('click', () => openModal('login'));
+
   // --- Login/Logout direkt vom Wartungsbildschirm aus ---
   function renderMaintenanceAuthRow(email){
     const row = document.getElementById('maintAuthRow');
@@ -2442,19 +2688,31 @@
   async function loadProfile(){
     const { data: { user } } = await supabaseClient.auth.getUser();
     maintenanceMode = await fetchMaintenanceMode();
+    comingSoonMode = await fetchComingSoonMode();
 
     const admin = await checkIsAdmin(user?.email);
     const whitelisted = admin ? true : await isWhitelistedEmail(user?.email);
 
     if(maintenanceMode && !whitelisted){
       document.getElementById('maintenanceScreen').style.display = 'flex';
+      document.getElementById('comingSoonScreen').style.display = 'none';
       document.querySelector('.sidebar').style.display = 'none';
       document.querySelector('.main').style.display = 'none';
       renderMaintenanceAuthRow(user?.email || null);
       return;
     }
 
+    if(comingSoonMode && !admin){
+      document.getElementById('maintenanceScreen').style.display = 'none';
+      document.getElementById('comingSoonScreen').style.display = 'flex';
+      document.querySelector('.sidebar').style.display = 'none';
+      document.querySelector('.main').style.display = 'none';
+      renderComingSoonAuthRow(user?.email || null);
+      return;
+    }
+
     document.getElementById('maintenanceScreen').style.display = 'none';
+    document.getElementById('comingSoonScreen').style.display = 'none';
     document.querySelector('.sidebar').style.display = '';
     document.querySelector('.main').style.display = '';
 
@@ -2657,6 +2915,25 @@
     showToast(newValue ? 'Wartungsmodus aktiviert.' : 'Wartungsmodus deaktiviert.');
   });
 
+  // --- Admin: Coming-Soon-Modus-Umschalter ---
+  const comingSoonToggle = document.getElementById('comingSoonToggle');
+  comingSoonToggle.addEventListener('change', async () => {
+    const hint = document.getElementById('comingSoonToggleHint');
+    hint.textContent = '';
+    const newValue = comingSoonToggle.checked;
+    comingSoonToggle.disabled = true;
+    const error = await setComingSoonMode(newValue);
+    comingSoonToggle.disabled = false;
+    if(error){
+      hint.textContent = error.message;
+      comingSoonToggle.checked = !newValue;
+      return;
+    }
+    comingSoonMode = newValue;
+    hint.textContent = newValue ? 'Coming-Soon-Modus wurde aktiviert.' : 'Coming-Soon-Modus wurde deaktiviert.';
+    showToast(newValue ? 'Coming-Soon-Modus aktiviert.' : 'Coming-Soon-Modus deaktiviert.');
+  });
+
   // --- Admin: Wartungs-Whitelist verwalten ---
   async function loadWhitelist(){
     const list = document.getElementById('wlList');
@@ -2835,6 +3112,8 @@
     if(isAdmin){
       maintenanceToggle.checked = maintenanceMode;
       document.getElementById('maintenanceToggleHint').textContent = '';
+      comingSoonToggle.checked = comingSoonMode;
+      document.getElementById('comingSoonToggleHint').textContent = '';
       loadWhitelist();
       loadAdminList();
     }
