@@ -3638,7 +3638,9 @@
     deployCheckRunning = true;
     try {
       const current = await fetchDeployMarker();
-      if(markersDiffer(deployBaseline, current)) triggerUpdateReload();
+      const differs = markersDiffer(deployBaseline, current);
+      console.log('[deploy-watcher] baseline=', deployBaseline, 'current=', current, 'differs=', differs);
+      if(differs) triggerUpdateReload();
     } catch(e){
       console.error('Deploy-Check fehlgeschlagen:', e);
     }
@@ -3648,6 +3650,7 @@
   async function initDeployWatcher(){
     try {
       deployBaseline = await fetchDeployMarker();
+      console.log('[deploy-watcher] Baseline gesetzt:', deployBaseline);
     } catch(e){
       console.error('Deploy-Watcher konnte nicht initialisiert werden:', e);
       return;
