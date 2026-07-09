@@ -210,6 +210,18 @@
   }
   .hero-eyebrow svg{width:10px;height:10px;fill:var(--brass);}
   .hero h1{font-family:var(--font-display);font-style:italic;font-size:35px;font-weight:600;margin-bottom:10px;letter-spacing:-.2px;}
+
+  /* --------- Schreibmaschinen-Cursor während die Hero-Begrüßung getippt wird --------- */
+  .hero h1.hero-greeting-typing::after{
+    content:'';display:inline-block;width:3px;height:.8em;margin-left:3px;
+    background:var(--accent-hi);vertical-align:-.05em;
+    animation:heroCaretBlink .8s steps(1) infinite;
+    box-shadow:0 0 6px rgba(240,211,142,.5);
+  }
+  @keyframes heroCaretBlink{
+    0%,50%{opacity:1;}
+    50.01%,100%{opacity:0;}
+  }
   .hero p{font-size:14px;color:var(--muted);margin-bottom:22px;max-width:380px;line-height:1.55;}
   .hero button{
     background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:var(--accent-ink);border:none;padding:15px 32px;border-radius:10px;
@@ -3226,8 +3238,39 @@
     if(h >= 18 && h < 22) return `Guten Abend, ${name}!`;
     return `Hallo Nachteule, ${name}!`;
   }
+
+  // Schreibmaschinen-Effekt: tippt den Begrüßungstext Zeichen für Zeichen, inkl. blinkendem
+  // Cursor — läuft nur einmal beim tatsächlichen Öffnen der Seite (siehe heroGreetingTyped-Flag),
+  // spätere Aktualisierungen (z.B. Namensänderung) setzen den Text direkt ohne erneute Animation.
+  let heroGreetingTyped = false;
+  let heroGreetingTypeTimer = null;
+  function typeHeroGreeting(text){
+    clearTimeout(heroGreetingTypeTimer);
+    heroGreeting.textContent = '';
+    heroGreeting.classList.add('hero-greeting-typing');
+    let i = 0;
+    const speed = 32;
+    (function step(){
+      heroGreeting.textContent = text.slice(0, i);
+      if(i <= text.length){
+        i++;
+        heroGreetingTypeTimer = setTimeout(step, speed);
+      } else {
+        heroGreeting.classList.remove('hero-greeting-typing');
+      }
+    })();
+  }
+
   function updateHeroGreeting(name){
-    heroGreeting.textContent = greetingText(name || 'Gast');
+    const text = greetingText(name || 'Gast');
+    if(!heroGreetingTyped){
+      heroGreetingTyped = true;
+      typeHeroGreeting(text);
+    } else {
+      clearTimeout(heroGreetingTypeTimer);
+      heroGreeting.classList.remove('hero-greeting-typing');
+      heroGreeting.textContent = text;
+    }
   }
 
   function renderAuthArea(profile, email){
