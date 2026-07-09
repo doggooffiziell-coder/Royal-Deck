@@ -663,6 +663,18 @@
     100%{transform:translateX(350%);}
   }
 
+  .maint-login-row{margin-top:8px;display:flex;gap:10px;align-items:center;justify-content:center;}
+  .maint-login-btn{
+    background:var(--accent);color:#f3f6fc;border:none;padding:10px 22px;border-radius:8px;
+    font-weight:600;font-size:13px;cursor:pointer;font-family:var(--font-body);transition:.15s;
+  }
+  .maint-login-btn:hover{background:var(--accent-hi);}
+  .maint-status-line{font-size:12px;color:var(--muted);margin-top:14px;}
+  .maint-logout-link{
+    background:none;border:none;color:var(--accent-hi);font-size:12px;font-weight:600;cursor:pointer;margin-top:8px;
+  }
+  .maint-logout-link:hover{text-decoration:underline;}
+
   /* --------- maintenance preview close button --------- */
   #maintenancePreviewExit{
     position:absolute;top:22px;right:22px;
@@ -679,6 +691,48 @@
     background:var(--accent-soft);color:var(--accent-hi);border:1px solid rgba(79,127,224,.35);
     padding:6px 12px;border-radius:20px;font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
   }
+
+  /* --------- admin: maintenance toggle switch --------- */
+  .toggle-row{display:flex;align-items:center;justify-content:space-between;gap:14px;}
+  .toggle-row .toggle-label{font-size:13px;color:var(--text);font-weight:600;}
+  .toggle-row .toggle-desc{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.5;}
+  .switch{position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;}
+  .switch input{opacity:0;width:0;height:0;}
+  .switch .slider{
+    position:absolute;cursor:pointer;inset:0;background:var(--surface-2);
+    box-shadow:inset 0 0 0 1px var(--border);transition:.15s;border-radius:24px;
+  }
+  .switch .slider:before{
+    position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;
+    background:var(--faint);border-radius:50%;transition:.15s;
+  }
+  .switch input:checked + .slider{background:var(--accent);box-shadow:inset 0 0 0 1px var(--accent-dim);}
+  .switch input:checked + .slider:before{transform:translateX(20px);background:#f3f6fc;}
+
+  /* --------- admin: whitelist manager --------- */
+  .wl-add-row{display:flex;gap:8px;}
+  .wl-add-row input{flex:1;}
+  .wl-add-row button{
+    flex-shrink:0;height:41px;padding:0 16px;border-radius:8px;border:none;
+    background:var(--accent);color:#f3f6fc;font-weight:600;font-size:13px;cursor:pointer;
+    font-family:var(--font-body);transition:.15s;
+  }
+  .wl-add-row button:hover{background:var(--accent-hi);}
+  .wl-add-row button:disabled{opacity:.55;cursor:default;}
+  .wl-list{margin-top:14px;display:flex;flex-direction:column;gap:6px;}
+  .wl-item{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:8px 10px 8px 13px;
+  }
+  .wl-item .wl-email{font-size:12.5px;color:var(--text);font-family:var(--font-mono);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .wl-item .wl-remove{
+    flex-shrink:0;width:24px;height:24px;border-radius:6px;background:transparent;border:1px solid var(--border);
+    color:var(--faint);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s;
+  }
+  .wl-item .wl-remove:hover{color:var(--danger);border-color:var(--danger);}
+  .wl-item .wl-remove svg{width:11px;height:11px;fill:currentColor;}
+  .wl-empty{font-size:12px;color:var(--faint);padding:6px 2px;}
 </style>
 </head>
 <body>
@@ -728,6 +782,98 @@
     <div class="maint-progress">
       <div class="maint-progress-bar"></div>
     </div>
+
+    <div class="maint-login-row" id="maintAuthRow">
+      <button type="button" class="maint-login-btn" id="maintLoginBtn">Anmelden</button>
+    </div>
+    <div class="maint-status-line" id="maintStatusLine"></div>
+  </div>
+</div>
+
+<!-- ================= LOGIN / REGISTER MODAL ================= -->
+<div class="overlay" id="overlay" style="z-index:1000;">
+  <div class="modal">
+    <div class="close" id="closeModal">✕</div>
+    <div class="mlogo">♠</div>
+    <h1 id="modalTitle">Willkommen zurück</h1>
+    <div class="sub" id="modalSub">Melde dich an und leg direkt am Tisch los</div>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="login">Login</div>
+      <div class="tab" data-tab="register">Registrieren</div>
+    </div>
+
+    <form id="authForm">
+      <div id="regFields" style="display:none;">
+        <label>Anzeigename</label>
+        <div class="field-icon-wrap">
+          <svg class="field-icon" viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5zm-7 19c0-3.9 3.1-7 7-7s7 3.1 7 7z"/></svg>
+          <input id="regName" placeholder="z. B. HighRoller_88">
+        </div>
+        <div class="field-hint">So wirst du für andere Spieler sichtbar.</div>
+
+        <label>Geschlecht</label>
+        <div class="gender-select" id="genderSelect">
+          <div class="gender-opt" data-gender="m">Männlich</div>
+          <div class="gender-opt" data-gender="w">Weiblich</div>
+        </div>
+      </div>
+
+      <label>E-Mail</label>
+      <div class="field-icon-wrap">
+        <svg class="field-icon" viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 4l-8 5-8-5V6l8 5 8-5z"/></svg>
+        <input id="authUser" type="email" placeholder="z. B. name@mail.com" autocomplete="username">
+      </div>
+
+      <label>Passwort</label>
+      <div class="field-icon-wrap pw-wrap">
+        <svg class="field-icon" viewBox="0 0 24 24"><path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-9h-1V6a5 5 0 00-10 0v2H6a2 2 0 00-2 2v9a2 2 0 002 2h12a2 2 0 002-2v-9a2 2 0 00-2-2zM9 6a3 3 0 016 0v2H9z"/></svg>
+        <input id="authPass" type="password" placeholder="••••••••" autocomplete="current-password">
+        <div class="pw-toggle" data-target="authPass" title="Passwort anzeigen">
+          <svg viewBox="0 0 24 24"><path d="M12 5c-5 0-9.3 3.1-11 7 1.7 3.9 6 7 11 7s9.3-3.1 11-7c-1.7-3.9-6-7-11-7zm0 11.5A4.5 4.5 0 1112 8a4.5 4.5 0 010 8.5zm0-7A2.5 2.5 0 1012 14a2.5 2.5 0 000-4.5z"/></svg>
+        </div>
+      </div>
+      <div class="field-hint" id="pwHintReg" style="display:none;">Mindestens 6 Zeichen.</div>
+
+      <div id="regConfirmWrap" style="display:none;">
+        <label>Passwort bestätigen</label>
+        <div class="field-icon-wrap pw-wrap">
+          <svg class="field-icon" viewBox="0 0 24 24"><path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-9h-1V6a5 5 0 00-10 0v2H6a2 2 0 00-2 2v9a2 2 0 002 2h12a2 2 0 002-2v-9a2 2 0 00-2-2zM9 6a3 3 0 016 0v2H9z"/></svg>
+          <input id="authPassConfirm" type="password" placeholder="Passwort wiederholen" autocomplete="new-password">
+          <div class="pw-toggle" data-target="authPassConfirm" title="Passwort anzeigen">
+            <svg viewBox="0 0 24 24"><path d="M12 5c-5 0-9.3 3.1-11 7 1.7 3.9 6 7 11 7s9.3-3.1 11-7c-1.7-3.9-6-7-11-7zm0 11.5A4.5 4.5 0 1112 8a4.5 4.5 0 010 8.5zm0-7A2.5 2.5 0 1012 14a2.5 2.5 0 000-4.5z"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="error" id="authError"></div>
+      <button type="submit" class="submit" id="submitBtn">Anmelden</button>
+    </form>
+    <button type="button" class="link-btn" id="forgotFromLogin">Passwort vergessen?</button>
+
+    <div class="age">
+      Mit der Anmeldung bestätigst du, dass du volljährig bist und unsere
+      Nutzungsbedingungen akzeptierst.
+    </div>
+  </div>
+</div>
+
+<!-- ================= FORGOT PASSWORD MODAL ================= -->
+<div class="overlay" id="forgotOverlay" style="z-index:1000;">
+  <div class="modal">
+    <div class="close" id="closeForgot">✕</div>
+    <div class="mlogo">♠</div>
+    <h1>Passwort vergessen</h1>
+    <div class="sub">Wir schicken dir einen Link zum Zurücksetzen</div>
+
+    <form id="forgotForm">
+      <label>E-Mail</label>
+      <input id="forgotEmail" type="email" placeholder="z. B. name@mail.com" autocomplete="username">
+      <div class="error" id="forgotError"></div>
+      <div class="hint" id="forgotHint"></div>
+      <button type="submit" class="submit" id="forgotSubmitBtn">Link senden</button>
+    </form>
+    <button type="button" class="link-btn" id="backToLogin">Zurück zum Login</button>
   </div>
 </div>
 
@@ -807,93 +953,6 @@
       </div>
 
       <div id="authArea"></div>
-    </div>
-  </div>
-
-  <!-- ================= LOGIN / REGISTER MODAL ================= -->
-  <div class="overlay" id="overlay">
-    <div class="modal">
-      <div class="close" id="closeModal">✕</div>
-      <div class="mlogo">♠</div>
-      <h1 id="modalTitle">Willkommen zurück</h1>
-      <div class="sub" id="modalSub">Melde dich an und leg direkt am Tisch los</div>
-
-      <div class="tabs">
-        <div class="tab active" data-tab="login">Login</div>
-        <div class="tab" data-tab="register">Registrieren</div>
-      </div>
-
-      <form id="authForm">
-        <div id="regFields" style="display:none;">
-          <label>Anzeigename</label>
-          <div class="field-icon-wrap">
-            <svg class="field-icon" viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5zm-7 19c0-3.9 3.1-7 7-7s7 3.1 7 7z"/></svg>
-            <input id="regName" placeholder="z. B. HighRoller_88">
-          </div>
-          <div class="field-hint">So wirst du für andere Spieler sichtbar.</div>
-
-          <label>Geschlecht</label>
-          <div class="gender-select" id="genderSelect">
-            <div class="gender-opt" data-gender="m">Männlich</div>
-            <div class="gender-opt" data-gender="w">Weiblich</div>
-          </div>
-        </div>
-
-        <label>E-Mail</label>
-        <div class="field-icon-wrap">
-          <svg class="field-icon" viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 4l-8 5-8-5V6l8 5 8-5z"/></svg>
-          <input id="authUser" type="email" placeholder="z. B. name@mail.com" autocomplete="username">
-        </div>
-
-        <label>Passwort</label>
-        <div class="field-icon-wrap pw-wrap">
-          <svg class="field-icon" viewBox="0 0 24 24"><path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-9h-1V6a5 5 0 00-10 0v2H6a2 2 0 00-2 2v9a2 2 0 002 2h12a2 2 0 002-2v-9a2 2 0 00-2-2zM9 6a3 3 0 016 0v2H9z"/></svg>
-          <input id="authPass" type="password" placeholder="••••••••" autocomplete="current-password">
-          <div class="pw-toggle" data-target="authPass" title="Passwort anzeigen">
-            <svg viewBox="0 0 24 24"><path d="M12 5c-5 0-9.3 3.1-11 7 1.7 3.9 6 7 11 7s9.3-3.1 11-7c-1.7-3.9-6-7-11-7zm0 11.5A4.5 4.5 0 1112 8a4.5 4.5 0 010 8.5zm0-7A2.5 2.5 0 1012 14a2.5 2.5 0 000-4.5z"/></svg>
-          </div>
-        </div>
-        <div class="field-hint" id="pwHintReg" style="display:none;">Mindestens 6 Zeichen.</div>
-
-        <div id="regConfirmWrap" style="display:none;">
-          <label>Passwort bestätigen</label>
-          <div class="field-icon-wrap pw-wrap">
-            <svg class="field-icon" viewBox="0 0 24 24"><path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-9h-1V6a5 5 0 00-10 0v2H6a2 2 0 00-2 2v9a2 2 0 002 2h12a2 2 0 002-2v-9a2 2 0 00-2-2zM9 6a3 3 0 016 0v2H9z"/></svg>
-            <input id="authPassConfirm" type="password" placeholder="Passwort wiederholen" autocomplete="new-password">
-            <div class="pw-toggle" data-target="authPassConfirm" title="Passwort anzeigen">
-              <svg viewBox="0 0 24 24"><path d="M12 5c-5 0-9.3 3.1-11 7 1.7 3.9 6 7 11 7s9.3-3.1 11-7c-1.7-3.9-6-7-11-7zm0 11.5A4.5 4.5 0 1112 8a4.5 4.5 0 010 8.5zm0-7A2.5 2.5 0 1012 14a2.5 2.5 0 000-4.5z"/></svg>
-            </div>
-          </div>
-        </div>
-
-        <div class="error" id="authError"></div>
-        <button type="submit" class="submit" id="submitBtn">Anmelden</button>
-      </form>
-      <button type="button" class="link-btn" id="forgotFromLogin">Passwort vergessen?</button>
-
-      <div class="age">
-        Mit der Anmeldung bestätigst du, dass du volljährig bist und unsere
-        Nutzungsbedingungen akzeptierst.
-      </div>
-    </div>
-  </div>
-
-  <!-- ================= FORGOT PASSWORD MODAL ================= -->
-  <div class="overlay" id="forgotOverlay">
-    <div class="modal">
-      <div class="close" id="closeForgot">✕</div>
-      <div class="mlogo">♠</div>
-      <h1>Passwort vergessen</h1>
-      <div class="sub">Wir schicken dir einen Link zum Zurücksetzen</div>
-
-      <form id="forgotForm">
-        <label>E-Mail</label>
-        <input id="forgotEmail" type="email" placeholder="z. B. name@mail.com" autocomplete="username">
-        <div class="error" id="forgotError"></div>
-        <div class="hint" id="forgotHint"></div>
-        <button type="submit" class="submit" id="forgotSubmitBtn">Link senden</button>
-      </form>
-      <button type="button" class="link-btn" id="backToLogin">Zurück zum Login</button>
     </div>
   </div>
 
@@ -1004,6 +1063,41 @@
           <!-- Admin pane (nur für Admin-Konten sichtbar) -->
           <div class="settings-pane" id="pane-admin">
             <div class="pane-heading">Admin</div>
+
+            <div class="lux-card">
+              <div class="card-title">
+                <svg viewBox="0 0 24 24"><path d="M12 2l7 3v6c0 5-3.4 8.7-7 10-3.6-1.3-7-5-7-10V5z"/></svg>
+                Wartungsmodus
+              </div>
+              <div class="toggle-row">
+                <div>
+                  <div class="toggle-label">Wartungsmodus aktiv</div>
+                  <div class="toggle-desc">Wenn aktiviert, sehen alle Spieler ohne Whitelist-Berechtigung den Wartungsbildschirm.</div>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="maintenanceToggle">
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="hint" id="maintenanceToggleHint"></div>
+            </div>
+
+            <div class="lux-card">
+              <div class="card-title">
+                <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5zm-7 19c0-3.9 3.1-7 7-7s7 3.1 7 7z"/></svg>
+                Whitelist für Wartung
+              </div>
+              <p class="card-note">
+                Konten mit diesen E-Mail-Adressen können sich während des Wartungsmodus trotzdem anmelden und die Seite nutzen.
+              </p>
+              <div class="wl-add-row">
+                <input id="wlEmailInput" type="email" placeholder="z. B. name@mail.com">
+                <button type="button" id="wlAddBtn">Hinzufügen</button>
+              </div>
+              <div class="hint" id="wlHint"></div>
+              <div class="wl-list" id="wlList"></div>
+            </div>
+
             <div class="lux-card">
               <div class="card-title">
                 <svg viewBox="0 0 24 24"><path d="M12 2l7 3v6c0 5-3.4 8.7-7 10-3.6-1.3-7-5-7-10V5z"/></svg>
@@ -1615,8 +1709,37 @@
     renderAuthArea(null);
   }
 
-  // --- Wartungsmodus: hier auf true/false schalten ---
-  const MAINTENANCE_MODE = true;
+  // --- Wartungsmodus ---
+  // Der Status kommt jetzt aus der Supabase-Tabelle "app_settings" (Zeile id=1, Spalte "maintenance_mode"),
+  // statt fest im Code zu stehen. Admins können ihn im Admin-Tab der Einstellungen umschalten.
+  let maintenanceMode = false;
+
+  async function fetchMaintenanceMode(){
+    const { data, error } = await supabaseClient
+      .from('app_settings')
+      .select('maintenance_mode')
+      .eq('id', 1)
+      .maybeSingle();
+    if(error){ console.error(error); return false; }
+    return !!data?.maintenance_mode;
+  }
+
+  async function setMaintenanceMode(value){
+    const { error } = await supabaseClient
+      .from('app_settings')
+      .update({ maintenance_mode: value })
+      .eq('id', 1);
+    return error;
+  }
+
+  // Prüft per RPC (security definer Funktion), ob eine E-Mail auf der Wartungs-Whitelist steht,
+  // ohne dass normale Nutzer die komplette Tabelle auslesen können.
+  async function isWhitelistedEmail(email){
+    if(!email) return false;
+    const { data, error } = await supabaseClient.rpc('is_maintenance_whitelisted', { check_email: email });
+    if(error){ console.error(error); return false; }
+    return !!data;
+  }
 
   // --- Wartungsbildschirm-Vorschau (nur visuell, ändert nichts am echten Wartungsstatus) ---
   function showMaintenancePreview(){
@@ -1657,14 +1780,44 @@
     showMaintenancePreview();
   });
 
+  // --- Login/Logout direkt vom Wartungsbildschirm aus ---
+  function renderMaintenanceAuthRow(email){
+    const row = document.getElementById('maintAuthRow');
+    const statusLine = document.getElementById('maintStatusLine');
+    if(email){
+      row.innerHTML = `<button type="button" class="maint-logout-link" id="maintLogoutBtn">Abmelden (${email})</button>`;
+      document.getElementById('maintLogoutBtn').addEventListener('click', async () => {
+        await logout();
+        await loadProfile();
+      });
+      statusLine.textContent = 'Dieses Konto hat aktuell keine Whitelist-Berechtigung.';
+    } else {
+      row.innerHTML = `<button type="button" class="maint-login-btn" id="maintLoginBtn">Anmelden</button>`;
+      document.getElementById('maintLoginBtn').addEventListener('click', () => openModal('login'));
+      statusLine.textContent = '';
+    }
+  }
+  document.getElementById('maintLoginBtn').addEventListener('click', () => openModal('login'));
+
   async function loadProfile(){
     const { data: { user } } = await supabaseClient.auth.getUser();
-    if(MAINTENANCE_MODE && !isAdminEmail(user?.email)){
+    maintenanceMode = await fetchMaintenanceMode();
+
+    const admin = isAdminEmail(user?.email);
+    const whitelisted = admin ? true : await isWhitelistedEmail(user?.email);
+
+    if(maintenanceMode && !whitelisted){
       document.getElementById('maintenanceScreen').style.display = 'flex';
       document.querySelector('.sidebar').style.display = 'none';
       document.querySelector('.main').style.display = 'none';
-        return;
+      renderMaintenanceAuthRow(user?.email || null);
+      return;
     }
+
+    document.getElementById('maintenanceScreen').style.display = 'none';
+    document.querySelector('.sidebar').style.display = '';
+    document.querySelector('.main').style.display = '';
+
     if(!user){
       currentUserId = null; currentUserEmail = null; isAdmin = false;
       renderAuthArea(null);
@@ -1686,7 +1839,7 @@
     currentProfile = profile;
     currentUserId = user.id;
     currentUserEmail = user.email;
-    isAdmin = isAdminEmail(user.email);
+    isAdmin = admin;
     avatarDataUrl = loadAvatarForUser(currentUserId);
     await loadNotifications();
     renderAuthArea(profile, user.email);
@@ -1822,6 +1975,84 @@
     });
   });
 
+  // --- Admin: Wartungsmodus-Umschalter ---
+  const maintenanceToggle = document.getElementById('maintenanceToggle');
+  maintenanceToggle.addEventListener('change', async () => {
+    const hint = document.getElementById('maintenanceToggleHint');
+    hint.textContent = '';
+    const newValue = maintenanceToggle.checked;
+    maintenanceToggle.disabled = true;
+    const error = await setMaintenanceMode(newValue);
+    maintenanceToggle.disabled = false;
+    if(error){
+      hint.textContent = error.message;
+      maintenanceToggle.checked = !newValue;
+      return;
+    }
+    maintenanceMode = newValue;
+    hint.textContent = newValue ? 'Wartungsmodus wurde aktiviert.' : 'Wartungsmodus wurde deaktiviert.';
+    showToast(newValue ? 'Wartungsmodus aktiviert.' : 'Wartungsmodus deaktiviert.');
+  });
+
+  // --- Admin: Wartungs-Whitelist verwalten ---
+  async function loadWhitelist(){
+    const list = document.getElementById('wlList');
+    if(!isAdmin){ list.innerHTML = ''; return; }
+    const { data, error } = await supabaseClient
+      .from('maintenance_whitelist')
+      .select('id, email')
+      .order('created_at', { ascending: true });
+    if(error){
+      list.innerHTML = `<div class="wl-empty">Fehler beim Laden: ${error.message}</div>`;
+      return;
+    }
+    if(!data || data.length === 0){
+      list.innerHTML = `<div class="wl-empty">Noch keine E-Mails auf der Whitelist.</div>`;
+      return;
+    }
+    list.innerHTML = data.map(row => `
+      <div class="wl-item" data-id="${row.id}">
+        <span class="wl-email">${row.email}</span>
+        <div class="wl-remove" title="Entfernen">
+          <svg viewBox="0 0 24 24"><path d="M18.3 5.7L12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7 2.9 18.3 9.2 12 2.9 5.7 4.3 4.3l6.3 6.3 6.3-6.3z"/></svg>
+        </div>
+      </div>`).join('');
+    list.querySelectorAll('.wl-remove').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const item = btn.closest('.wl-item');
+        const id = item.dataset.id;
+        const { error: delError } = await supabaseClient.from('maintenance_whitelist').delete().eq('id', id);
+        if(delError){ showToast(delError.message); return; }
+        showToast('E-Mail entfernt.');
+        await loadWhitelist();
+      });
+    });
+  }
+
+  document.getElementById('wlAddBtn').addEventListener('click', async () => {
+    const input = document.getElementById('wlEmailInput');
+    const hint = document.getElementById('wlHint');
+    const btn = document.getElementById('wlAddBtn');
+    const email = input.value.trim();
+    hint.textContent = '';
+    if(!email){
+      hint.textContent = 'Bitte eine E-Mail-Adresse eingeben.';
+      return;
+    }
+    btn.disabled = true;
+    btn.textContent = 'Füge hinzu...';
+    const { error } = await supabaseClient.from('maintenance_whitelist').insert({ email: email.toLowerCase() });
+    btn.disabled = false;
+    btn.textContent = 'Hinzufügen';
+    if(error){
+      hint.textContent = error.message.includes('duplicate') ? 'Diese E-Mail ist bereits auf der Whitelist.' : error.message;
+      return;
+    }
+    input.value = '';
+    hint.textContent = 'E-Mail hinzugefügt.';
+    await loadWhitelist();
+  });
+
   function openSettings(email){
     document.getElementById('profileError').textContent = '';
     document.getElementById('profileHint').textContent = '';
@@ -1848,6 +2079,12 @@
       nav.appendChild(tab);
     } else if(adminTab && !isAdmin){
       adminTab.remove();
+    }
+
+    if(isAdmin){
+      maintenanceToggle.checked = maintenanceMode;
+      document.getElementById('maintenanceToggleHint').textContent = '';
+      loadWhitelist();
     }
 
     document.querySelectorAll('#settingsGenderSelect .gender-opt').forEach(o => {
