@@ -733,6 +733,66 @@
   .wl-item .wl-remove:hover{color:var(--danger);border-color:var(--danger);}
   .wl-item .wl-remove svg{width:11px;height:11px;fill:currentColor;}
   .wl-empty{font-size:12px;color:var(--faint);padding:6px 2px;}
+
+  /* ---------- Freunde-System ---------- */
+  .nav-badge{
+    position:absolute;top:2px;right:6px;background:var(--danger);color:#1a0808;font-size:9px;
+    min-width:15px;height:15px;padding:0 3px;border-radius:8px;display:none;align-items:center;justify-content:center;
+    font-weight:700;border:2px solid var(--sidebar);
+  }
+  .nav-item{position:relative;}
+  .friends-wrap{max-width:760px;}
+  .friends-head{margin-bottom:20px;}
+  .friends-head h1{font-family:var(--font-display);font-size:24px;font-weight:600;color:var(--text);margin-bottom:4px;}
+  .friends-head p{color:var(--muted);font-size:13.5px;}
+  .friend-search-bar{display:flex;gap:8px;margin-bottom:26px;}
+  .friend-search-bar input{
+    flex:1;height:42px;border-radius:9px;border:1px solid var(--border);background:var(--surface);
+    color:var(--text);padding:0 15px;font-size:13.5px;outline:none;transition:.15s;font-family:var(--font-body);
+  }
+  .friend-search-bar input:focus{border-color:var(--accent-dim);box-shadow:0 0 0 3px var(--accent-soft);}
+  .friend-search-results{margin-bottom:8px;display:flex;flex-direction:column;gap:6px;}
+  .friend-tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:4px;margin-bottom:16px;width:fit-content;}
+  .friend-tab{
+    padding:8px 16px;border-radius:6px;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;transition:.15s;
+    display:flex;align-items:center;gap:6px;
+  }
+  .friend-tab.active{background:var(--accent);color:#f3f6fc;}
+  .friend-tab .ft-count{
+    background:rgba(255,255,255,.18);border-radius:10px;font-size:10px;padding:1px 6px;font-weight:700;
+  }
+  .friend-tab.active .ft-count{background:rgba(255,255,255,.28);}
+  .friend-panel{display:none;}
+  .friend-panel.active{display:block;}
+  .friend-row{
+    display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);
+    border-radius:10px;padding:10px 14px;margin-bottom:8px;
+  }
+  .friend-row .avatar{width:38px;height:38px;font-size:14px;display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:600;font-family:var(--font-body);}
+  .friend-row .fr-info{flex:1;min-width:0;}
+  .friend-row .fr-username{font-size:13.5px;font-weight:600;color:var(--text);}
+  .friend-row .fr-name{font-size:11.5px;color:var(--muted);}
+  .friend-row .fr-actions{display:flex;gap:8px;flex-shrink:0;}
+  .fr-btn{
+    height:32px;padding:0 14px;border-radius:7px;border:1px solid var(--border);background:var(--surface-2);
+    color:var(--text);font-size:12px;font-weight:600;cursor:pointer;transition:.15s;font-family:var(--font-body);
+  }
+  .fr-btn:hover{border-color:#333d4a;}
+  .fr-btn.primary{background:var(--accent);border-color:var(--accent);color:#f3f6fc;}
+  .fr-btn.primary:hover{background:var(--accent-hi);}
+  .fr-btn.danger{color:var(--danger);}
+  .fr-btn.danger:hover{border-color:var(--danger);}
+  .fr-btn:disabled{opacity:.5;cursor:default;}
+  .friend-empty{color:var(--faint);font-size:12.5px;padding:18px 4px;text-align:center;}
+
+  /* Pflicht-Username-Overlay: kann nicht weggeklickt werden */
+  .modal.username-modal{width:400px;}
+  .username-modal .u-prefix{
+    position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--faint);font-size:13.5px;font-weight:600;
+  }
+  .username-modal .u-wrap{position:relative;}
+  .username-modal .u-wrap input{padding-left:26px;}
 </style>
 </head>
 <body>
@@ -877,6 +937,24 @@
   </div>
 </div>
 
+<div class="overlay" id="usernameOverlay" style="z-index:1000;">
+  <div class="modal username-modal">
+    <div class="mlogo">@</div>
+    <h1>Wähle deinen Benutzernamen</h1>
+    <div class="sub">Damit dich andere Spieler als Freund finden können, brauchst du einen eindeutigen Benutzernamen.</div>
+    <form id="usernameForm">
+      <label>Benutzername</label>
+      <div class="u-wrap">
+        <span class="u-prefix">@</span>
+        <input id="usernameInput" placeholder="z. B. HighRoller88" autocomplete="off" maxlength="20">
+      </div>
+      <div class="field-hint">3–20 Zeichen, nur Buchstaben, Zahlen und Unterstriche.</div>
+      <div class="error" id="usernameError"></div>
+      <button type="submit" class="submit" id="usernameSubmitBtn">Speichern</button>
+    </form>
+  </div>
+</div>
+
 <div class="sidebar">
   <div class="brand" title="Royal Table">
     <svg viewBox="0 0 24 24"><path fill="var(--accent-hi)" d="M12 2l2.6 5.9 6.4.6-4.8 4.3 1.5 6.3L12 15.8 6.3 19.1l1.5-6.3-4.8-4.3 6.4-.6z" opacity="0.9"/></svg>
@@ -889,9 +967,10 @@
     <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-6h2zm0-8h-2V7h2z"/></svg>
     <span>Entdecken</span>
   </div>
-  <div class="nav-item">
+  <div class="nav-item" id="navFriends">
     <svg viewBox="0 0 24 24"><path d="M16 11c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3 1.3 3 3 3zm-8 0c1.7 0 3-1.3 3-3S9.7 5 8 5 5 6.3 5 8s1.3 3 3 3zm0 2c-2.3 0-7 1.2-7 3.5V19h9v-2.5c0-.9.4-1.9 1.2-2.7C10 13.4 8.7 13 8 13zm8 0c-.3 0-.6 0-1 .1 1 .8 1.7 1.9 1.7 3.4V19h6v-2.5c0-2.3-4.7-3.5-6.7-3.5z"/></svg>
     <span>Freunde</span>
+    <div class="nav-badge" id="friendsNavBadge">0</div>
   </div>
   <div class="nav-item">
     <svg viewBox="0 0 24 24"><path d="M4 4h16v12H5.2L4 17.2zm2 3v2h12V7zm0 4v2h8v-2z"/></svg>
@@ -1117,7 +1196,7 @@
     </div>
   </div>
 
-  <div class="content">
+  <div class="content" id="homeView">
     <div class="hero">
       <div class="hero-inner">
         <div class="hero-eyebrow">
@@ -1135,6 +1214,30 @@
       <a id="allGamesLink">Alle anzeigen</a>
     </div>
     <div class="row" id="row1"></div>
+  </div>
+
+  <div class="content" id="friendsView" style="display:none;">
+    <div class="friends-wrap">
+      <div class="friends-head">
+        <h1>Freunde</h1>
+        <p>Suche Spieler über ihren Benutzernamen und verwalte deine Freundschaften.</p>
+      </div>
+
+      <div class="friend-search-bar">
+        <input id="friendSearchInput" placeholder="Benutzername suchen … (mind. 2 Zeichen)" autocomplete="off">
+      </div>
+      <div class="friend-search-results" id="friendSearchResults"></div>
+
+      <div class="friend-tabs">
+        <div class="friend-tab active" data-fpanel="list">Freunde <span class="ft-count" id="ftCountFriends">0</span></div>
+        <div class="friend-tab" data-fpanel="incoming">Anfragen <span class="ft-count" id="ftCountIncoming">0</span></div>
+        <div class="friend-tab" data-fpanel="outgoing">Gesendet <span class="ft-count" id="ftCountOutgoing">0</span></div>
+      </div>
+
+      <div class="friend-panel active" id="fpanelList"></div>
+      <div class="friend-panel" id="fpanelIncoming"></div>
+      <div class="friend-panel" id="fpanelOutgoing"></div>
+    </div>
   </div>
 </div>
 
@@ -1208,14 +1311,36 @@
     document.getElementById('gamesSection').scrollIntoView({ behavior:'smooth', block:'start' });
   });
 
-  // Sidebar-Navigation: Home ist aktiv, restliche Bereiche sind noch nicht gebaut
+  // Sidebar-Navigation: Home und Freunde sind gebaut, restliche Bereiche folgen später
+  function switchMainView(view){
+    const home = document.getElementById('homeView');
+    const friends = document.getElementById('friendsView');
+    if(view === 'friends'){
+      home.style.display = 'none';
+      friends.style.display = '';
+      friends.scrollTo({ top:0 });
+      if(!currentUserId){
+        showToast('Melde dich an, um Freunde hinzuzufügen.');
+        openModal('login');
+        return;
+      }
+      loadFriendsData();
+    } else {
+      friends.style.display = 'none';
+      home.style.display = '';
+      home.scrollTo({ top:0, behavior:'smooth' });
+    }
+  }
+
   document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', () => {
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
       item.classList.add('active');
       const label = item.querySelector('span')?.textContent;
       if(label === 'Home'){
-        document.querySelector('.content').scrollTo({ top:0, behavior:'smooth' });
+        switchMainView('home');
+      } else if(label === 'Freunde'){
+        switchMainView('friends');
       } else {
         showToast(`${label} folgt in Kürze.`);
       }
@@ -1706,6 +1831,7 @@
     openModal('login');
   });
   forgotOverlay.addEventListener('click', e => { if(e.target === forgotOverlay) forgotOverlay.classList.remove('open'); });
+  // (username overlay listeners weiter unten, nach ihrer Definition)
 
   forgotForm.addEventListener('submit', async e => {
     e.preventDefault();
@@ -1734,6 +1860,11 @@
   async function logout(){
     await supabaseClient.auth.signOut();
     currentUserId = null; currentUserEmail = null; isAdmin = false; notifications = [];
+    document.getElementById('usernameOverlay').classList.remove('open');
+    unsubscribeFriendRequests();
+    switchMainView('home');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelector('.nav-item span') && document.querySelectorAll('.nav-item')[0].classList.add('active');
     renderAuthArea(null);
   }
 
@@ -1853,12 +1984,12 @@
     }
     let { data: profile, error } = await supabaseClient
       .from('profiles')
-      .select('name, chips, gender')
+      .select('name, chips, gender, username')
       .eq('id', user.id)
       .single();
     if(error){
-      // "gender"-Spalte existiert evtl. noch nicht in der profiles-Tabelle — ohne sie nochmal versuchen,
-      // damit der Login trotzdem funktioniert.
+      // "gender"/"username"-Spalte existiert evtl. noch nicht in der profiles-Tabelle — ohne sie nochmal
+      // versuchen, damit der Login trotzdem funktioniert.
       const fallback = await supabaseClient.from('profiles').select('name, chips').eq('id', user.id).single();
       profile = fallback.data;
       error = fallback.error;
@@ -1871,6 +2002,9 @@
     avatarDataUrl = loadAvatarForUser(currentUserId);
     await loadNotifications();
     renderAuthArea(profile, user.email);
+    enforceUsername(profile);
+    subscribeFriendRequests();
+    refreshFriendsBadge();
   }
 
   // --- Zeitbasierte Begrüßung im Hero-Header ---
@@ -2255,6 +2389,311 @@
     });
     hint.textContent = error ? error.message : `Link wurde an ${user.email} gesendet.`;
   });
+
+  // ============================================================
+  // --- Pflicht-Benutzername ---
+  // Jeder Account braucht einen eindeutigen Benutzernamen, bevor er die App nutzen kann.
+  // Betrifft neue UND bereits registrierte Konten (die vorher nur mit E-Mail liefen).
+  // ============================================================
+  const usernameOverlay = document.getElementById('usernameOverlay');
+  const usernameForm = document.getElementById('usernameForm');
+  const usernameInput = document.getElementById('usernameInput');
+  const usernameError = document.getElementById('usernameError');
+  const usernameSubmitBtn = document.getElementById('usernameSubmitBtn');
+  const USERNAME_RE = /^[a-zA-Z0-9_]{3,20}$/;
+
+  function enforceUsername(profile){
+    // 'username' ist nur im Profil-Objekt vorhanden, wenn die Spalte existiert (siehe loadProfile-Fallback).
+    if(profile && ('username' in profile) && !profile.username){
+      usernameError.textContent = '';
+      usernameInput.value = '';
+      usernameOverlay.classList.add('open');
+      setTimeout(() => usernameInput.focus(), 50);
+    } else {
+      usernameOverlay.classList.remove('open');
+    }
+  }
+
+  usernameForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    const uname = usernameInput.value.trim();
+    if(!USERNAME_RE.test(uname)){
+      usernameError.textContent = '3–20 Zeichen: nur Buchstaben, Zahlen, Unterstriche.';
+      return;
+    }
+    usernameSubmitBtn.disabled = true;
+    usernameSubmitBtn.textContent = 'Prüfe Verfügbarkeit...';
+    usernameError.textContent = '';
+
+    // Verfügbarkeit vorab prüfen (case-insensitive), damit wir eine klare Fehlermeldung geben können.
+    const { data: existing, error: checkErr } = await supabaseClient
+      .from('public_profiles')
+      .select('id')
+      .ilike('username', uname)
+      .maybeSingle();
+    if(checkErr && checkErr.code !== 'PGRST116'){
+      usernameSubmitBtn.disabled = false;
+      usernameSubmitBtn.textContent = 'Speichern';
+      usernameError.textContent = checkErr.message;
+      return;
+    }
+    if(existing){
+      usernameSubmitBtn.disabled = false;
+      usernameSubmitBtn.textContent = 'Speichern';
+      usernameError.textContent = 'Dieser Benutzername ist bereits vergeben.';
+      return;
+    }
+
+    const { error } = await supabaseClient
+      .from('profiles')
+      .update({ username: uname })
+      .eq('id', currentUserId);
+
+    usernameSubmitBtn.disabled = false;
+    usernameSubmitBtn.textContent = 'Speichern';
+
+    if(error){
+      // 23505 = unique_violation, falls zwei Leute gleichzeitig denselben Namen ergattern wollten.
+      usernameError.textContent = error.code === '23505'
+        ? 'Dieser Benutzername ist bereits vergeben.'
+        : error.message;
+      return;
+    }
+
+    currentProfile.username = uname;
+    usernameOverlay.classList.remove('open');
+    showToast('Benutzername gespeichert.');
+  });
+
+  // ============================================================
+  // --- Freunde-System ---
+  // Tabellen (in Supabase anzulegen, siehe SQL-Datei): profiles.username, public.friend_requests
+  // ============================================================
+  let friendsCache = { friends: [], incoming: [], outgoing: [] };
+  let friendsChannel = null;
+  let friendSearchTimer = null;
+
+  function initials(name){ return (name || '?').charAt(0).toUpperCase(); }
+
+  function friendAvatarHTML(name){
+    return `<div class="avatar" style="background:linear-gradient(135deg,#4f7fe0,#2a3542)">${initials(name)}</div>`;
+  }
+
+  // Holt öffentliche Profildaten (id, username, name) zu einer Liste von User-IDs.
+  async function fetchPublicProfiles(ids){
+    if(!ids.length) return {};
+    const { data, error } = await supabaseClient
+      .from('public_profiles')
+      .select('id, username, name')
+      .in('id', ids);
+    if(error){ console.error(error); return {}; }
+    const map = {};
+    (data || []).forEach(p => { map[p.id] = p; });
+    return map;
+  }
+
+  async function loadFriendsData(){
+    if(!currentUserId) return;
+    const { data, error } = await supabaseClient
+      .from('friend_requests')
+      .select('id, sender_id, receiver_id, status, created_at')
+      .or(`sender_id.eq.${currentUserId},receiver_id.eq.${currentUserId}`);
+    if(error){ console.error(error); return; }
+
+    const rows = data || [];
+    const otherIds = rows.map(r => r.sender_id === currentUserId ? r.receiver_id : r.sender_id);
+    const profileMap = await fetchPublicProfiles([...new Set(otherIds)]);
+
+    const friends = [], incoming = [], outgoing = [];
+    rows.forEach(r => {
+      const otherId = r.sender_id === currentUserId ? r.receiver_id : r.sender_id;
+      const other = profileMap[otherId] || { id: otherId, username: '(unbekannt)', name: '' };
+      if(r.status === 'accepted'){
+        friends.push({ requestId: r.id, ...other });
+      } else if(r.status === 'pending' && r.receiver_id === currentUserId){
+        incoming.push({ requestId: r.id, ...other });
+      } else if(r.status === 'pending' && r.sender_id === currentUserId){
+        outgoing.push({ requestId: r.id, ...other });
+      }
+    });
+
+    friendsCache = { friends, incoming, outgoing };
+    renderFriendsView();
+    refreshFriendsBadge();
+  }
+
+  function refreshFriendsBadge(){
+    const badge = document.getElementById('friendsNavBadge');
+    if(!badge) return;
+    const n = friendsCache.incoming.length;
+    if(currentUserId && n > 0){ badge.textContent = n; badge.style.display = 'flex'; }
+    else { badge.style.display = 'none'; }
+  }
+
+  function renderFriendsView(){
+    document.getElementById('ftCountFriends').textContent = friendsCache.friends.length;
+    document.getElementById('ftCountIncoming').textContent = friendsCache.incoming.length;
+    document.getElementById('ftCountOutgoing').textContent = friendsCache.outgoing.length;
+
+    const listEl = document.getElementById('fpanelList');
+    listEl.innerHTML = friendsCache.friends.length ? friendsCache.friends.map(f => `
+      <div class="friend-row">
+        ${friendAvatarHTML(f.name || f.username)}
+        <div class="fr-info">
+          <div class="fr-username">@${f.username}</div>
+          <div class="fr-name">${f.name || ''}</div>
+        </div>
+        <div class="fr-actions">
+          <button class="fr-btn danger" data-remove="${f.requestId}">Entfernen</button>
+        </div>
+      </div>`).join('') : `<div class="friend-empty">Noch keine Freunde. Suche oben nach einem Benutzernamen.</div>`;
+
+    const inEl = document.getElementById('fpanelIncoming');
+    inEl.innerHTML = friendsCache.incoming.length ? friendsCache.incoming.map(f => `
+      <div class="friend-row">
+        ${friendAvatarHTML(f.name || f.username)}
+        <div class="fr-info">
+          <div class="fr-username">@${f.username}</div>
+          <div class="fr-name">${f.name || ''}</div>
+        </div>
+        <div class="fr-actions">
+          <button class="fr-btn primary" data-accept="${f.requestId}">Annehmen</button>
+          <button class="fr-btn danger" data-decline="${f.requestId}">Ablehnen</button>
+        </div>
+      </div>`).join('') : `<div class="friend-empty">Keine offenen Anfragen.</div>`;
+
+    const outEl = document.getElementById('fpanelOutgoing');
+    outEl.innerHTML = friendsCache.outgoing.length ? friendsCache.outgoing.map(f => `
+      <div class="friend-row">
+        ${friendAvatarHTML(f.name || f.username)}
+        <div class="fr-info">
+          <div class="fr-username">@${f.username}</div>
+          <div class="fr-name">Angefragt</div>
+        </div>
+        <div class="fr-actions">
+          <button class="fr-btn danger" data-cancel="${f.requestId}">Zurückziehen</button>
+        </div>
+      </div>`).join('') : `<div class="friend-empty">Keine gesendeten Anfragen.</div>`;
+
+    listEl.querySelectorAll('[data-remove]').forEach(b => b.addEventListener('click', () => removeFriendRequest(b.dataset.remove)));
+    inEl.querySelectorAll('[data-accept]').forEach(b => b.addEventListener('click', () => respondFriendRequest(b.dataset.accept, 'accepted')));
+    inEl.querySelectorAll('[data-decline]').forEach(b => b.addEventListener('click', () => respondFriendRequest(b.dataset.decline, 'declined')));
+    outEl.querySelectorAll('[data-cancel]').forEach(b => b.addEventListener('click', () => removeFriendRequest(b.dataset.cancel)));
+  }
+
+  async function sendFriendRequest(receiverId, btn){
+    if(!currentUserId || receiverId === currentUserId) return;
+    if(btn) btn.disabled = true;
+    const { error } = await supabaseClient
+      .from('friend_requests')
+      .insert({ sender_id: currentUserId, receiver_id: receiverId, status: 'pending' });
+    if(error){
+      showToast(error.code === '23505' ? 'Es besteht bereits eine Anfrage oder Freundschaft.' : 'Anfrage fehlgeschlagen.');
+      if(btn) btn.disabled = false;
+      return;
+    }
+    showToast('Freundschaftsanfrage gesendet.');
+    document.getElementById('friendSearchInput').value = '';
+    document.getElementById('friendSearchResults').innerHTML = '';
+    loadFriendsData();
+  }
+
+  async function respondFriendRequest(requestId, status){
+    const { error } = await supabaseClient
+      .from('friend_requests')
+      .update({ status, responded_at: new Date().toISOString() })
+      .eq('id', requestId);
+    if(error){ showToast('Aktion fehlgeschlagen.'); return; }
+    showToast(status === 'accepted' ? 'Freundschaft bestätigt.' : 'Anfrage abgelehnt.');
+    loadFriendsData();
+  }
+
+  async function removeFriendRequest(requestId){
+    const { error } = await supabaseClient.from('friend_requests').delete().eq('id', requestId);
+    if(error){ showToast('Aktion fehlgeschlagen.'); return; }
+    loadFriendsData();
+  }
+
+  // --- Suche nach Benutzername (debounced) ---
+  const friendSearchInput = document.getElementById('friendSearchInput');
+  friendSearchInput.addEventListener('input', () => {
+    clearTimeout(friendSearchTimer);
+    const q = friendSearchInput.value.trim();
+    if(q.length < 2){
+      document.getElementById('friendSearchResults').innerHTML = '';
+      return;
+    }
+    friendSearchTimer = setTimeout(() => runFriendSearch(q), 300);
+  });
+
+  async function runFriendSearch(q){
+    const resultsEl = document.getElementById('friendSearchResults');
+    if(!currentUserId) return;
+    const { data, error } = await supabaseClient
+      .from('public_profiles')
+      .select('id, username, name')
+      .ilike('username', `%${q}%`)
+      .not('username', 'is', null)
+      .limit(8);
+    if(error){ console.error(error); return; }
+
+    const knownIds = new Set([
+      currentUserId,
+      ...friendsCache.friends.map(f => f.id),
+      ...friendsCache.incoming.map(f => f.id),
+      ...friendsCache.outgoing.map(f => f.id),
+    ]);
+    const results = (data || []).filter(p => !knownIds.has(p.id));
+
+    if(!results.length){
+      resultsEl.innerHTML = `<div class="friend-empty">Keine passenden Spieler gefunden.</div>`;
+      return;
+    }
+    resultsEl.innerHTML = results.map(p => `
+      <div class="friend-row">
+        ${friendAvatarHTML(p.name || p.username)}
+        <div class="fr-info">
+          <div class="fr-username">@${p.username}</div>
+          <div class="fr-name">${p.name || ''}</div>
+        </div>
+        <div class="fr-actions">
+          <button class="fr-btn primary" data-add="${p.id}">Hinzufügen</button>
+        </div>
+      </div>`).join('');
+    resultsEl.querySelectorAll('[data-add]').forEach(b => {
+      b.addEventListener('click', () => sendFriendRequest(b.dataset.add, b));
+    });
+  }
+
+  document.querySelectorAll('.friend-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.friend-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.friend-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      const target = { list:'fpanelList', incoming:'fpanelIncoming', outgoing:'fpanelOutgoing' }[tab.dataset.fpanel];
+      document.getElementById(target).classList.add('active');
+    });
+  });
+
+  // Realtime: aktualisiert Freundesliste/Badge sofort bei neuen Anfragen, Annahmen, etc.
+  // Wichtig: Realtime muss in Supabase für "friend_requests" aktiviert sein
+  // (Dashboard -> Database -> Publications -> supabase_realtime -> Tabelle einschalten).
+  function subscribeFriendRequests(){
+    unsubscribeFriendRequests();
+    if(!currentUserId) return;
+    friendsChannel = supabaseClient
+      .channel('friend_requests_' + currentUserId)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests' }, payload => {
+        const row = payload.new?.id ? payload.new : payload.old;
+        if(row && (row.sender_id === currentUserId || row.receiver_id === currentUserId)){
+          loadFriendsData();
+        }
+      })
+      .subscribe();
+  }
+  function unsubscribeFriendRequests(){
+    if(friendsChannel){ supabaseClient.removeChannel(friendsChannel); friendsChannel = null; }
+  }
 
   // Falls Supabase uns über einen Passwort-Reset-Link zurückschickt (PASSWORD_RECOVERY event),
   // direkt das Sicherheits-Tab der Einstellungen öffnen, damit der Nutzer ein neues Passwort setzen kann.
