@@ -1341,9 +1341,8 @@
     </div>
 
     <h1>Ein Update ist gerade im Gange</h1>
-    <p class="upd-sub">Wir mischen frisch — <strong>einen Moment</strong>, die Seite lädt gleich neu.</p>
+    <p class="upd-sub">Wir mischen frisch — <strong>lade die Seite bitte neu</strong>, um die Änderungen zu sehen.</p>
 
-    <div class="upd-progress"><div class="upd-progress-bar"></div></div>
   </div>
 </div>
 
@@ -4027,18 +4026,8 @@
     if(!overlay || overlay.classList.contains('show')) return;
     overlay.classList.add('show');
     console.log('[deploy-watcher] Update-Screen angezeigt um', new Date().toISOString());
-    const shownAt = Date.now();
-    const MIN_SHOW_MS = 11000; // exakt 11 Sekunden Mindestanzeige
-    // Statt blind auf ein einzelnes setTimeout zu vertrauen (das durch Tab-Drosselung
-    // im Hintergrund verzögert, aber nie zu früh feuert), wird hier per Intervall
-    // die tatsächlich vergangene Zeit geprüft — sicherer bei Hintergrund-Tabs etc.
-    const checkTimer = setInterval(() => {
-      if(Date.now() - shownAt >= MIN_SHOW_MS){
-        clearInterval(checkTimer);
-        console.log('[deploy-watcher] Reload nach', Date.now() - shownAt, 'ms');
-        window.location.reload();
-      }
-    }, 250);
+    // Kein Auto-Reload mehr: Der Screen bleibt stehen, bis der Nutzer die Seite
+    // selbst neu lädt — erst dann sind die neuen Dateien wirklich aktiv.
   }
 
   async function checkForDeploy(){
