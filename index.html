@@ -921,6 +921,12 @@
     padding:6px 12px;border-radius:20px;font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
   }
 
+  /* --------- boot gate: verhindert Flash der Hauptseite vor dem ersten loadProfile() --------- */
+  #bootGate{
+    position:fixed;inset:0;z-index:99999;background:var(--bg);
+    display:flex;align-items:center;justify-content:center;
+  }
+
   /* --------- coming soon screen --------- */
   #comingSoonScreen{
     display:none;position:fixed;inset:0;z-index:999;
@@ -1199,6 +1205,7 @@
 </style>
 </head>
 <body>
+<div id="bootGate"></div>
 
 <div id="maintenanceScreen">
   <div class="maint-grid"></div>
@@ -2800,6 +2807,7 @@
       document.querySelector('.sidebar').style.display = 'none';
       document.querySelector('.main').style.display = 'none';
       renderMaintenanceAuthRow(user?.email || null);
+      document.getElementById('bootGate').style.display = 'none';
       return;
     }
 
@@ -2810,6 +2818,7 @@
       document.querySelector('.sidebar').style.display = 'none';
       document.querySelector('.main').style.display = 'none';
       renderComingSoonAuthRow(user?.email || null);
+      document.getElementById('bootGate').style.display = 'none';
       return;
     }
 
@@ -2817,6 +2826,7 @@
     document.getElementById('comingSoonScreen').style.display = 'none';
     document.querySelector('.sidebar').style.display = '';
     document.querySelector('.main').style.display = '';
+    document.getElementById('bootGate').style.display = 'none';
 
     if(!user){
       currentUserId = null; currentUserEmail = null; isAdmin = false;
