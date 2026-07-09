@@ -422,6 +422,7 @@
     box-shadow:0 0 0 3px var(--sidebar);background-size:cover;background-position:center;
     overflow:hidden;position:relative;z-index:1;
   }
+  .rail-avatar-wrap .big-avatar.avatar-symbol{font-size:42px;}
   .rail-avatar-wrap .avatar-edit-badge{
     position:absolute;right:0px;bottom:0px;width:30px;height:30px;border-radius:50%;z-index:2;
     background:linear-gradient(180deg,var(--accent-hi),var(--accent));border:2px solid var(--sidebar);display:flex;align-items:center;justify-content:center;
@@ -552,6 +553,17 @@
     background-size:cover;background-position:center;
     border:1px solid var(--accent-dim);box-shadow:0 0 0 3px rgba(212,175,106,.14);
   }
+  .avatar-picker-preview.avatar-symbol{font-size:38px;}
+  /* Symbol-Avatare (Presets) brauchen eine eigene, aufrechte Darstellung:
+     Fraunces hat für Kartensymbole/Krone/Würfel keine echten Kursivformen,
+     der Browser hat sie bisher synthetisch schräggestellt und damit optisch
+     aus der Kreismitte gerückt. Feste, nicht-serifene Symbolschrift + normal
+     statt italic = zentriert und konsistent über alle Glyphen hinweg. */
+  .avatar-symbol{
+    font-style:normal !important;
+    font-family:'Segoe UI Symbol','Noto Sans Symbol','Arial Unicode MS',Arial,sans-serif !important;
+    line-height:1;
+  }
   .avatar-picker-actions{display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-width:0;}
   .avatar-picker-actions .submit.ghost{width:auto;height:40px;padding:0 18px;margin:0;}
   .avatar-picker-actions-row{display:flex;flex-wrap:wrap;gap:8px;}
@@ -572,7 +584,8 @@
   .avatar-option{
     width:52px;height:52px;border-radius:50%;cursor:pointer;border:2px solid transparent;
     display:flex;align-items:center;justify-content:center;position:relative;
-    font-family:var(--font-display);font-style:italic;font-weight:600;font-size:20px;color:var(--text);
+    font-family:'Segoe UI Symbol','Noto Sans Symbol','Arial Unicode MS',Arial,sans-serif;
+    font-style:normal;font-weight:600;font-size:21px;color:var(--text);line-height:1;
     box-shadow:0 3px 10px rgba(0,0,0,.35), inset 0 0 0 1px rgba(212,175,106,.1);
     transition:transform .15s ease, box-shadow .15s ease;
   }
@@ -1607,6 +1620,7 @@
                 <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5z"/></svg>
                 Anzeigename
               </div>
+              <p class="card-note">Wie du am Tisch für andere sichtbar bist. Änderbar max. 1x alle 7 Tage.</p>
               <form id="profileNameForm">
                 <input id="profileName" placeholder="Dein Anzeigename" maxlength="12">
                 <div class="error" id="profileError"></div>
@@ -2036,7 +2050,7 @@
   // --- Vorgefertigte Profilbilder (Symbol + Farbverlauf, passend zum Tisch-Thema) ---
   // Es werden keine eigenen Fotos mehr hochgeladen — stattdessen wählt man eines von
   // ca. 50 Presets. Die Auswahl gilt nur für die aktuelle Sitzung (kein Speichern/Sync).
-  const AVATAR_SYMBOLS = ['♠','♥','♦','♣','★','♛','⚀','⚅','7','$','◆','♞'];
+  const AVATAR_SYMBOLS = ['♠','♥','♦','♣','★','♛','⚀','⚅'];
   const AVATAR_GRADIENTS = [
     'linear-gradient(135deg,#c9a05b,#8a6a35)',
     'linear-gradient(135deg,#1c4830,#0f2c1d)',
@@ -2863,7 +2877,7 @@
     }
     let { data: profile, error } = await supabaseClient
       .from('profiles')
-      .select('name, chips, gender, username, username_changed_at')
+      .select('name, chips, gender, username, username_changed_at, name_changed_at')
       .eq('id', user.id)
       .single();
     if(error){
@@ -3357,6 +3371,7 @@
 
     if(currentProfile){
       document.getElementById('profileName').value = currentProfile.name;
+      renderProfileNameCard();
       document.getElementById('settingsUname').textContent = currentProfile.name;
       document.getElementById('settingsHandle').textContent = currentProfile.username ? '@' + currentProfile.username : 'Kein Benutzername';
       renderUsernameChangeCard();
@@ -3448,7 +3463,34 @@
     t.addEventListener('click', () => switchPane(t.dataset.spane));
   });
 
-  // Profil speichern (Anzeigename)
+  // Profil speichern (Anzeigename), max. 1x alle 7 Tage
+  const NAME_COOLDOWN_MS = 7*24*60*60*1000;
+
+  function nextAllowedNameChangeDate(){
+    if(!currentProfile?.name_changed_at) return null;
+    const last = new Date(currentProfile.name_changed_at);
+    const next = new Date(last.getTime() + NAME_COOLDOWN_MS);
+    return next > new Date() ? next : null;
+  }
+
+  function renderProfileNameCard(){
+    const profileError = document.getElementById('profileError');
+    const profileHint = document.getElementById('profileHint');
+    const profileName = document.getElementById('profileName');
+    const profileSubmitBtn = document.getElementById('profileSubmitBtn');
+    profileError.textContent = '';
+    const blockedUntil = nextAllowedNameChangeDate();
+    if(blockedUntil){
+      profileName.disabled = true;
+      profileSubmitBtn.disabled = true;
+      profileHint.textContent = `Nächste Änderung möglich ab ${blockedUntil.toLocaleDateString('de-DE')}.`;
+    } else {
+      profileName.disabled = false;
+      profileSubmitBtn.disabled = false;
+      profileHint.textContent = '';
+    }
+  }
+
   document.getElementById('profileNameForm').addEventListener('submit', async e => {
     e.preventDefault();
     const profileError = document.getElementById('profileError');
@@ -3456,6 +3498,12 @@
     const profileSubmitBtn = document.getElementById('profileSubmitBtn');
     profileError.textContent = '';
     profileHint.textContent = '';
+
+    const blockedUntil = nextAllowedNameChangeDate();
+    if(blockedUntil){
+      profileError.textContent = `Änderung noch nicht möglich (max. 1x alle 7 Tage). Nächste Änderung ab ${blockedUntil.toLocaleDateString('de-DE')}.`;
+      return;
+    }
 
     const newName = document.getElementById('profileName').value.trim();
     if(!newName){
@@ -3470,24 +3518,42 @@
       profileError.textContent = 'Dieser Anzeigename ist nicht erlaubt.';
       return;
     }
+    if(currentProfile?.name && newName === currentProfile.name){
+      profileError.textContent = 'Das ist bereits dein aktueller Anzeigename.';
+      return;
+    }
 
     const { data: { user } } = await supabaseClient.auth.getUser();
     if(!user){ profileError.textContent = 'Nicht angemeldet.'; return; }
 
     profileSubmitBtn.disabled = true;
     profileSubmitBtn.textContent = 'Speichere...';
-    const { error } = await supabaseClient
+    const { data: updated, error } = await supabaseClient
       .from('profiles')
-      .update({ name: newName })
-      .eq('id', user.id);
+      .update({ name: newName, name_changed_at: new Date().toISOString() })
+      .eq('id', user.id)
+      .select('name, name_changed_at')
+      .maybeSingle();
     profileSubmitBtn.disabled = false;
     profileSubmitBtn.textContent = 'Änderungen speichern';
 
     if(error){
-      profileError.textContent = error.message;
+      // Falls ein DB-Trigger die 7-Tage-Sperre serverseitig zusätzlich absichert
+      // (siehe Migration), greift der auch bei umgangener Client-Prüfung.
+      profileError.textContent = (error.message || '').includes('name_cooldown')
+        ? 'Änderung noch nicht möglich (max. 1x alle 7 Tage).'
+        : error.message;
       return;
     }
+    if(!updated){
+      profileError.textContent = 'Speichern wurde von der Datenbank blockiert.';
+      return;
+    }
+
+    currentProfile.name = updated.name;
+    currentProfile.name_changed_at = updated.name_changed_at;
     profileHint.textContent = 'Profil aktualisiert.';
+    renderProfileNameCard();
     await loadProfile();
   });
 
