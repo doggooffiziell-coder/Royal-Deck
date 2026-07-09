@@ -3846,8 +3846,37 @@
     const overlay = document.getElementById('updateOverlay');
     if(!overlay || overlay.classList.contains('show')) return;
     overlay.classList.add('show');
-    const delay = 6000; // 6 Sekunden, wie gewünscht
-    setTimeout(() => { window.location.reload(); }, delay);
+    waitUntilLiveThenReload();
+  }
+
+  // Statt einer festen Wartezeit wird hier weiter gepollt, bis das neue Deploy
+  // tatsächlich "steht" (zwei aufeinanderfolgende Checks liefern denselben Marker
+  // und die Seite ist erreichbar). Erst dann wird neu geladen. Ein Sicherheitsnetz
+  // (UPDATE_MAX_WAIT_MS) verhindert, dass der Screen ewig hängen bleibt, falls der
+  // Host nie einen stabilen Zustand meldet.
+  const UPDATE_POLL_INTERVAL_MS = 1500;
+  const UPDATE_MIN_SHOW_MS = 1500;   // Overlay mindestens so lange sichtbar lassen
+  const UPDATE_MAX_WAIT_MS = 45000;  // danach wird notfalls trotzdem neu geladen
+
+  async function waitUntilLiveThenReload(){
+    const startedAt = Date.now();
+    let lastMarker = null;
+    while(true){
+      let marker = null;
+      try { marker = await fetchDeployMarker(); } catch(e){ marker = null; }
+      const elapsed = Date.now() - startedAt;
+      const stable = !!(marker && lastMarker && !markersDiffer(lastMarker, marker));
+      if(stable && elapsed >= UPDATE_MIN_SHOW_MS){
+        window.location.reload();
+        return;
+      }
+      if(elapsed >= UPDATE_MAX_WAIT_MS){
+        window.location.reload();
+        return;
+      }
+      if(marker) lastMarker = marker;
+      await new Promise(r => setTimeout(r, UPDATE_POLL_INTERVAL_MS));
+    }
   }
 
   async function checkForDeploy(){
