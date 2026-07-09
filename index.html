@@ -394,6 +394,22 @@
   .modal button.link-btn:hover{text-decoration:underline;}
   .modal .age{text-align:center;font-size:11px;color:var(--faint);margin-top:16px;line-height:1.5;}
 
+  /* ---------- Generisches Bestätigungs-Modal ---------- */
+  .confirm-modal{width:360px;padding:32px 28px 26px;text-align:center;}
+  .confirm-icon{
+    width:52px;height:52px;border-radius:50%;margin:0 auto 16px;
+    background:rgba(193,68,60,.14);border:1px solid rgba(193,68,60,.35);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .confirm-icon svg{width:24px;height:24px;fill:var(--danger);}
+  .confirm-modal h1{margin-bottom:8px;}
+  .confirm-modal .sub{margin-bottom:24px;}
+  .confirm-btn-row{display:flex;gap:10px;}
+  .confirm-btn-row .adm-ghost-btn{flex:1;padding:12px;font-size:13px;border-radius:9px;}
+  .confirm-btn-row .submit{margin-top:0;height:44px;}
+  .confirm-modal.neutral .confirm-icon{background:rgba(212,175,106,.14);border-color:rgba(212,175,106,.35);}
+  .confirm-modal.neutral .confirm-icon svg{fill:var(--accent-hi);}
+
   .field-icon-wrap{position:relative;}
   .field-icon-wrap .field-icon{
     position:absolute;left:13px;top:50%;transform:translateY(-50%);width:14px;height:14px;
@@ -2108,6 +2124,21 @@
           </div>
         </div>
       </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generisches Bestätigungs-Modal (ersetzt native confirm()-Dialoge) -->
+  <div class="overlay" id="confirmOverlay" style="z-index:1500;">
+    <div class="modal confirm-modal">
+      <div class="confirm-icon" id="confirmIcon">
+        <svg viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 6.5c.55 0 1 .45 1 1v4.5a1 1 0 01-2 0V9.5c0-.55.45-1 1-1zM12 17.2a1.2 1.2 0 110-2.4 1.2 1.2 0 010 2.4z"/></svg>
+      </div>
+      <h1 id="confirmTitle">Bist du sicher?</h1>
+      <p class="sub" id="confirmMessage">Diese Aktion kannst du nicht rückgängig machen.</p>
+      <div class="confirm-btn-row">
+        <button type="button" class="adm-ghost-btn confirm-cancel-btn" id="confirmCancelBtn">Abbrechen</button>
+        <button type="button" class="submit" id="confirmOkBtn" style="width:auto;flex:1;">Bestätigen</button>
       </div>
     </div>
   </div>
@@ -3839,7 +3870,13 @@
   const forceUpdateBtn = document.getElementById('forceUpdateBtn');
   forceUpdateBtn.addEventListener('click', async () => {
     const hint = document.getElementById('forceUpdateHint');
-    if(!confirm('Allen aktuell verbundenen Nutzern (außer Admins) jetzt den Update-Screen anzeigen?')) return;
+    const ok = await showConfirmDialog({
+      title: 'Update-Screen erzwingen?',
+      message: 'Allen aktuell verbundenen Nutzern (außer Admins) wird sofort der "Neue Version verfügbar"-Screen angezeigt.',
+      confirmText: 'Jetzt senden',
+      tone: 'danger'
+    });
+    if(!ok) return;
     hint.textContent = '';
     forceUpdateBtn.disabled = true;
     const error = await triggerForceUpdateForUsers();
@@ -4138,6 +4175,37 @@
   }
 
   // --- Profilbild aus vorgefertigten Presets wählen (in eigenem Auswahlfenster) ---
+  // --- Generisches Bestätigungs-Modal (ersetzt native confirm()-Dialoge) ---
+  const confirmOverlay = document.getElementById('confirmOverlay');
+  const confirmModalEl = confirmOverlay.querySelector('.confirm-modal');
+  const confirmTitleEl = document.getElementById('confirmTitle');
+  const confirmMessageEl = document.getElementById('confirmMessage');
+  const confirmOkBtn = document.getElementById('confirmOkBtn');
+  const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+  let confirmResolver = null;
+
+  function showConfirmDialog({ title = 'Bist du sicher?', message = '', confirmText = 'Bestätigen', cancelText = 'Abbrechen', tone = 'danger' } = {}){
+    confirmTitleEl.textContent = title;
+    confirmMessageEl.textContent = message;
+    confirmOkBtn.textContent = confirmText;
+    confirmCancelBtn.textContent = cancelText;
+    confirmModalEl.classList.toggle('neutral', tone === 'neutral');
+    confirmOverlay.classList.add('open');
+    return new Promise(resolve => { confirmResolver = resolve; });
+  }
+
+  function closeConfirmDialog(result){
+    confirmOverlay.classList.remove('open');
+    if(confirmResolver){ confirmResolver(result); confirmResolver = null; }
+  }
+
+  confirmOkBtn.addEventListener('click', () => closeConfirmDialog(true));
+  confirmCancelBtn.addEventListener('click', () => closeConfirmDialog(false));
+  confirmOverlay.addEventListener('click', e => { if(e.target === confirmOverlay) closeConfirmDialog(false); });
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape' && confirmOverlay.classList.contains('open')) closeConfirmDialog(false);
+  });
+
   const avatarPickerOverlay = document.getElementById('avatarPickerOverlay');
   const avatarModalGrid = document.getElementById('avatarModalGrid');
 
