@@ -76,9 +76,8 @@
      the hero and a couple of key dividers, so the room reads "casino"
      without tipping into neon-sign kitsch */
   .marquee-rule{
-    height:3px;background-repeat:repeat-x;background-position:center;
-    background-image:radial-gradient(circle, var(--accent-hi) 1.4px, transparent 1.6px);
-    background-size:15px 100%;opacity:.55;
+    height:2px;background:linear-gradient(90deg,transparent,var(--accent-dim) 12%,var(--accent-hi) 50%,var(--accent-dim) 88%,transparent);
+    opacity:.8;
   }
   /* signature motif 2: a foil-stamped playing-card corner index quietly
      dropped onto felt panels, like the pip in the corner of a real card */
@@ -108,11 +107,11 @@
     content:"";position:absolute;inset:0;border-radius:9px;box-shadow:inset 0 0 0 1px rgba(212,175,106,.22);
   }
   .nav-item{
-    width:58px;height:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:5px;border-radius:9px;cursor:pointer;color:var(--faint);transition:.15s;position:relative;
+    width:60px;height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:6px;border-radius:10px;cursor:pointer;color:var(--faint);transition:.15s;position:relative;
   }
-  .nav-item svg{width:19px;height:19px;fill:currentColor;}
-  .nav-item span{font-size:9.5px;letter-spacing:.3px;font-weight:500;}
+  .nav-item svg{width:22px;height:22px;fill:currentColor;}
+  .nav-item span{font-size:10.5px;letter-spacing:.3px;font-weight:500;}
   .nav-item.active{color:var(--accent-hi);background:var(--accent-soft);box-shadow:inset 0 0 0 1px rgba(212,175,106,.22);}
   .nav-item.active:before{
     content:"";position:absolute;left:-1px;top:10px;bottom:10px;width:2px;border-radius:2px;
@@ -151,12 +150,12 @@
   }
   .points-chip .star path{fill:var(--accent-ink);}
   .icon-btn{
-    width:34px;height:34px;border-radius:8px;background:var(--surface);display:flex;align-items:center;
+    width:40px;height:40px;border-radius:9px;background:var(--surface);display:flex;align-items:center;
     justify-content:center;cursor:pointer;color:var(--muted);position:relative;transition:.15s;
     border:1px solid var(--border);
   }
   .icon-btn:hover{color:var(--text);border-color:var(--accent-dim);}
-  .icon-btn svg{width:15px;height:15px;fill:currentColor;}
+  .icon-btn svg{width:18px;height:18px;fill:currentColor;}
   .badge{
     position:absolute;top:-4px;right:-4px;background:var(--danger);color:#1a0808;font-size:9px;
     width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;
@@ -192,12 +191,12 @@
     font-size:190px;line-height:1;color:rgba(240,211,142,.05);
     font-family:var(--font-display);pointer-events:none;
   }
-  /* signature marquee bulbs along the base of the hero */
+  /* signature: a brushed-foil rail along the base of the hero, like the
+     gold trim on a card-table rail — a hairline, not a string of bulbs */
   .hero:after{
-    content:"";position:absolute;left:0;bottom:0;width:100%;height:4px;
-    background-image:radial-gradient(circle, var(--accent-hi) 1.6px, transparent 1.8px);
-    background-size:18px 100%;background-position:9px center;opacity:.65;
-    box-shadow:0 0 6px rgba(240,211,142,.25);
+    content:"";position:absolute;left:24px;right:24px;bottom:0;height:1px;
+    background:linear-gradient(90deg,transparent,var(--accent-dim) 6%,var(--accent-hi) 50%,var(--accent-dim) 94%,transparent);
+    opacity:.9;box-shadow:0 1px 8px rgba(240,211,142,.18);
   }
   .hero-inner{position:relative;z-index:1;}
   .hero-eyebrow{
@@ -208,8 +207,8 @@
   .hero h1{font-family:var(--font-display);font-style:italic;font-size:35px;font-weight:600;margin-bottom:10px;letter-spacing:-.2px;}
   .hero p{font-size:14px;color:var(--muted);margin-bottom:22px;max-width:380px;line-height:1.55;}
   .hero button{
-    background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:var(--accent-ink);border:none;padding:12px 26px;border-radius:9px;
-    font-weight:700;font-size:13.5px;cursor:pointer;letter-spacing:.2px;transition:.15s;font-family:var(--font-body);
+    background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:var(--accent-ink);border:none;padding:15px 32px;border-radius:10px;
+    font-weight:700;font-size:15px;cursor:pointer;letter-spacing:.2px;transition:.15s;font-family:var(--font-body);
     box-shadow:0 8px 18px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.35);
   }
   .hero button:hover{filter:brightness(1.06);transform:translateY(-1px);}
@@ -322,8 +321,8 @@
   .modal .error{color:var(--danger);font-size:12px;margin-top:8px;min-height:16px;}
   .modal .hint{color:var(--success);font-size:12px;margin-top:8px;min-height:16px;}
   .modal button.submit{
-    width:100%;height:43px;border:none;border-radius:8px;margin-top:10px;
-    background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:var(--accent-ink);font-weight:700;font-size:13.5px;
+    width:100%;height:48px;border:none;border-radius:9px;margin-top:10px;
+    background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:var(--accent-ink);font-weight:700;font-size:14.5px;
     cursor:pointer;transition:.15s;font-family:var(--font-body);letter-spacing:.2px;
     box-shadow:0 6px 16px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.3);
   }
@@ -587,7 +586,7 @@
   .admin-compose .ac-hint{color:var(--success);font-size:11.5px;margin-bottom:6px;min-height:14px;}
   .admin-compose .ac-actions{display:flex;gap:8px;}
   .admin-compose .ac-actions button{
-    flex:1;height:32px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;
+    flex:1;height:38px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;
     font-family:var(--font-body);transition:.15s;border:1px solid var(--border);
   }
   .admin-compose .ac-cancel{background:var(--surface-2);color:var(--text);}
@@ -619,8 +618,8 @@
   .notif-detail-body{font-size:12.5px;color:var(--muted);line-height:1.6;margin-bottom:16px;}
   .notif-detail-actions{display:flex;gap:8px;}
   .mini-btn{
-    flex:1;height:34px;border-radius:7px;border:1px solid var(--border);background:var(--surface-2);
-    color:var(--text);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:.15s;
+    flex:1;height:39px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);
+    color:var(--text);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:.15s;
   }
   .mini-btn:hover{border-color:var(--accent-dim);color:var(--accent-hi);}
   .mini-btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);}
@@ -659,8 +658,8 @@
   .panel-loggedout .lo-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;}
   .panel-loggedout .lo-text{font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:16px;}
   .panel-loggedout .lo-btn{
-    width:100%;height:36px;border:none;border-radius:8px;background:var(--accent);color:var(--accent-ink);
-    font-weight:600;font-size:12.5px;cursor:pointer;font-family:var(--font-body);transition:.15s;
+    width:100%;height:41px;border:none;border-radius:9px;background:var(--accent);color:var(--accent-ink);
+    font-weight:600;font-size:13.5px;cursor:pointer;font-family:var(--font-body);transition:.15s;
   }
   .panel-loggedout .lo-btn:hover{background:var(--accent-hi);}
 
@@ -856,8 +855,8 @@
   .wl-add-row{display:flex;gap:8px;}
   .wl-add-row input{flex:1;}
   .wl-add-row button{
-    flex-shrink:0;height:41px;padding:0 16px;border-radius:8px;border:none;
-    background:var(--accent);color:var(--accent-ink);font-weight:600;font-size:13px;cursor:pointer;
+    flex-shrink:0;height:44px;padding:0 20px;border-radius:9px;border:none;
+    background:var(--accent);color:var(--accent-ink);font-weight:600;font-size:14px;cursor:pointer;
     font-family:var(--font-body);transition:.15s;
   }
   .wl-add-row button:hover{background:var(--accent-hi);}
@@ -897,7 +896,7 @@
   .friend-search-results{margin-bottom:8px;display:flex;flex-direction:column;gap:6px;}
   .friend-tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:4px;margin-bottom:16px;width:fit-content;}
   .friend-tab{
-    padding:8px 16px;border-radius:6px;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;transition:.15s;
+    padding:10px 19px;border-radius:7px;font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer;transition:.15s;
     display:flex;align-items:center;gap:6px;
   }
   .friend-tab.active{background:var(--accent);color:var(--accent-ink);}
@@ -918,8 +917,8 @@
   .friend-row .fr-name{font-size:11.5px;color:var(--muted);}
   .friend-row .fr-actions{display:flex;gap:8px;flex-shrink:0;}
   .fr-btn{
-    height:32px;padding:0 14px;border-radius:7px;border:1px solid var(--border);background:var(--surface-2);
-    color:var(--text);font-size:12px;font-weight:600;cursor:pointer;transition:.15s;font-family:var(--font-body);
+    height:37px;padding:0 17px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);
+    color:var(--text);font-size:13px;font-weight:600;cursor:pointer;transition:.15s;font-family:var(--font-body);
   }
   .fr-btn:hover{border-color:var(--accent-dim);}
   .fr-btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);}
@@ -1651,7 +1650,8 @@
     if(!currentUserId){ notifications = []; updateNotifBadge(); return; }
     const { data: allNotifs, error: e1 } = await supabaseClient
       .from('notifications')
-      .select('id, title, sub, body, created_at')
+      .select('id, title, sub, body, created_at, target_user_id')
+      .or(`target_user_id.is.null,target_user_id.eq.${currentUserId}`)
       .order('created_at', { ascending:false });
     if(e1){ console.error(e1); notifications = []; updateNotifBadge(); return; }
 
@@ -1778,7 +1778,7 @@
       sendBtn.textContent = 'Sende...';
       const { error } = await supabaseClient
         .from('notifications')
-        .insert({ title, sub: sub || null, body: bodyText, created_by: currentUserId });
+        .insert({ title, sub: sub || null, body: bodyText, created_by: currentUserId, target_user_id: null });
       sendBtn.disabled = false;
       sendBtn.textContent = 'Senden';
       if(error){
@@ -1982,6 +1982,16 @@
         // Falls der DB-Trigger "gender" nicht selbst setzt, hier sicherheitshalber nachziehen.
         try {
           await supabaseClient.from('profiles').update({ gender: selectedGenderAuth }).eq('id', data.user.id);
+        } catch(e){ console.error(e); }
+        // Persönliche Willkommens-Benachrichtigung für den neuen Account anlegen.
+        try {
+          await supabaseClient.from('notifications').insert({
+            title: 'Willkommen',
+            sub: `Willkommen bei Royal-Deck, ${name}!`,
+            body: `Du hast soeben ein neues Konto bei Royal-Deck erstellt, wir heißen dich herzlich willkommen! Schau dich gerne um, füge Freunde hinzu und leg direkt am Tisch los. Falls du Fragen hast, findest du Hilfe jederzeit in den Einstellungen.`,
+            created_by: data.user.id,
+            target_user_id: data.user.id
+          });
         } catch(e){ console.error(e); }
         closeModal();
         await loadProfile();
