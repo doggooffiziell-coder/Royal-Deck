@@ -603,6 +603,8 @@
     .settings-pane.active{grid-template-columns:1fr;}
   }
 
+  .avatar-color-inline{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .avatar-color-label{font-size:12.5px;color:var(--muted);white-space:nowrap;}
   .swatches{display:flex;gap:10px;flex-wrap:wrap;}
   .swatch{width:27px;height:27px;border-radius:7px;cursor:pointer;border:2px solid transparent;
     transition:transform .15s, box-shadow .15s;}
@@ -636,7 +638,7 @@
   }
   .avatar-picker-actions{display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-width:0;}
   .avatar-picker-actions .submit.ghost{width:auto;height:40px;padding:0 18px;margin:0;}
-  .avatar-picker-actions-row{display:flex;flex-wrap:wrap;gap:8px;}
+  .avatar-picker-actions-row{display:flex;flex-wrap:wrap;align-items:center;gap:16px;}
   .avatar-picker-remove{
     background:none;border:none;padding:0;color:var(--muted);font-size:12px;font-weight:600;
     cursor:pointer;font-family:var(--font-body);transition:.15s;
@@ -1897,14 +1899,20 @@
                 </div>
                 <div class="adm-card-title">Profilbild anpassen</div>
               </div>
-              <p class="adm-card-note">Wähl dein Symbol – die Farbe stellst du unten bei Avatarfarbe ein.</p>
+              <p class="adm-card-note">Wähl dein Symbol und deine Profilbildfarbe.</p>
               <div class="avatar-picker">
                 <div class="avatar-picker-preview" id="avatarPickerPreview">H</div>
                 <div class="avatar-picker-actions" style="flex:1;gap:10px;">
-                  <button type="button" class="avatar-change-btn" id="avatarChangeBtn">
-                    <svg viewBox="0 0 24 24"><path d="M12 9a3.5 3.5 0 100 7 3.5 3.5 0 000-7zM9 3L7.5 5H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.5L15 3z"/></svg>
-                    Profilbild ändern
-                  </button>
+                  <div class="avatar-picker-actions-row" style="align-items:center;">
+                    <button type="button" class="avatar-change-btn" id="avatarChangeBtn">
+                      <svg viewBox="0 0 24 24"><path d="M12 9a3.5 3.5 0 100 7 3.5 3.5 0 000-7zM9 3L7.5 5H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.5L15 3z"/></svg>
+                      Profilbild ändern
+                    </button>
+                    <div class="avatar-color-inline">
+                      <span class="avatar-color-label">Profilbildfarbe</span>
+                      <div class="swatches" id="colorSwatches"></div>
+                    </div>
+                  </div>
                   <button type="button" class="avatar-picker-remove" id="avatarPickerRemoveBtn">Profilbild entfernen</button>
                 </div>
               </div>
@@ -1948,18 +1956,7 @@
             </div>
 
             <div class="adm-grid-2" style="grid-column:1/-1;">
-              <div class="adm-card" data-accent="muted">
-                <div class="adm-card-head">
-                  <div class="adm-card-icon">
-                    <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/></svg>
-                  </div>
-                  <div class="adm-card-title">Avatarfarbe</div>
-                </div>
-                <p class="adm-card-note">Wird verwendet, solange kein eigenes Profilbild hinterlegt ist.</p>
-                <div class="swatches" id="colorSwatches"></div>
-              </div>
-
-              <div class="adm-card" data-accent="muted">
+              <div class="adm-card" data-accent="muted" style="grid-column:1/-1;">
                 <div class="adm-card-head">
                   <div class="adm-card-icon">
                     <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5zm-7 19c0-3.9 3.1-7 7-7s7 3.1 7 7z"/></svg>
