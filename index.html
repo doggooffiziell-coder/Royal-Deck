@@ -1367,9 +1367,9 @@
         <label>Anzeigename</label>
         <div class="field-icon-wrap">
           <svg class="field-icon" viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5zm-7 19c0-3.9 3.1-7 7-7s7 3.1 7 7z"/></svg>
-          <input id="regName" placeholder="z. B. HighRoller_88">
+          <input id="regName" placeholder="z. B. HighRoller_88" maxlength="12">
         </div>
-        <div class="field-hint">Das ist einfach dein Spitzname, taucht z. B. in der Begrüßung auf. Deinen echten <strong>Benutzernamen</strong>, über den dich andere Spieler finden, wählst du gleich im nächsten Schritt.</div>
+        <div class="field-hint">Das ist einfach dein Spitzname (2–12 Zeichen), taucht z. B. in der Begrüßung auf. Deinen echten <strong>Benutzernamen</strong>, über den dich andere Spieler finden, wählst du gleich im nächsten Schritt.</div>
 
         <label>Geschlecht</label>
         <div class="gender-select" id="genderSelect">
@@ -1608,7 +1608,7 @@
                 Anzeigename
               </div>
               <form id="profileNameForm">
-                <input id="profileName" placeholder="Dein Anzeigename">
+                <input id="profileName" placeholder="Dein Anzeigename" maxlength="12">
                 <div class="error" id="profileError"></div>
                 <div class="hint" id="profileHint"></div>
                 <button type="submit" class="submit" id="profileSubmitBtn">Änderungen speichern</button>
@@ -2122,6 +2122,44 @@
   let currentProfile = null;
 
   // --- Notification inbox (Broadcasts aus Supabase, pro Nutzer gelesen/archiviert) ---
+  // --- Validierungsregeln für Email, Benutzername & Anzeigename ---
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  // Roblox-Style: 3-20 Zeichen, Buchstaben/Zahlen/Unterstrich, kein führender/abschließender/doppelter Unterstrich,
+  // mind. ein Buchstabe (nicht nur Zahlen/Unterstriche).
+  const USERNAME_CHARSET_RE = /^[a-zA-Z0-9_]{3,20}$/;
+  const USERNAME_HAS_LETTER_RE = /[a-zA-Z]/;
+  const USERNAME_DOUBLE_UNDERSCORE_RE = /__/;
+  const DISPLAY_NAME_MIN = 2;
+  const DISPLAY_NAME_MAX = 12;
+
+  // Kleiner Denylist-Filter gegen offensichtlich unangemessene Namen. Prüft normalisiert
+  // (klein geschrieben, Zahlen-als-Buchstaben-Ersatz entfernt) auf Teilstrings.
+  const BAD_WORDS = [
+    'fuck','shit','bitch','asshole','cunt','nigger','nigga','fag','whore','slut',
+    'hurensohn','wichser','arschloch','fotze','schlampe','hure','nazi','hitler',
+    'kanake','spast','mongo','neger'
+  ];
+  function normalizeForFilter(str){
+    return str.toLowerCase()
+      .replace(/0/g,'o').replace(/1/g,'i').replace(/3/g,'e').replace(/4/g,'a')
+      .replace(/5/g,'s').replace(/7/g,'t').replace(/@/g,'a').replace(/\$/g,'s')
+      .replace(/[^a-z0-9]/g,'');
+  }
+  function containsBadWord(str){
+    const norm = normalizeForFilter(str);
+    return BAD_WORDS.some(w => norm.includes(w));
+  }
+  function isValidUsername(uname){
+    if(!USERNAME_CHARSET_RE.test(uname)) return false;         // 3-20 Zeichen, nur a-z/A-Z/0-9/_
+    if(uname.startsWith('_') || uname.endsWith('_')) return false; // kein _ am Anfang/Ende
+    if(USERNAME_DOUBLE_UNDERSCORE_RE.test(uname)) return false; // kein doppeltes __
+    if(!USERNAME_HAS_LETTER_RE.test(uname)) return false;       // mind. 1 Buchstabe (nicht nur Zahlen)
+    return true;
+  }
+  function isValidDisplayName(name){
+    return name.length >= DISPLAY_NAME_MIN && name.length <= DISPLAY_NAME_MAX;
+  }
+
   const ADMIN_EMAIL = 'doggo.offiziell@gmail.com';
   const DEFAULT_NOTIF_ICON = '<svg viewBox="0 0 24 24"><path d="M12 22a2 2 0 002-2h-4a2 2 0 002 2zm6-6v-5a6 6 0 10-12 0v5l-2 2v1h16v-1z"/></svg>';
   let notifications = []; // gemergte Liste: { id, title, sub, body, created_at, read, archived }
@@ -2501,6 +2539,10 @@
       authError.textContent = 'Bitte alle Felder ausfüllen.';
       return;
     }
+    if(!EMAIL_RE.test(email)){
+      authError.textContent = 'Bitte eine gültige E-Mail-Adresse eingeben.';
+      return;
+    }
 
     if(mode === 'register'){
       const passConfirm = document.getElementById('authPassConfirm').value;
@@ -2518,7 +2560,19 @@
     submitBtn.textContent = 'Bitte warten...';
 
     if(mode === 'register'){
-      const name = document.getElementById('regName').value.trim() || email.split('@')[0];
+      const name = document.getElementById('regName').value.trim() || email.split('@')[0].slice(0, DISPLAY_NAME_MAX);
+      if(!isValidDisplayName(name)){
+        authError.textContent = `Anzeigename muss ${DISPLAY_NAME_MIN}–${DISPLAY_NAME_MAX} Zeichen lang sein.`;
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Konto erstellen';
+        return;
+      }
+      if(containsBadWord(name)){
+        authError.textContent = 'Dieser Anzeigename ist nicht erlaubt.';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Konto erstellen';
+        return;
+      }
       const { data, error } = await supabaseClient.auth.signUp({
         email, password: pass,
         options: { data: { name, gender: selectedGenderAuth } }
@@ -2585,6 +2639,10 @@
     forgotHint.textContent = '';
     if(!email){
       forgotError.textContent = 'Bitte E-Mail-Adresse eingeben.';
+      return;
+    }
+    if(!EMAIL_RE.test(email)){
+      forgotError.textContent = 'Bitte eine gültige E-Mail-Adresse eingeben.';
       return;
     }
     forgotSubmitBtn.disabled = true;
@@ -3461,6 +3519,14 @@
       profileError.textContent = 'Bitte einen Anzeigenamen eingeben.';
       return;
     }
+    if(!isValidDisplayName(newName)){
+      profileError.textContent = `Anzeigename muss ${DISPLAY_NAME_MIN}–${DISPLAY_NAME_MAX} Zeichen lang sein.`;
+      return;
+    }
+    if(containsBadWord(newName)){
+      profileError.textContent = 'Dieser Anzeigename ist nicht erlaubt.';
+      return;
+    }
 
     const { data: { user } } = await supabaseClient.auth.getUser();
     if(!user){ profileError.textContent = 'Nicht angemeldet.'; return; }
@@ -3539,7 +3605,6 @@
   const usernameInput = document.getElementById('usernameInput');
   const usernameError = document.getElementById('usernameError');
   const usernameSubmitBtn = document.getElementById('usernameSubmitBtn');
-  const USERNAME_RE = /^[a-zA-Z0-9_]{3,20}$/;
 
   function enforceUsername(profile){
     // 'username' ist nur im Profil-Objekt vorhanden, wenn die Spalte existiert (siehe loadProfile-Fallback).
@@ -3558,8 +3623,12 @@
   usernameForm.addEventListener('submit', async e => {
     e.preventDefault();
     const uname = usernameInput.value.trim();
-    if(!USERNAME_RE.test(uname)){
-      usernameError.textContent = '3–20 Zeichen: nur Buchstaben, Zahlen, Unterstriche.';
+    if(!isValidUsername(uname)){
+      usernameError.textContent = '3–20 Zeichen, mind. 1 Buchstabe. Nur Buchstaben/Zahlen/Unterstrich, kein _ am Anfang/Ende oder doppelt.';
+      return;
+    }
+    if(containsBadWord(uname)){
+      usernameError.textContent = 'Dieser Benutzername ist nicht erlaubt.';
       return;
     }
     usernameSubmitBtn.disabled = true;
@@ -3649,8 +3718,12 @@
     usernameChangeError.textContent = '';
     usernameChangeHint.textContent = '';
 
-    if(!USERNAME_RE.test(uname)){
-      usernameChangeError.textContent = '3–20 Zeichen: nur Buchstaben, Zahlen, Unterstriche.';
+    if(!isValidUsername(uname)){
+      usernameChangeError.textContent = '3–20 Zeichen, mind. 1 Buchstabe. Nur Buchstaben/Zahlen/Unterstrich, kein _ am Anfang/Ende oder doppelt.';
+      return;
+    }
+    if(containsBadWord(uname)){
+      usernameChangeError.textContent = 'Dieser Benutzername ist nicht erlaubt.';
       return;
     }
     if(currentProfile?.username && uname.toLowerCase() === currentProfile.username.toLowerCase()){
