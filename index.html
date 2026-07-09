@@ -266,6 +266,29 @@
   .modal button.link-btn:hover{text-decoration:underline;}
   .modal .age{text-align:center;font-size:11px;color:var(--faint);margin-top:16px;line-height:1.5;}
 
+  .field-icon-wrap{position:relative;}
+  .field-icon-wrap .field-icon{
+    position:absolute;left:13px;top:50%;transform:translateY(-50%);width:14px;height:14px;
+    fill:var(--faint);pointer-events:none;
+  }
+  .field-icon-wrap input{padding-left:37px;}
+  .field-icon-wrap.pw-wrap input{padding-right:38px;}
+  .pw-toggle{
+    position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--faint);
+    display:flex;transition:.15s;
+  }
+  .pw-toggle:hover{color:var(--accent-hi);}
+  .pw-toggle svg{width:16px;height:16px;fill:currentColor;}
+  .field-hint{color:var(--faint);font-size:11px;margin-top:6px;line-height:1.4;}
+
+  .gender-select{display:flex;gap:8px;}
+  .gender-opt{
+    flex:1;text-align:center;padding:9px 0;border-radius:8px;border:1px solid var(--border);
+    background:var(--surface);color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:.15s;
+  }
+  .gender-opt:hover{border-color:#333d4a;color:var(--text);}
+  .gender-opt.selected{background:var(--accent);color:#f3f6fc;border-color:var(--accent);}
+
   @keyframes modalIn{
     from{opacity:0;transform:translateY(8px) scale(.98);}
     to{opacity:1;transform:translateY(0) scale(1);}
@@ -626,12 +649,46 @@
       <form id="authForm">
         <div id="regFields" style="display:none;">
           <label>Anzeigename</label>
-          <input id="regName" placeholder="z. B. HighRoller_88">
+          <div class="field-icon-wrap">
+            <svg class="field-icon" viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5zm-7 19c0-3.9 3.1-7 7-7s7 3.1 7 7z"/></svg>
+            <input id="regName" placeholder="z. B. HighRoller_88">
+          </div>
+          <div class="field-hint">So wirst du für andere Spieler sichtbar.</div>
+
+          <label>Geschlecht</label>
+          <div class="gender-select" id="genderSelect">
+            <div class="gender-opt" data-gender="m">Männlich</div>
+            <div class="gender-opt" data-gender="w">Weiblich</div>
+          </div>
         </div>
+
         <label>E-Mail</label>
-        <input id="authUser" type="email" placeholder="z. B. name@mail.com" autocomplete="username">
+        <div class="field-icon-wrap">
+          <svg class="field-icon" viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 4l-8 5-8-5V6l8 5 8-5z"/></svg>
+          <input id="authUser" type="email" placeholder="z. B. name@mail.com" autocomplete="username">
+        </div>
+
         <label>Passwort</label>
-        <input id="authPass" type="password" placeholder="••••••••" autocomplete="current-password">
+        <div class="field-icon-wrap pw-wrap">
+          <svg class="field-icon" viewBox="0 0 24 24"><path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-9h-1V6a5 5 0 00-10 0v2H6a2 2 0 00-2 2v9a2 2 0 002 2h12a2 2 0 002-2v-9a2 2 0 00-2-2zM9 6a3 3 0 016 0v2H9z"/></svg>
+          <input id="authPass" type="password" placeholder="••••••••" autocomplete="current-password">
+          <div class="pw-toggle" data-target="authPass" title="Passwort anzeigen">
+            <svg viewBox="0 0 24 24"><path d="M12 5c-5 0-9.3 3.1-11 7 1.7 3.9 6 7 11 7s9.3-3.1 11-7c-1.7-3.9-6-7-11-7zm0 11.5A4.5 4.5 0 1112 8a4.5 4.5 0 010 8.5zm0-7A2.5 2.5 0 1012 14a2.5 2.5 0 000-4.5z"/></svg>
+          </div>
+        </div>
+        <div class="field-hint" id="pwHintReg" style="display:none;">Mindestens 6 Zeichen.</div>
+
+        <div id="regConfirmWrap" style="display:none;">
+          <label>Passwort bestätigen</label>
+          <div class="field-icon-wrap pw-wrap">
+            <svg class="field-icon" viewBox="0 0 24 24"><path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-9h-1V6a5 5 0 00-10 0v2H6a2 2 0 00-2 2v9a2 2 0 002 2h12a2 2 0 002-2v-9a2 2 0 00-2-2zM9 6a3 3 0 016 0v2H9z"/></svg>
+            <input id="authPassConfirm" type="password" placeholder="Passwort wiederholen" autocomplete="new-password">
+            <div class="pw-toggle" data-target="authPassConfirm" title="Passwort anzeigen">
+              <svg viewBox="0 0 24 24"><path d="M12 5c-5 0-9.3 3.1-11 7 1.7 3.9 6 7 11 7s9.3-3.1 11-7c-1.7-3.9-6-7-11-7zm0 11.5A4.5 4.5 0 1112 8a4.5 4.5 0 010 8.5zm0-7A2.5 2.5 0 1012 14a2.5 2.5 0 000-4.5z"/></svg>
+            </div>
+          </div>
+        </div>
+
         <div class="error" id="authError"></div>
         <button type="submit" class="submit" id="submitBtn">Anmelden</button>
       </form>
@@ -678,12 +735,7 @@
         <input type="file" id="avatarFileInput" accept="image/*" style="display:none;">
         <div class="rail-id-name" id="settingsUname">—</div>
         <div class="rail-id-email" id="settingsEmail">—</div>
-        <div class="rail-badges" id="railBadges">
-          <div class="rail-badge vip">
-            <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>
-            VIP-Mitglied
-          </div>
-        </div>
+        <div class="rail-badges" id="railBadges"></div>
 
         <div class="settings-tabnav">
           <div class="stab active" data-spane="profile">
@@ -722,6 +774,18 @@
               </div>
               <p class="card-note">Wird verwendet, solange kein eigenes Profilbild hinterlegt ist.</p>
               <div class="swatches" id="colorSwatches"></div>
+            </div>
+
+            <div class="lux-card">
+              <div class="card-title">
+                <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5zm-7 19c0-3.9 3.1-7 7-7s7 3.1 7 7z"/></svg>
+                Geschlecht
+              </div>
+              <div class="gender-select" id="settingsGenderSelect">
+                <div class="gender-opt" data-gender="m">Männlich</div>
+                <div class="gender-opt" data-gender="w">Weiblich</div>
+              </div>
+              <div class="hint" id="genderHint"></div>
             </div>
           </div>
 
@@ -1205,12 +1269,33 @@
     }
   });
 
+  let selectedGenderAuth = null;
+  document.querySelectorAll('#genderSelect .gender-opt').forEach(opt => {
+    opt.addEventListener('click', () => {
+      selectedGenderAuth = opt.dataset.gender;
+      document.querySelectorAll('#genderSelect .gender-opt').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+    });
+  });
+  document.querySelectorAll('.pw-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = document.getElementById(btn.dataset.target);
+      if(!input) return;
+      input.type = input.type === 'password' ? 'text' : 'password';
+    });
+  });
+
   function openModal(m){
     mode = m;
     authError.textContent = '';
     authForm.reset();
+    selectedGenderAuth = null;
+    document.querySelectorAll('#genderSelect .gender-opt').forEach(o => o.classList.remove('selected'));
     tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === m));
     regFields.style.display = m === 'register' ? 'block' : 'none';
+    document.getElementById('regConfirmWrap').style.display = m === 'register' ? 'block' : 'none';
+    document.getElementById('pwHintReg').style.display = m === 'register' ? 'block' : 'none';
+    document.getElementById('forgotFromLogin').style.display = m === 'register' ? 'none' : 'block';
     modalTitle.textContent = m === 'register' ? 'Konto erstellen' : 'Willkommen zurück';
     modalSub.textContent = m === 'register' ? 'Leg dein Spielerkonto an' : 'Melde dich an und leg direkt am Tisch los';
     submitBtn.textContent = m === 'register' ? 'Konto erstellen' : 'Anmelden';
@@ -1232,6 +1317,18 @@
       return;
     }
 
+    if(mode === 'register'){
+      const passConfirm = document.getElementById('authPassConfirm').value;
+      if(pass !== passConfirm){
+        authError.textContent = 'Die Passwörter stimmen nicht überein.';
+        return;
+      }
+      if(!selectedGenderAuth){
+        authError.textContent = 'Bitte ein Geschlecht auswählen.';
+        return;
+      }
+    }
+
     submitBtn.disabled = true;
     submitBtn.textContent = 'Bitte warten...';
 
@@ -1239,7 +1336,7 @@
       const name = document.getElementById('regName').value.trim() || email.split('@')[0];
       const { data, error } = await supabaseClient.auth.signUp({
         email, password: pass,
-        options: { data: { name } }
+        options: { data: { name, gender: selectedGenderAuth } }
       });
       submitBtn.disabled = false;
       submitBtn.textContent = 'Konto erstellen';
@@ -1248,6 +1345,10 @@
         return;
       }
       if(data.session){
+        // Falls der DB-Trigger "gender" nicht selbst setzt, hier sicherheitshalber nachziehen.
+        try {
+          await supabaseClient.from('profiles').update({ gender: selectedGenderAuth }).eq('id', data.user.id);
+        } catch(e){ console.error(e); }
         closeModal();
         await loadProfile();
       } else {
@@ -1328,7 +1429,7 @@
     }
     const { data: profile, error } = await supabaseClient
       .from('profiles')
-      .select('name, chips')
+      .select('name, chips, gender')
       .eq('id', user.id)
       .single();
     if(error){ console.error(error); renderAuthArea(null); return; }
@@ -1448,11 +1549,7 @@
   function renderRailBadges(){
     const wrap = document.getElementById('railBadges');
     if(!wrap) return;
-    let html = `
-      <div class="rail-badge vip">
-        <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>
-        VIP-Mitglied
-      </div>`;
+    let html = '';
     if(isAdmin){
       html += `
       <div class="rail-badge admin">
@@ -1463,16 +1560,33 @@
     wrap.innerHTML = html;
   }
 
+  document.querySelectorAll('#settingsGenderSelect .gender-opt').forEach(opt => {
+    opt.addEventListener('click', async () => {
+      if(!currentUserId) return;
+      document.querySelectorAll('#settingsGenderSelect .gender-opt').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      const hint = document.getElementById('genderHint');
+      const { error } = await supabaseClient.from('profiles').update({ gender: opt.dataset.gender }).eq('id', currentUserId);
+      hint.textContent = error ? error.message : 'Gespeichert.';
+      if(!error && currentProfile) currentProfile.gender = opt.dataset.gender;
+    });
+  });
+
   function openSettings(email){
     document.getElementById('profileError').textContent = '';
     document.getElementById('profileHint').textContent = '';
     document.getElementById('pwError').textContent = '';
     document.getElementById('pwHint').textContent = '';
     document.getElementById('resetFromSettingsHint').textContent = '';
+    document.getElementById('genderHint').textContent = '';
     document.getElementById('pwForm').reset();
 
     avatarDataUrl = currentUserId ? loadAvatarForUser(currentUserId) : null;
     renderRailBadges();
+
+    document.querySelectorAll('#settingsGenderSelect .gender-opt').forEach(o => {
+      o.classList.toggle('selected', currentProfile && o.dataset.gender === currentProfile.gender);
+    });
 
     if(currentProfile){
       document.getElementById('profileName').value = currentProfile.name;
