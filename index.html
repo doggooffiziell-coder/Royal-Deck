@@ -373,7 +373,41 @@
   .panel-head{
     padding:12px 16px 10px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
     color:var(--faint);border-bottom:1px solid var(--border);margin-bottom:4px;
+    display:flex;align-items:center;justify-content:space-between;
   }
+  .panel-head-admin-btn{
+    width:22px;height:22px;border-radius:6px;background:var(--surface-2);border:1px solid var(--border);
+    color:var(--accent-hi);display:flex;align-items:center;justify-content:center;cursor:pointer;
+    transition:.15s;flex-shrink:0;
+  }
+  .panel-head-admin-btn:hover{border-color:var(--accent-dim);background:var(--accent-soft);}
+  .panel-head-admin-btn svg{width:12px;height:12px;fill:currentColor;}
+
+  .admin-compose{padding:14px 16px 16px;border-bottom:1px solid var(--border);}
+  .admin-compose .ac-label{
+    font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--brass);
+    display:flex;align-items:center;gap:6px;margin-bottom:10px;
+  }
+  .admin-compose .ac-label svg{width:11px;height:11px;fill:var(--brass);}
+  .admin-compose input, .admin-compose textarea{
+    width:100%;border-radius:7px;border:1px solid var(--border);background:var(--surface);
+    color:var(--text);padding:8px 10px;font-size:12.5px;outline:none;transition:.15s;
+    font-family:var(--font-body);margin-bottom:8px;resize:vertical;
+  }
+  .admin-compose textarea{min-height:60px;}
+  .admin-compose input:focus, .admin-compose textarea:focus{border-color:var(--accent-dim);box-shadow:0 0 0 3px var(--accent-soft);}
+  .admin-compose .ac-error{color:var(--danger);font-size:11.5px;margin-bottom:6px;min-height:14px;}
+  .admin-compose .ac-hint{color:var(--success);font-size:11.5px;margin-bottom:6px;min-height:14px;}
+  .admin-compose .ac-actions{display:flex;gap:8px;}
+  .admin-compose .ac-actions button{
+    flex:1;height:32px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;
+    font-family:var(--font-body);transition:.15s;border:1px solid var(--border);
+  }
+  .admin-compose .ac-cancel{background:var(--surface-2);color:var(--text);}
+  .admin-compose .ac-cancel:hover{border-color:#333d4a;}
+  .admin-compose .ac-send{background:var(--accent);color:#f3f6fc;border-color:var(--accent);}
+  .admin-compose .ac-send:hover{background:var(--accent-hi);}
+  .admin-compose .ac-send:disabled{opacity:.55;cursor:default;}
   .panel-item{display:flex;align-items:flex-start;gap:11px;padding:11px 16px;cursor:pointer;transition:.12s;position:relative;}
   .panel-item:hover{background:var(--surface-2);}
   .panel-item .panel-text{flex:1;min-width:0;}
@@ -531,7 +565,9 @@
           <div class="badge" id="notifBadge">3</div>
         </div>
         <div class="dropdown panel-dropdown" id="notifDropdown">
-          <div class="panel-head">Benachrichtigungen</div>
+          <div class="panel-head" id="notifPanelHead">
+            <span>Benachrichtigungen</span>
+          </div>
           <div id="notifBody"></div>
         </div>
       </div>
@@ -828,27 +864,68 @@
   let mode = 'login';
   let currentProfile = null;
 
-  // --- Notification inbox (Roblox-artiges Lesen/Zurück/Archivieren) ---
-  const notifications = [
-    {
-      id:1, read:false, date:'Heute',
-      title:'Willkommen!', sub:'Dein Konto wurde erstellt.',
-      body:'Schön, dass du da bist. Leg direkt an einem unserer Tische los, sammle Punkte und steig im Level auf.',
-      icon:'<svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>'
-    },
-    {
-      id:2, read:false, date:'Gestern',
-      title:'Neu: Blackjack', sub:'Jetzt am Tisch verfügbar.',
-      body:'Blackjack ist ab sofort spielbar. Schlag den Dealer auf 21 und sichere dir zusätzliche Punkte für jeden Sieg.',
-      icon:'<svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-1.2 14.6L6.4 12.2l1.4-1.4 2.9 2.9 6-6 1.5 1.4z"/></svg>'
-    },
-    {
-      id:3, read:false, date:'vor 3 Tagen',
-      title:'Nächstes Level', sub:'Sammle Punkte, um aufzusteigen.',
-      body:'Du bist nah an deinem nächsten Level. Spiel weiter an den Tischen, um mehr Punkte zu sammeln und aufzusteigen.',
-      icon:'<svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5zm-7 19c0-3.9 3.1-7 7-7s7 3.1 7 7z"/></svg>'
-    },
-  ];
+  // --- Notification inbox (Broadcasts aus Supabase, pro Nutzer gelesen/archiviert) ---
+  const ADMIN_EMAIL = 'doggo.offiziell@gmail.com';
+  const DEFAULT_NOTIF_ICON = '<svg viewBox="0 0 24 24"><path d="M12 22a2 2 0 002-2h-4a2 2 0 002 2zm6-6v-5a6 6 0 10-12 0v5l-2 2v1h16v-1z"/></svg>';
+  let notifications = []; // gemergte Liste: { id, title, sub, body, created_at, read, archived }
+  let currentUserId = null;
+  let currentUserEmail = null;
+  let isAdmin = false;
+
+  function isAdminEmail(email){
+    return !!email && email.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase();
+  }
+
+  function formatNotifDate(iso){
+    if(!iso) return '';
+    const d = new Date(iso);
+    const now = new Date();
+    const sameDay = d.toDateString() === now.toDateString();
+    const yest = new Date(now); yest.setDate(now.getDate() - 1);
+    if(sameDay) return 'Heute';
+    if(d.toDateString() === yest.toDateString()) return 'Gestern';
+    return d.toLocaleDateString('de-DE', { day:'2-digit', month:'2-digit', year:'numeric' });
+  }
+
+  async function loadNotifications(){
+    if(!currentUserId){ notifications = []; updateNotifBadge(); return; }
+    const { data: allNotifs, error: e1 } = await supabaseClient
+      .from('notifications')
+      .select('id, title, sub, body, created_at')
+      .order('created_at', { ascending:false });
+    if(e1){ console.error(e1); notifications = []; updateNotifBadge(); return; }
+
+    const { data: reads, error: e2 } = await supabaseClient
+      .from('notification_reads')
+      .select('notification_id, read, archived')
+      .eq('user_id', currentUserId);
+    if(e2){ console.error(e2); }
+
+    const readMap = {};
+    (reads || []).forEach(r => { readMap[r.notification_id] = r; });
+
+    notifications = (allNotifs || [])
+      .map(n => ({
+        id: n.id,
+        title: n.title,
+        sub: n.sub,
+        body: n.body,
+        date: formatNotifDate(n.created_at),
+        icon: DEFAULT_NOTIF_ICON,
+        read: !!readMap[n.id]?.read,
+        archived: !!readMap[n.id]?.archived,
+      }))
+      .filter(n => !n.archived);
+
+    updateNotifBadge();
+  }
+
+  async function setNotifReadState(notificationId, patch){
+    if(!currentUserId) return;
+    await supabaseClient
+      .from('notification_reads')
+      .upsert({ user_id: currentUserId, notification_id: notificationId, ...patch }, { onConflict: 'user_id,notification_id' });
+  }
 
   function updateNotifBadge(){
     const badge = document.getElementById('notifBadge');
@@ -880,8 +957,91 @@
       </div>`;
   }
 
-  function renderNotifList(){
+  function renderNotifPanelHead(){
+    const head = document.getElementById('notifPanelHead');
+    if(!head) return;
+    if(isAdmin && currentProfile){
+      head.innerHTML = `
+        <span>Benachrichtigungen</span>
+        <div class="panel-head-admin-btn" id="notifAdminBtn" title="Neue Benachrichtigung an alle senden">
+          <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"/></svg>
+        </div>`;
+      document.getElementById('notifAdminBtn').addEventListener('click', () => {
+        document.getElementById('notifBody').style.display = 'none';
+        renderAdminComposeForm();
+      });
+    } else {
+      head.innerHTML = `<span>Benachrichtigungen</span>`;
+    }
+  }
+
+  function renderAdminComposeForm(){
     const body = document.getElementById('notifBody');
+    const wrap = document.createElement('div');
+    wrap.className = 'admin-compose';
+    wrap.innerHTML = `
+      <div class="ac-label">
+        <svg viewBox="0 0 24 24"><path d="M3 11l18-7-7 18-2-8z"/></svg>
+        Broadcast an alle Nutzer
+      </div>
+      <input id="acTitle" placeholder="Titel" maxlength="60">
+      <input id="acSub" placeholder="Kurzbeschreibung" maxlength="100">
+      <textarea id="acBody" placeholder="Nachrichtentext"></textarea>
+      <div class="ac-error" id="acError"></div>
+      <div class="ac-hint" id="acHint"></div>
+      <div class="ac-actions">
+        <button type="button" class="ac-cancel" id="acCancel">Abbrechen</button>
+        <button type="button" class="ac-send" id="acSend">Senden</button>
+      </div>`;
+    // insert compose form right after panel head, before body
+    const existing = document.querySelector('.admin-compose');
+    if(existing) existing.remove();
+    document.getElementById('notifDropdown').insertBefore(wrap, document.getElementById('notifBody'));
+
+    document.getElementById('acCancel').addEventListener('click', () => {
+      wrap.remove();
+      document.getElementById('notifBody').style.display = '';
+    });
+    document.getElementById('acSend').addEventListener('click', async () => {
+      const title = document.getElementById('acTitle').value.trim();
+      const sub = document.getElementById('acSub').value.trim();
+      const bodyText = document.getElementById('acBody').value.trim();
+      const err = document.getElementById('acError');
+      const hint = document.getElementById('acHint');
+      err.textContent = ''; hint.textContent = '';
+      if(!title || !bodyText){
+        err.textContent = 'Titel und Nachrichtentext sind erforderlich.';
+        return;
+      }
+      const sendBtn = document.getElementById('acSend');
+      sendBtn.disabled = true;
+      sendBtn.textContent = 'Sende...';
+      const { error } = await supabaseClient
+        .from('notifications')
+        .insert({ title, sub: sub || null, body: bodyText, created_by: currentUserId });
+      sendBtn.disabled = false;
+      sendBtn.textContent = 'Senden';
+      if(error){
+        err.textContent = error.message;
+        return;
+      }
+      hint.textContent = 'Benachrichtigung wurde an alle Nutzer gesendet.';
+      showToast('Broadcast gesendet.');
+      await loadNotifications();
+      setTimeout(() => {
+        wrap.remove();
+        document.getElementById('notifBody').style.display = '';
+        renderNotifList();
+      }, 700);
+    });
+  }
+
+  function renderNotifList(){
+    const existingCompose = document.querySelector('.admin-compose');
+    if(existingCompose) existingCompose.remove();
+    renderNotifPanelHead();
+    const body = document.getElementById('notifBody');
+    body.style.display = '';
     if(!currentProfile){
       body.innerHTML = loggedOutPanelHTML('notif');
       document.getElementById('loginFromNotifPanel')?.addEventListener('click', () => {
@@ -899,12 +1059,12 @@
         <div class="panel-icon">${n.icon}</div>
         <div class="panel-text">
           <div class="panel-title">${n.title}</div>
-          <div class="panel-sub">${n.sub}</div>
+          <div class="panel-sub">${n.sub || ''}</div>
         </div>
         ${n.read ? '' : '<div class="unread-dot"></div>'}
       </div>`).join('');
     body.querySelectorAll('.panel-item').forEach(el => {
-      el.addEventListener('click', () => openNotif(parseInt(el.dataset.id, 10)));
+      el.addEventListener('click', () => openNotif(el.dataset.id));
     });
   }
 
@@ -921,11 +1081,14 @@
     body.innerHTML = `<div class="panel-empty">Noch keine Nachrichten. Füge Freunde hinzu, um zu chatten.</div>`;
   }
 
-  function openNotif(id){
+  async function openNotif(id){
     const n = notifications.find(x => x.id === id);
     if(!n) return;
-    n.read = true;
-    updateNotifBadge();
+    if(!n.read){
+      n.read = true;
+      updateNotifBadge();
+      setNotifReadState(id, { read: true });
+    }
     const body = document.getElementById('notifBody');
     body.innerHTML = `
       <div class="notif-detail">
@@ -944,12 +1107,13 @@
       </div>`;
     document.getElementById('notifBackBtn').addEventListener('click', renderNotifList);
     document.getElementById('notifBackBtn2').addEventListener('click', renderNotifList);
-    document.getElementById('notifArchiveBtn').addEventListener('click', () => {
+    document.getElementById('notifArchiveBtn').addEventListener('click', async () => {
       const idx = notifications.findIndex(x => x.id === id);
       if(idx > -1) notifications.splice(idx, 1);
       updateNotifBadge();
       renderNotifList();
       showToast('Benachrichtigung archiviert.');
+      await setNotifReadState(id, { read: true, archived: true });
     });
   }
 
@@ -968,7 +1132,10 @@
       if(willOpen){ dd.classList.add('open'); if(onOpen) onOpen(); }
     });
   }
-  setupPanelToggle('notifBtn', 'notifDropdown', renderNotifList);
+  setupPanelToggle('notifBtn', 'notifDropdown', async () => {
+    if(currentUserId) await loadNotifications();
+    renderNotifList();
+  });
   setupPanelToggle('mailBtn', 'mailDropdown', renderMailBody);
   document.addEventListener('click', e => {
     if(!e.target.closest('.icon-btn-wrap')){
@@ -1086,12 +1253,17 @@
   // --- Account / logout ---
   async function logout(){
     await supabaseClient.auth.signOut();
+    currentUserId = null; currentUserEmail = null; isAdmin = false; notifications = [];
     renderAuthArea(null);
   }
 
   async function loadProfile(){
     const { data: { user } } = await supabaseClient.auth.getUser();
-    if(!user){ renderAuthArea(null); return; }
+    if(!user){
+      currentUserId = null; currentUserEmail = null; isAdmin = false;
+      renderAuthArea(null);
+      return;
+    }
     const { data: profile, error } = await supabaseClient
       .from('profiles')
       .select('name, chips')
@@ -1099,6 +1271,10 @@
       .single();
     if(error){ console.error(error); renderAuthArea(null); return; }
     currentProfile = profile;
+    currentUserId = user.id;
+    currentUserEmail = user.email;
+    isAdmin = isAdminEmail(user.email);
+    await loadNotifications();
     renderAuthArea(profile, user.email);
   }
 
