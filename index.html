@@ -2292,9 +2292,16 @@
       .replace(/5/g,'s').replace(/7/g,'t').replace(/@/g,'a').replace(/\$/g,'s')
       .replace(/[^a-z0-9]/g,'');
   }
+  // Reduziert wiederholte Buchstaben auf einen ("niiggeer" -> "niger", "fuuuck" -> "fuck").
+  // Fängt damit auch Varianten wie "Niger" (single-g) gegen "Nigger" (double-g) ab,
+  // weil beide beim Vergleich auf dieselbe Kernform reduziert werden.
+  function collapseRepeats(str){
+    return str.replace(/(.)\1+/g, '$1');
+  }
   function containsBadWord(str){
     const norm = normalizeForFilter(str);
-    return BAD_WORDS.some(w => norm.includes(w));
+    const collapsed = collapseRepeats(norm);
+    return BAD_WORDS.some(w => norm.includes(w) || collapsed.includes(collapseRepeats(w)));
   }
   function isValidUsername(uname){
     if(!USERNAME_CHARSET_RE.test(uname)) return false;         // 3-20 Zeichen, nur a-z/A-Z/0-9/_
