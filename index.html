@@ -1228,6 +1228,22 @@
   const SUPABASE_ANON_KEY = 'sb_publishable_0ZvwrcL4AuFobJGdyARmhA_KfchINLa';
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+  // Live-Update: reagiert sofort, wenn sich maintenance_mode in der DB ändert
+  // (kein Reload nötig, gilt für alle verbundenen Clients).
+  // Wichtig: Realtime muss in Supabase für die Tabelle "app_settings" aktiviert sein
+  // (Dashboard -> Database -> Replication -> app_settings einschalten).
+  supabaseClient
+    .channel('app_settings_changes')
+    .on('postgres_changes', {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'app_settings',
+      filter: 'id=eq.1'
+    }, () => {
+      loadProfile();
+    })
+    .subscribe();
+
   const AVATAR_COLORS = [
     'linear-gradient(135deg,#00a2ff,#7c3aed)',
     'linear-gradient(135deg,#f0d888,#d4af37)',
