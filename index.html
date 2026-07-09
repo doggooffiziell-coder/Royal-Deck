@@ -994,6 +994,15 @@
     color:var(--text);letter-spacing:-.2px;margin-bottom:2px;
   }
 
+  /* --------- sanftes Einblenden nach Anmeldung/Registrierung auf dem Coming-Soon-Screen --------- */
+  @keyframes soonFadeIn{
+    0%{opacity:0;transform:translateY(-10px) scale(.97);filter:blur(2px);}
+    100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0);}
+  }
+  .soon-fade-in{animation:soonFadeIn .6s cubic-bezier(.16,.8,.3,1) both;}
+  .soon-fade-in-d1{animation-delay:.08s;}
+  .soon-fade-in-d2{animation-delay:.16s;}
+
   .soon-title{
     font-family:var(--font-marquee);font-weight:800;font-size:42px;letter-spacing:1px;
     text-transform:uppercase;margin:18px 0 4px;line-height:1.05;
@@ -3008,6 +3017,7 @@
     if(email){
       const label = displayName || email;
       greetingTextEl.textContent = greetingText(displayName || 'Gast');
+      const wasHidden = greetingWrap.style.display === 'none';
       greetingWrap.style.display = 'flex';
       row.innerHTML = `<button type="button" class="maint-logout-link" id="soonLogoutBtn">Abmelden (${label})</button>`;
       document.getElementById('soonLogoutBtn').addEventListener('click', async () => {
@@ -3015,11 +3025,23 @@
         await loadProfile();
       });
       statusLine.innerHTML = `<div>Angemeldet als <strong>${label}</strong></div><div>Dieses Konto hat aktuell keine Whitelist-Berechtigung.</div>`;
+      // Nur beim tatsächlichen Wechsel von "ausgeloggt" zu "eingeloggt" (Anmeldung/Registrierung)
+      // sanft einblenden — bei wiederholten Renders (z.B. Realtime-Updates) nicht erneut animieren.
+      if(wasHidden){
+        [greetingWrap, row, statusLine].forEach((el, i) => {
+          el.classList.remove('soon-fade-in');
+          void el.offsetWidth; // Reflow erzwingen, damit die Animation sicher neu startet
+          el.classList.add('soon-fade-in', `soon-fade-in-d${i}`);
+        });
+      }
     } else {
       greetingWrap.style.display = 'none';
+      greetingWrap.classList.remove('soon-fade-in', 'soon-fade-in-d0');
       row.innerHTML = `<button type="button" class="maint-login-btn" id="soonLoginBtn">Anmelden</button>`;
       document.getElementById('soonLoginBtn').addEventListener('click', () => openModal('login'));
+      row.classList.remove('soon-fade-in', 'soon-fade-in-d1');
       statusLine.textContent = '';
+      statusLine.classList.remove('soon-fade-in', 'soon-fade-in-d2');
     }
   }
   document.getElementById('soonLoginBtn').addEventListener('click', () => openModal('login'));
