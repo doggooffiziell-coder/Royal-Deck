@@ -2834,7 +2834,13 @@
     currentUserId = user.id;
     currentUserEmail = user.email;
     isAdmin = admin;
-    avatarDataUrl = profile.avatar_url || loadAvatarForUser(currentUserId);
+    // Lokal (in diesem Browser) gespeicherter Wert hat Vorrang vor Supabase:
+    // Die Cloud-Synchronisierung nach einem Zuschnitt läuft asynchron im Hintergrund,
+    // daher kann Supabase kurz nach dem Speichern noch den alten Wert liefern (z. B. bei
+    // einem schnellen Seiten-Reload). Lokal ist immer die aktuellste Version vorhanden.
+    // Nur wenn dieser Browser gar keine lokale Kopie hat (z. B. neues Gerät), wird auf
+    // den Supabase-Wert zurückgefallen.
+    avatarDataUrl = loadAvatarForUser(currentUserId) || profile.avatar_url;
     await loadNotifications();
     renderAuthArea(profile, user.email);
     enforceUsername(profile);
@@ -3202,7 +3208,9 @@
     document.getElementById('genderHint').textContent = '';
     document.getElementById('pwForm').reset();
 
-    avatarDataUrl = currentUserId ? (currentProfile?.avatar_url || loadAvatarForUser(currentUserId)) : null;
+    // Lokaler Wert hat Vorrang (siehe loadProfile) — verhindert, dass ein gerade
+    // gespeicherter Zuschnitt beim Öffnen der Einstellungen kurzzeitig wieder verschwindet.
+    avatarDataUrl = currentUserId ? (loadAvatarForUser(currentUserId) || currentProfile?.avatar_url) : null;
     renderRailBadges();
 
     // Admin-Tab nur für Admin-Konten im Sicherheits-/Navigationsbereich einblenden
