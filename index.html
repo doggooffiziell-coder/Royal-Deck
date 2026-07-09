@@ -1620,7 +1620,7 @@
                 <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5z"/></svg>
                 Anzeigename
               </div>
-              <p class="card-note">Wie du am Tisch für andere sichtbar bist. Änderbar max. 1x alle 7 Tage.</p>
+              <p class="card-note">Wie du am Tisch für andere sichtbar bist.</p>
               <form id="profileNameForm">
                 <input id="profileName" placeholder="Dein Anzeigename" maxlength="12">
                 <div class="error" id="profileError"></div>
@@ -1634,7 +1634,7 @@
                 <svg viewBox="0 0 24 24"><path d="M16 11c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3 1.3 3 3 3zm-8 0c1.7 0 3-1.3 3-3S9.7 5 8 5 5 6.3 5 8s1.3 3 3 3z"/></svg>
                 Benutzername
               </div>
-              <p class="card-note">Dein fester Handle für die Freunde-Suche – nicht dein Anzeigename. Änderbar max. 1x im Monat.</p>
+              <p class="card-note">Dein fester Handle für die Freunde-Suche – nicht dein Anzeigename.</p>
               <form id="usernameChangeForm">
                 <div class="u-wrap">
                   <span class="u-prefix">@</span>
@@ -3483,7 +3483,7 @@
     if(blockedUntil){
       profileName.disabled = true;
       profileSubmitBtn.disabled = true;
-      profileHint.textContent = `Nächste Änderung möglich ab ${blockedUntil.toLocaleDateString('de-DE')}.`;
+      profileHint.textContent = `Du kannst deinen Anzeigenamen erst wieder ab dem ${blockedUntil.toLocaleDateString('de-DE')} ändern.`;
     } else {
       profileName.disabled = false;
       profileSubmitBtn.disabled = false;
@@ -3501,7 +3501,7 @@
 
     const blockedUntil = nextAllowedNameChangeDate();
     if(blockedUntil){
-      profileError.textContent = `Änderung noch nicht möglich (max. 1x alle 7 Tage). Nächste Änderung ab ${blockedUntil.toLocaleDateString('de-DE')}.`;
+      profileError.textContent = `Geht noch nicht – dein Anzeigename lässt sich erst wieder ab dem ${blockedUntil.toLocaleDateString('de-DE')} ändern.`;
       return;
     }
 
@@ -3541,7 +3541,7 @@
       // Falls ein DB-Trigger die 7-Tage-Sperre serverseitig zusätzlich absichert
       // (siehe Migration), greift der auch bei umgangener Client-Prüfung.
       profileError.textContent = (error.message || '').includes('name_cooldown')
-        ? 'Änderung noch nicht möglich (max. 1x alle 7 Tage).'
+        ? 'Geht noch nicht – dein Anzeigename ist erst in ein paar Tagen wieder änderbar.'
         : error.message;
       return;
     }
@@ -3714,7 +3714,7 @@
     if(blockedUntil){
       usernameChangeInput.disabled = true;
       usernameChangeBtn.disabled = true;
-      usernameChangeHint.textContent = `Nächste Änderung möglich ab ${blockedUntil.toLocaleDateString('de-DE')}.`;
+      usernameChangeHint.textContent = `Du kannst deinen Benutzernamen erst wieder ab dem ${blockedUntil.toLocaleDateString('de-DE')} ändern.`;
     } else {
       usernameChangeInput.disabled = false;
       usernameChangeBtn.disabled = false;
@@ -3777,7 +3777,7 @@
       if(error.code === '23505'){
         usernameChangeError.textContent = 'Dieser Benutzername ist bereits vergeben.';
       } else if((error.message || '').includes('username_cooldown')){
-        usernameChangeError.textContent = 'Änderung noch nicht möglich (max. 1x im Monat).';
+        usernameChangeError.textContent = 'Geht noch nicht – dein Benutzername ist erst in ein paar Wochen wieder änderbar.';
       } else {
         usernameChangeError.textContent = error.message;
       }
