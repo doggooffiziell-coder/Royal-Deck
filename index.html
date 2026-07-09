@@ -1153,11 +1153,6 @@
 
   /* Pflicht-Username-Overlay: kann nicht weggeklickt werden */
   .modal.username-modal{width:400px;}
-  .modal.crop-modal{width:360px;}
-  .crop-stage{position:relative;width:320px;height:320px;margin:0 auto;border-radius:12px;overflow:hidden;background:#000;border:1px solid var(--border);touch-action:none;}
-  .crop-stage canvas{position:absolute;top:0;left:0;cursor:grab;}
-  .crop-stage canvas:active{cursor:grabbing;}
-  .crop-mask{position:absolute;inset:0;pointer-events:none;box-shadow:0 0 0 2000px rgba(10,18,14,.72);border-radius:50%;border:2px solid var(--accent-hi);}
   .u-prefix{
     position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--faint);font-size:13.5px;font-weight:600;
   }
@@ -1493,22 +1488,6 @@
   </div>
 
   <!-- ================= ACCOUNT SETTINGS MODAL ================= -->
-  <div class="overlay" id="cropOverlay" style="z-index:1100;">
-    <div class="modal crop-modal">
-      <button class="close" id="cropCloseBtn" type="button">&times;</button>
-      <h1 style="font-size:18px;">Profilbild zuschneiden</h1>
-      <div class="sub">Ziehen zum Verschieben, Regler zum Zoomen</div>
-      <div class="crop-stage" id="cropStage">
-        <canvas id="cropCanvas" width="320" height="320"></canvas>
-        <div class="crop-mask"></div>
-      </div>
-      <input type="range" id="cropZoom" min="1" max="3" step="0.01" value="1" style="width:100%;margin:16px 0 4px;">
-      <div style="display:flex;gap:10px;margin-top:14px;">
-        <button type="button" class="submit" id="cropCancelBtn" style="background:var(--surface-2);color:var(--text);">Abbrechen</button>
-        <button type="button" class="submit" id="cropSaveBtn">Übernehmen</button>
-      </div>
-    </div>
-  </div>
   <div class="overlay" id="settingsOverlay">
     <div class="modal settings">
       <div class="settings-topbar">
@@ -3182,11 +3161,11 @@
     }
     // Handy-Fotos haben oft eine EXIF-Rotation. createImageBitmap mit imageOrientation
     // richtet das Bild dabei automatisch korrekt aus (Canvas würde das sonst ignorieren
-    // und den Ausschnitt schief/falsch gedreht speichern).
+    // und das Ergebnis schief/falsch gedreht speichern).
     if(window.createImageBitmap){
       try {
         const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
-        openCropper(bitmap);
+        await applyAvatarImage(bitmap);
         input.value = '';
         return;
       } catch(err){
@@ -3204,8 +3183,8 @@
         showToast('Dieses Bildformat wird nicht unterstützt. Bitte JPG oder PNG verwenden.');
         input.value = '';
       };
-      img.onload = () => {
-        openCropper(img);
+      img.onload = async () => {
+        await applyAvatarImage(img);
         input.value = '';
       };
       img.src = evt.target.result;
@@ -3213,112 +3192,34 @@
     reader.readAsDataURL(file);
   });
 
-  // --- Bildzuschnitt (Crop) ---
-  const cropOverlay = document.getElementById('cropOverlay');
-  const cropCanvas = document.getElementById('cropCanvas');
-  const cropCtx = cropCanvas.getContext('2d');
-  const cropZoomSlider = document.getElementById('cropZoom');
-  const CROP_STAGE = 320;
-  const CROP_OUTPUT = 400;
-  let cropImg = null, cropBaseScale = 1, cropZoom = 1, cropPosX = 0, cropPosY = 0;
-  let cropDragging = false, cropDragStartX = 0, cropDragStartY = 0, cropStartPosX = 0, cropStartPosY = 0;
-
-  function cropClamp(){
-    const scale = cropBaseScale * cropZoom;
-    const w = cropImg.width * scale, h = cropImg.height * scale;
-    const minX = CROP_STAGE - w, minY = CROP_STAGE - h;
-    cropPosX = Math.min(0, Math.max(minX, cropPosX));
-    cropPosY = Math.min(0, Math.max(minY, cropPosY));
-  }
-
-  function drawCrop(){
-    const scale = cropBaseScale * cropZoom;
-    const w = cropImg.width * scale, h = cropImg.height * scale;
-    cropCtx.clearRect(0, 0, CROP_STAGE, CROP_STAGE);
-    cropCtx.drawImage(cropImg, cropPosX, cropPosY, w, h);
-  }
-
-  function openCropper(img){
-    cropImg = img;
-    cropBaseScale = Math.max(CROP_STAGE / img.width, CROP_STAGE / img.height);
-    cropZoom = 1;
-    cropZoomSlider.value = 1;
-    const w = img.width * cropBaseScale, h = img.height * cropBaseScale;
-    cropPosX = (CROP_STAGE - w) / 2;
-    cropPosY = (CROP_STAGE - h) / 2;
-    drawCrop();
-    cropOverlay.classList.add('open');
-  }
-
-  function closeCropper(){
-    cropOverlay.classList.remove('open');
-    if(cropImg && typeof cropImg.close === 'function') cropImg.close();
-    cropImg = null;
-  }
-
-  cropZoomSlider.addEventListener('input', () => {
-    if(!cropImg) return;
-    const oldScale = cropBaseScale * cropZoom;
-    const centerX = (CROP_STAGE / 2 - cropPosX) / oldScale;
-    const centerY = (CROP_STAGE / 2 - cropPosY) / oldScale;
-    cropZoom = parseFloat(cropZoomSlider.value);
-    const newScale = cropBaseScale * cropZoom;
-    cropPosX = CROP_STAGE / 2 - centerX * newScale;
-    cropPosY = CROP_STAGE / 2 - centerY * newScale;
-    cropClamp();
-    drawCrop();
-  });
-
-  function cropPointerDown(x, y){
-    cropDragging = true;
-    cropDragStartX = x; cropDragStartY = y;
-    cropStartPosX = cropPosX; cropStartPosY = cropPosY;
-  }
-  function cropPointerMove(x, y){
-    if(!cropDragging) return;
-    cropPosX = cropStartPosX + (x - cropDragStartX);
-    cropPosY = cropStartPosY + (y - cropDragStartY);
-    cropClamp();
-    drawCrop();
-  }
-  function cropPointerUp(){ cropDragging = false; }
-
-  cropCanvas.addEventListener('mousedown', e => cropPointerDown(e.clientX, e.clientY));
-  window.addEventListener('mousemove', e => cropPointerMove(e.clientX, e.clientY));
-  window.addEventListener('mouseup', cropPointerUp);
-  cropCanvas.addEventListener('touchstart', e => { const t = e.touches[0]; cropPointerDown(t.clientX, t.clientY); }, {passive:true});
-  cropCanvas.addEventListener('touchmove', e => { const t = e.touches[0]; cropPointerMove(t.clientX, t.clientY); e.preventDefault(); }, {passive:false});
-  cropCanvas.addEventListener('touchend', cropPointerUp);
-
-  document.getElementById('cropCancelBtn').addEventListener('click', closeCropper);
-  document.getElementById('cropCloseBtn').addEventListener('click', closeCropper);
-  cropOverlay.addEventListener('click', e => { if(e.target === cropOverlay) closeCropper(); });
-
-  document.getElementById('cropSaveBtn').addEventListener('click', () => {
-    if(!cropImg) return;
+  // --- Profilbild automatisch einpassen ---
+  // Statt eines manuellen Zuschnitts wird das hochgeladene Bild automatisch zentriert
+  // auf ein quadratisches Format skaliert (wie CSS object-fit: cover) und direkt gespeichert.
+  const AVATAR_OUTPUT = 400;
+  async function applyAvatarImage(imgSource){
     try {
+      const srcW = imgSource.width, srcH = imgSource.height;
       const outCanvas = document.createElement('canvas');
-      outCanvas.width = CROP_OUTPUT; outCanvas.height = CROP_OUTPUT;
+      outCanvas.width = AVATAR_OUTPUT; outCanvas.height = AVATAR_OUTPUT;
       const outCtx = outCanvas.getContext('2d');
-      // Wichtig: den Ausschnitt NICHT erneut aus dem Original-Bild berechnen (das führte bei
-      // manchen PC-Fotos zu einem leeren/schwarzen Ergebnis-Canvas, siehe Nutzer-Feedback).
-      // Stattdessen einfach das bereits korrekt gezeichnete Vorschau-Canvas hochskalieren –
-      // so entspricht das gespeicherte Bild exakt dem, was im Zuschneide-Dialog zu sehen war.
-      outCtx.drawImage(cropCanvas, 0, 0, CROP_STAGE, CROP_STAGE, 0, 0, CROP_OUTPUT, CROP_OUTPUT);
+      const scale = Math.max(AVATAR_OUTPUT / srcW, AVATAR_OUTPUT / srcH);
+      const drawW = srcW * scale, drawH = srcH * scale;
+      const dx = (AVATAR_OUTPUT - drawW) / 2, dy = (AVATAR_OUTPUT - drawH) / 2;
+      outCtx.drawImage(imgSource, dx, dy, drawW, drawH);
       const dataUrl = outCanvas.toDataURL('image/jpeg', 0.9);
       avatarDataUrl = dataUrl;
       if(currentUserId) saveAvatarForUser(currentUserId, dataUrl);
       updateAvatarPreviews('', dataUrl);
       renderAuthArea(currentProfile, currentUserEmail);
       showToast('Profilbild aktualisiert.');
-      syncAvatarToProfile(dataUrl);
+      await syncAvatarToProfile(dataUrl);
     } catch(err){
       console.error('Profilbild konnte nicht verarbeitet werden:', err);
       showToast('Profilbild konnte nicht verarbeitet werden.');
     } finally {
-      closeCropper();
+      if(imgSource && typeof imgSource.close === 'function') imgSource.close();
     }
-  });
+  }
   document.getElementById('closeSettings').addEventListener('click', () => settingsOverlay.classList.remove('open'));
   settingsOverlay.addEventListener('click', e => { if(e.target === settingsOverlay) settingsOverlay.classList.remove('open'); });
 
