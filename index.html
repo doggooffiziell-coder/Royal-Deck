@@ -1913,6 +1913,12 @@
                       <div class="swatches" id="colorSwatches"></div>
                     </div>
                   </div>
+                  <div class="avatar-picker-actions-row">
+                    <div class="avatar-color-inline">
+                      <span class="avatar-color-label">Symbolfarbe</span>
+                      <div class="swatches" id="symbolColorSwatches"></div>
+                    </div>
+                  </div>
                   <button type="button" class="avatar-picker-remove" id="avatarPickerRemoveBtn">Profilbild entfernen</button>
                 </div>
               </div>
@@ -2440,6 +2446,13 @@
     'linear-gradient(135deg,#c9a05b,#8a6a35)'
   ];
 
+  // Farben für das Symbol/Initial selbst (Buchstabe oder Kartensymbol), unabhängig
+  // von der Profilbildfarbe (Hintergrund).
+  const SYMBOL_COLORS = [
+    '#f2ecdd', '#1a1206', '#ffffff', '#0f2c1d',
+    '#d4af37', '#7c3aed', '#ff4b2b', '#38ef7d'
+  ];
+
   // --- Vorgefertigte Profilbilder (Symbol, Farbe kommt separat aus der Avatarfarbe) ---
   // Die Symbolauswahl im Fenster zeigt alle Symbole einheitlich eingefärbt (nur zur Auswahl
   // der Form). Die tatsächliche Hintergrundfarbe kommt aus der "Avatarfarbe"-Karte in den
@@ -2453,11 +2466,12 @@
 
   // Profilbild-Auswahl gilt nur für die aktuelle Sitzung — kein localStorage, kein Supabase-Sync.
   let avatarDataUrl = null;
-  function applyAvatarToEl(el, initial, value, color){
+  function applyAvatarToEl(el, initial, value, color, symbolColor){
     if(!el) return;
     const preset = getPreset(value);
     el.style.backgroundImage = '';
     el.style.background = color;
+    el.style.color = symbolColor || '';
     if(preset){
       el.textContent = preset.symbol;
       el.classList.add('avatar-symbol');
@@ -3614,6 +3628,7 @@
     if(userChanged){
       avatarDataUrl = null;
       selectedColor = AVATAR_COLORS[0];
+      selectedSymbolColor = SYMBOL_COLORS[0];
     }
     await loadNotifications();
     renderAuthArea(profile, user.email);
@@ -3696,7 +3711,7 @@
     const chips = profile.chips || 0;
     const avatarPreset = getPreset(avatarDataUrl);
     const avatarClass = avatarPreset ? ' avatar-symbol' : '';
-    const avatarStyle = `style="background:${selectedColor}"`;
+    const avatarStyle = `style="background:${selectedColor};color:${selectedSymbolColor}"`;
     const avatarInner = avatarPreset ? avatarPreset.symbol : initial;
     updateAvatarPreviews(initial);
     const crownBadgeHTML = `<div class="admin-crown-badge" title="Adminzugriff"><svg viewBox="0 0 24 24"><path d="M5 16L3 6l5.5 4L12 4l3.5 6L21 6l-2 10H5zm0 2h14v2H5z"/></svg></div>`;
@@ -3770,13 +3785,15 @@
   const settingsOverlay = document.getElementById('settingsOverlay');
   const panes = document.querySelectorAll('.settings-pane');
   const colorSwatches = document.getElementById('colorSwatches');
+  const symbolColorSwatches = document.getElementById('symbolColorSwatches');
   const bigAvatar = document.getElementById('bigAvatar');
   const avatarPickerPreview = document.getElementById('avatarPickerPreview');
   let selectedColor = AVATAR_COLORS[0];
+  let selectedSymbolColor = SYMBOL_COLORS[0];
 
   function updateAvatarPreviews(initial){
-    applyAvatarToEl(bigAvatar, initial, avatarDataUrl, selectedColor);
-    applyAvatarToEl(avatarPickerPreview, initial, avatarDataUrl, selectedColor);
+    applyAvatarToEl(bigAvatar, initial, avatarDataUrl, selectedColor, selectedSymbolColor);
+    applyAvatarToEl(avatarPickerPreview, initial, avatarDataUrl, selectedColor, selectedSymbolColor);
   }
 
   AVATAR_COLORS.forEach((grad, i) => {
@@ -3785,7 +3802,7 @@
     sw.style.background = grad;
     sw.addEventListener('click', async () => {
       selectedColor = grad;
-      document.querySelectorAll('.swatch').forEach(s => s.classList.remove('selected'));
+      colorSwatches.querySelectorAll('.swatch').forEach(s => s.classList.remove('selected'));
       sw.classList.add('selected');
       // Wichtig: das gewählte Symbol bleibt erhalten, nur die Hintergrundfarbe ändert sich.
       const initial = currentProfile ? currentProfile.name.charAt(0).toUpperCase() : 'H';
@@ -3793,6 +3810,21 @@
       renderAuthArea(currentProfile, currentUserEmail);
     });
     colorSwatches.appendChild(sw);
+  });
+
+  SYMBOL_COLORS.forEach((color, i) => {
+    const sw = document.createElement('div');
+    sw.className = 'swatch' + (i === 0 ? ' selected' : '');
+    sw.style.background = color;
+    sw.addEventListener('click', async () => {
+      selectedSymbolColor = color;
+      symbolColorSwatches.querySelectorAll('.swatch').forEach(s => s.classList.remove('selected'));
+      sw.classList.add('selected');
+      const initial = currentProfile ? currentProfile.name.charAt(0).toUpperCase() : 'H';
+      updateAvatarPreviews(initial);
+      renderAuthArea(currentProfile, currentUserEmail);
+    });
+    symbolColorSwatches.appendChild(sw);
   });
 
   function renderRailBadges(){
