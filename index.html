@@ -3249,7 +3249,8 @@
     heroGreeting.textContent = '';
     heroGreeting.classList.add('hero-greeting-typing');
     let i = 0;
-    const speed = 95;
+    const targetDuration = 4000; // Gesamtdauer ca. 4 Sekunden
+    const speed = Math.max(120, Math.round(targetDuration / Math.max(text.length, 1)));
     (function step(){
       heroGreeting.textContent = text.slice(0, i);
       if(i <= text.length){
