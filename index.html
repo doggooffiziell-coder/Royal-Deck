@@ -2998,13 +2998,14 @@
   document.getElementById('cropSaveBtn').addEventListener('click', () => {
     if(!cropImg) return;
     try {
-      const ratio = CROP_OUTPUT / CROP_STAGE;
       const outCanvas = document.createElement('canvas');
       outCanvas.width = CROP_OUTPUT; outCanvas.height = CROP_OUTPUT;
       const outCtx = outCanvas.getContext('2d');
-      const scale = cropBaseScale * cropZoom;
-      const w = cropImg.width * scale, h = cropImg.height * scale;
-      outCtx.drawImage(cropImg, cropPosX * ratio, cropPosY * ratio, w * ratio, h * ratio);
+      // Wichtig: den Ausschnitt NICHT erneut aus dem Original-Bild berechnen (das führte bei
+      // manchen PC-Fotos zu einem leeren/schwarzen Ergebnis-Canvas, siehe Nutzer-Feedback).
+      // Stattdessen einfach das bereits korrekt gezeichnete Vorschau-Canvas hochskalieren –
+      // so entspricht das gespeicherte Bild exakt dem, was im Zuschneide-Dialog zu sehen war.
+      outCtx.drawImage(cropCanvas, 0, 0, CROP_STAGE, CROP_STAGE, 0, 0, CROP_OUTPUT, CROP_OUTPUT);
       const dataUrl = outCanvas.toDataURL('image/jpeg', 0.9);
       avatarDataUrl = dataUrl;
       if(currentUserId) saveAvatarForUser(currentUserId, dataUrl);
@@ -3627,7 +3628,7 @@
     const overlay = document.getElementById('updateOverlay');
     if(!overlay || overlay.classList.contains('show')) return;
     overlay.classList.add('show');
-    const delay = 2400 + Math.random() * 1800; // ~2.4–4.2s, genug Zeit für die Animation
+    const delay = 6000; // 6 Sekunden, wie gewünscht
     setTimeout(() => { window.location.reload(); }, delay);
   }
 
