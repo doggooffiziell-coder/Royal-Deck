@@ -141,36 +141,74 @@
   .search input:focus{border-color:var(--accent-dim);box-shadow:0 0 0 3px var(--accent-soft);}
   .search svg{position:absolute;left:13px;top:10.5px;width:15px;height:15px;fill:var(--faint);}
 
-  .top-right{margin-left:auto;display:flex;align-items:center;gap:14px;}
+  .top-right{margin-left:auto;display:flex;align-items:center;}
+
+  /* --- HUD-Rail: alles oben rechts in einer durchgehenden Glas-Leiste,
+     getrennt durch feine Gold-Trennlinien statt einzelner Boxen --- */
+  .hud-rail{
+    display:flex;align-items:stretch;gap:0;padding:4px;border-radius:18px;
+    background:linear-gradient(180deg,rgba(24,40,30,.85),rgba(10,18,14,.92));
+    border:1px solid var(--border-soft);
+    box-shadow:inset 0 0 0 1px rgba(212,175,106,.06),inset 0 1px 0 rgba(255,255,255,.03),0 10px 26px rgba(0,0,0,.4);
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  }
+  .hud-divider{width:1px;align-self:stretch;margin:6px 3px;flex-shrink:0;
+    background:linear-gradient(180deg,transparent,rgba(212,175,106,.28),transparent);}
+
   .points-chip{
-    display:flex;align-items:center;gap:8px;font-weight:600;font-size:12.5px;color:var(--text);
-    background:linear-gradient(180deg,var(--surface-2),var(--surface));
-    border:1px solid var(--border);padding:6px 14px 6px 8px;border-radius:20px;cursor:default;
-    font-family:var(--font-mono);letter-spacing:.2px;box-shadow:inset 0 0 0 1px rgba(212,175,106,.08);
+    display:flex;align-items:center;gap:9px;padding:5px 14px 5px 6px;border-radius:14px;cursor:default;
+    transition:.18s;
   }
-  .points-chip .star{
-    width:20px;height:20px;padding:4px;box-sizing:border-box;border-radius:50%;flex-shrink:0;
-    background:radial-gradient(circle at 33% 30%,var(--accent-hi),var(--accent) 60%,var(--accent-dim));
-    box-shadow:0 0 0 2px var(--surface), 0 0 0 3px rgba(212,175,106,.4);
+  .points-chip:hover{background:rgba(212,175,106,.07);}
+  .points-chip .chip-coin{
+    width:28px;height:28px;border-radius:50%;flex-shrink:0;position:relative;
+    background:repeating-conic-gradient(var(--accent-hi) 0deg 15deg,var(--accent-dim) 15deg 30deg);
+    box-shadow:0 0 0 2px var(--panel),0 0 0 3px rgba(212,175,106,.35),0 0 10px rgba(212,175,106,.2);
+    display:flex;align-items:center;justify-content:center;
+    animation:chipSpin 14s linear infinite;
   }
-  .points-chip .star path{fill:var(--accent-ink);}
-  .icon-btn{
-    width:40px;height:40px;border-radius:9px;background:var(--surface);display:flex;align-items:center;
-    justify-content:center;cursor:pointer;color:var(--muted);position:relative;transition:.15s;
-    border:1px solid var(--border);
+  @keyframes chipSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+  .points-chip .chip-coin-inner{
+    width:19px;height:19px;border-radius:50%;
+    background:radial-gradient(circle at 34% 30%,var(--accent-hi),var(--accent) 65%,var(--accent-dim));
+    display:flex;align-items:center;justify-content:center;
   }
-  .icon-btn:hover{color:var(--text);border-color:var(--accent-dim);}
+  .points-chip .chip-coin-inner svg{width:11px;height:11px;fill:var(--accent-ink);}
+  .points-chip .chip-text{display:flex;flex-direction:column;line-height:1.2;gap:1px;}
+  .points-chip .chip-level{font-size:11.5px;font-weight:700;color:var(--accent-hi);letter-spacing:.3px;font-family:var(--font-body);}
+  .points-chip .chip-points{font-size:11px;color:var(--muted);font-family:var(--font-mono);letter-spacing:.2px;}
+
+  .hud-rail .icon-btn-wrap{display:flex;}
+  .hud-rail .icon-btn{
+    width:38px;height:38px;border-radius:12px;background:transparent;display:flex;align-items:center;
+    justify-content:center;cursor:pointer;color:var(--muted);position:relative;transition:.16s;
+    border:1px solid transparent;margin:auto;
+  }
+  .hud-rail .icon-btn:hover{color:var(--accent-hi);background:rgba(212,175,106,.08);border-color:rgba(212,175,106,.22);}
   .icon-btn svg{width:18px;height:18px;fill:currentColor;}
   .badge{
-    position:absolute;top:-4px;right:-4px;background:var(--danger);color:#1a0808;font-size:9px;
+    position:absolute;top:-3px;right:-3px;background:var(--danger);color:#1a0808;font-size:9px;
     width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;
-    border:2px solid var(--panel);
+    border:2px solid var(--panel);box-shadow:0 0 6px rgba(220,80,80,.5);
   }
+
   .avatar{
     width:34px;height:34px;border-radius:50%;background:var(--accent);
     cursor:pointer;flex-shrink:0;background-size:cover;background-position:center;
-    box-shadow:0 0 0 2px var(--panel), 0 0 0 3px rgba(212,175,106,.3);
   }
+  /* Level-Ring um den Avatar — Fortschritt zum nächsten Level als Goldring */
+  .avatar-ring{
+    width:38px;height:38px;border-radius:50%;flex-shrink:0;position:relative;padding:2px;box-sizing:border-box;
+    background:conic-gradient(var(--accent-hi) calc(var(--ring-pct,0) * 1%),rgba(212,175,106,.16) 0);
+  }
+  .avatar-ring .avatar{width:100%;height:100%;box-shadow:0 0 0 2px var(--panel);}
+  .admin-crown-badge{
+    position:absolute;bottom:-2px;right:-2px;width:15px;height:15px;border-radius:50%;
+    background:linear-gradient(180deg,var(--accent-hi),var(--accent));display:flex;align-items:center;justify-content:center;
+    border:2px solid var(--panel);box-shadow:0 0 8px rgba(240,207,142,.65);z-index:1;
+  }
+  .admin-crown-badge svg{width:8px;height:8px;fill:var(--accent-ink);}
+
 
   /* Content */
   .content{
@@ -630,12 +668,16 @@
   .lux-card button.submit.ghost:hover{box-shadow:inset 0 0 0 1px var(--accent-dim);background:var(--surface-2);}
 
   /* Logged-in state in topbar */
-  .user-chip{display:flex;align-items:center;gap:9px;cursor:pointer;position:relative;padding:4px 6px 4px 4px;border-radius:9px;transition:.15s;}
-  .user-chip:hover{background:var(--surface);}
-  .user-chip .avatar{width:32px;height:32px;border-radius:8px;background:var(--accent);
-    display:flex;align-items:center;justify-content:center;color:var(--accent-ink);font-weight:600;font-size:12.5px;flex-shrink:0;}
+  .user-chip{display:flex;align-items:center;gap:8px;cursor:pointer;position:relative;padding:4px 10px 4px 4px;border-radius:14px;transition:.16s;}
+  .user-chip:hover{background:rgba(212,175,106,.07);}
+  .user-chip .avatar{
+    display:flex;align-items:center;justify-content:center;color:var(--accent-ink);font-weight:700;font-size:13px;flex-shrink:0;
+  }
   .user-chip .uname-stack{display:flex;flex-direction:column;gap:2px;min-width:0;}
-  .user-chip .uname{font-size:13px;font-weight:600;color:var(--text);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .user-chip .uname{font-size:12.5px;font-weight:600;color:var(--text);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .user-chip .uname-role{font-size:9.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--accent-hi);opacity:.85;}
+  .user-chip .caret{width:12px;height:12px;fill:var(--faint);flex-shrink:0;transition:.16s;margin-left:-2px;}
+  .user-chip:hover .caret{fill:var(--accent-hi);}
   .admin-access-tag{
     display:inline-flex;align-items:center;gap:4px;width:fit-content;
     font-size:9px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;
@@ -654,6 +696,7 @@
   .dropdown .dd-menu div{padding:11px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:9px;color:var(--text);transition:.12s;}
   .dropdown .dd-menu div:hover{background:var(--surface-2);color:var(--accent-hi);}
   .dropdown svg{width:14px;height:14px;fill:currentColor;}
+
 
   /* icon button dropdowns (notifications / mail) */
   .icon-btn-wrap{position:relative;}
@@ -755,8 +798,9 @@
   .dropdown .dd-head{
     display:flex;align-items:center;gap:10px;padding:13px 14px;border-bottom:1px solid var(--border);
   }
-  .dropdown .dd-head .avatar{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;
-    justify-content:center;color:var(--accent-ink);font-weight:600;font-size:14px;flex-shrink:0;}
+  .dropdown .dd-head .avatar{display:flex;align-items:center;
+    justify-content:center;color:var(--accent-ink);font-weight:700;font-size:14px;flex-shrink:0;}
+  .dropdown .dd-head .avatar-ring{width:42px;height:42px;}
   .dropdown .dd-info{min-width:0;flex:1;}
   .dropdown .dd-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .dropdown .dd-level{font-size:11px;color:var(--muted);margin-top:3px;font-family:var(--font-mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -1664,36 +1708,43 @@
       <input placeholder="Spiele, Erlebnisse suchen">
     </div>
     <div class="top-right">
-      <div class="points-chip" id="pointsDisplay" title="Dein Level basiert auf deinen Punkten">
-        <svg class="star" viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg> Level 1 · 0 Punkte
-      </div>
-
-      <div class="icon-btn-wrap">
-        <div class="icon-btn" id="notifBtn">
-          <svg viewBox="0 0 24 24"><path d="M12 22a2 2 0 002-2h-4a2 2 0 002 2zm6-6v-5a6 6 0 10-12 0v5l-2 2v1h16v-1z"/></svg>
-          <div class="badge" id="notifBadge">3</div>
+      <div class="hud-rail">
+        <div class="points-chip" id="pointsDisplay" title="Dein Level basiert auf deinen Punkten">
+          <div class="chip-coin"><div class="chip-coin-inner"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg></div></div>
+          <div class="chip-text"><span class="chip-level">Level 1</span><span class="chip-points">0 Punkte</span></div>
         </div>
-        <div class="dropdown panel-dropdown" id="notifDropdown">
-          <div class="panel-head" id="notifPanelHead">
-            <span>Benachrichtigungen</span>
+
+        <div class="hud-divider"></div>
+
+        <div class="icon-btn-wrap">
+          <div class="icon-btn" id="notifBtn">
+            <svg viewBox="0 0 24 24"><path d="M12 22a2 2 0 002-2h-4a2 2 0 002 2zm6-6v-5a6 6 0 10-12 0v5l-2 2v1h16v-1z"/></svg>
+            <div class="badge" id="notifBadge">3</div>
           </div>
-          <div id="notifBody"></div>
-        </div>
-      </div>
-
-      <div class="icon-btn-wrap">
-        <div class="icon-btn" id="mailBtn">
-          <svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 4l-8 5-8-5V6l8 5 8-5z"/></svg>
-        </div>
-        <div class="dropdown panel-dropdown" id="mailDropdown">
-          <div class="panel-head" id="mailPanelHead">
-            <span>Nachrichten</span>
+          <div class="dropdown panel-dropdown" id="notifDropdown">
+            <div class="panel-head" id="notifPanelHead">
+              <span>Benachrichtigungen</span>
+            </div>
+            <div id="notifBody"></div>
           </div>
-          <div id="mailBody"></div>
         </div>
-      </div>
 
-      <div id="authArea"></div>
+        <div class="icon-btn-wrap">
+          <div class="icon-btn" id="mailBtn">
+            <svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 4l-8 5-8-5V6l8 5 8-5z"/></svg>
+          </div>
+          <div class="dropdown panel-dropdown" id="mailDropdown">
+            <div class="panel-head" id="mailPanelHead">
+              <span>Nachrichten</span>
+            </div>
+            <div id="mailBody"></div>
+          </div>
+        </div>
+
+        <div class="hud-divider"></div>
+
+        <div id="authArea"></div>
+      </div>
     </div>
   </div>
 
@@ -3297,7 +3348,8 @@
     updateHeroGreeting(profile.name);
     pointsDisplay.style.display = 'flex';
     const level = Math.max(1, Math.floor((profile.chips || 0) / 100));
-    pointsDisplay.innerHTML = `<svg class="star" viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg> Level ${level} · ${(profile.chips||0).toLocaleString('de-DE')} Punkte`;
+    const ringPct = Math.max(4, (profile.chips || 0) % 100);
+    pointsDisplay.innerHTML = `<div class="chip-coin"><div class="chip-coin-inner"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg></div></div><div class="chip-text"><span class="chip-level">Level ${level}</span><span class="chip-points">${(profile.chips||0).toLocaleString('de-DE')} Punkte</span></div>`;
     const initial = profile.name.charAt(0).toUpperCase();
     const chips = profile.chips || 0;
     const avatarPreset = getPreset(avatarDataUrl);
@@ -3305,17 +3357,25 @@
     const avatarStyle = `style="background:${selectedColor}"`;
     const avatarInner = avatarPreset ? avatarPreset.symbol : initial;
     updateAvatarPreviews(initial);
+    const crownBadgeHTML = `<div class="admin-crown-badge" title="Adminzugriff"><svg viewBox="0 0 24 24"><path d="M5 16L3 6l5.5 4L12 4l3.5 6L21 6l-2 10H5zm0 2h14v2H5z"/></svg></div>`;
     const adminTagHTML = `<span class="admin-access-tag"><svg viewBox="0 0 24 24"><path d="M5 16L3 6l5.5 4L12 4l3.5 6L21 6l-2 10H5zm0 2h14v2H5z"/></svg>Adminzugriff</span>`;
     authArea.innerHTML = `
       <div class="user-chip" id="userChip">
-        <div class="avatar${avatarClass}" ${avatarStyle}>${avatarInner}</div>
+        <div class="avatar-ring" style="--ring-pct:${ringPct}">
+          <div class="avatar${avatarClass}" ${avatarStyle}>${avatarInner}</div>
+          ${isAdmin ? crownBadgeHTML : ''}
+        </div>
         <div class="uname-stack">
           <span class="uname">${profile.name}</span>
-          ${isAdmin ? adminTagHTML : ''}
+          <span class="uname-role">${isAdmin ? 'Admin' : 'Level ' + level}</span>
         </div>
+        <svg class="caret" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
         <div class="dropdown" id="dropdown">
           <div class="dd-head">
-            <div class="avatar${avatarClass}" ${avatarStyle}>${avatarInner}</div>
+            <div class="avatar-ring" style="--ring-pct:${ringPct}">
+              <div class="avatar${avatarClass}" ${avatarStyle}>${avatarInner}</div>
+              ${isAdmin ? crownBadgeHTML : ''}
+            </div>
             <div class="dd-info">
               <div class="dd-name">${profile.name}</div>
               ${isAdmin ? adminTagHTML : ''}
