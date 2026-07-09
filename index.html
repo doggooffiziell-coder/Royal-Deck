@@ -550,14 +550,60 @@
     background:var(--brass);box-shadow:0 0 0 2px var(--sidebar);
   }
   .sidebar-bottom{margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:8px;}
+
+  /* --------- maintenance screen --------- */
+  #maintenanceScreen{
+    position:fixed;inset:0;z-index:999;
+    background:radial-gradient(120% 90% at 50% 0%, #131824 0%, #0a0c10 55%);
+    color:var(--text);
+    flex-direction:column;align-items:center;justify-content:center;
+    font-family:var(--font-body);text-align:center;padding:24px;
+  }
+  .maint-wrap{max-width:400px;display:flex;flex-direction:column;align-items:center;}
+  #maintCanvas{margin-bottom:2px;}
+  .maint-eyebrow{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:10.5px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase;
+    color:var(--accent-hi);margin-bottom:12px;
+  }
+  .maint-eyebrow svg{width:10px;height:10px;fill:var(--brass);}
+  #maintenanceScreen h1{
+    font-family:var(--font-display);font-size:25px;font-weight:600;margin-bottom:10px;letter-spacing:-.2px;
+  }
+  .maint-sub{color:var(--muted);font-size:13.5px;line-height:1.6;margin-bottom:22px;}
+  .maint-details{
+    display:flex;flex-direction:column;gap:11px;width:100%;
+    background:var(--panel);border:1px solid var(--border);border-radius:12px;
+    padding:16px 18px;margin-bottom:18px;text-align:left;
+  }
+  .maint-detail{
+    display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--text);font-weight:500;
+  }
+  .maint-detail svg{width:14px;height:14px;fill:var(--success);flex-shrink:0;}
+  .maint-eta{
+    font-family:var(--font-mono);font-size:11px;color:var(--faint);letter-spacing:.2px;
+    border-top:1px solid var(--border-soft);padding-top:14px;width:100%;
+  }
 </style>
 </head>
 <body>
 
-<div id="maintenanceScreen" style="display:none;position:fixed;inset:0;z-index:999;background:#0a0c10;color:#eef1f5;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Inter',sans-serif;text-align:center;padding:20px;">
-  <div style="font-size:40px;margin-bottom:14px;">🛠️</div>
-  <h1 style="font-family:'Fraunces',serif;font-size:24px;margin-bottom:8px;">Wartungsarbeiten</h1>
-  <p style="color:#8993a4;font-size:14px;max-width:360px;">Wir sind kurz am Schrauben. Schau gleich wieder vorbei.</p>
+<div id="maintenanceScreen" style="display:none;">
+  <div class="maint-wrap">
+    <canvas id="maintCanvas" width="140" height="140"></canvas>
+    <div class="maint-eyebrow">
+      <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>
+      Kurze Unterbrechung
+    </div>
+    <h1>Wir bauen gerade am Tisch</h1>
+    <p class="maint-sub">Royal Table ist für ein kurzes Update offline. Deine Punkte, dein Konto und deine Einstellungen bleiben dabei unangetastet.</p>
+    <div class="maint-details">
+      <div class="maint-detail"><svg viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>Datenbank wird optimiert</div>
+      <div class="maint-detail"><svg viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>Neue Spieltische werden vorbereitet</div>
+      <div class="maint-detail"><svg viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>Sicherheitsupdate wird eingespielt</div>
+    </div>
+    <div class="maint-eta">Wir sind in Kürze zurück — schau gleich nochmal vorbei.</div>
+  </div>
 </div>
 
 <div class="sidebar">
@@ -752,6 +798,10 @@
             <svg viewBox="0 0 24 24"><path d="M12 2l7 3v6c0 5-3.4 8.7-7 10-3.6-1.3-7-5-7-10V5z"/></svg>
             Sicherheit
           </div>
+          <div class="stab" data-spane="admin" id="adminTabBtn" style="display:none;">
+            <svg viewBox="0 0 24 24"><path d="M19.4 13a7.9 7.9 0 000-2l2.1-1.6-2-3.4-2.5 1a8 8 0 00-1.7-1L14.9 3H9.1l-.4 2.9a8 8 0 00-1.7 1l-2.5-1-2 3.4L4.6 11a7.9 7.9 0 000 2l-2.1 1.6 2 3.4 2.5-1a8 8 0 001.7 1l.4 2.9h5.8l.4-2.9a8 8 0 001.7-1l2.5 1 2-3.4z"/></svg>
+            Admin
+          </div>
         </div>
       </div>
 
@@ -827,6 +877,26 @@
                 Reset-Link an meine E-Mail senden
               </button>
               <div class="hint" id="resetFromSettingsHint"></div>
+            </div>
+          </div>
+
+          <!-- Admin pane -->
+          <div class="settings-pane" id="pane-admin">
+            <div class="pane-heading">Admin</div>
+            <div class="lux-card">
+              <div class="card-title">
+                <svg viewBox="0 0 24 24"><path d="M20 6h-2.2l-1.5-2H7.7L6.2 6H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm-8 12a5 5 0 110-10 5 5 0 010 10z"/></svg>
+                Wartungsmodus
+              </div>
+              <p class="card-note">
+                Wenn aktiv, sehen alle Besucher und Spieler eine Wartungsseite. Dein
+                Adminkonto behält immer normalen Zugriff.
+              </p>
+              <div class="gender-select" id="maintenanceToggle">
+                <div class="gender-opt" data-maint="off">Aus</div>
+                <div class="gender-opt" data-maint="on">An</div>
+              </div>
+              <div class="hint" id="maintenanceHint"></div>
             </div>
           </div>
         </div>
@@ -944,6 +1014,26 @@
   const SUPABASE_URL = 'https://tydippnbkkvdohzxplgw.supabase.co';
   const SUPABASE_ANON_KEY = 'sb_publishable_0ZvwrcL4AuFobJGdyARmhA_KfchINLa';
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // --- Sicherheitsnetz: verhindert, dass rohe Error-/Response-Objekte (die z. B. ein
+  // nicht klonbares "Headers"-Objekt enthalten können) ungefiltert an die Konsole gehen.
+  // Manche Vorschau-/Devtools-Umgebungen leiten Konsolenausgaben per postMessage weiter,
+  // was bei solchen Objekten mit "DataCloneError" abbricht. Wir fangen daher global ab
+  // und loggen nur eine reine Textnachricht.
+  function safeErrorText(err){
+    if(!err) return 'Unbekannter Fehler';
+    if(typeof err === 'string') return err;
+    if(err.message) return String(err.message);
+    try { return String(err); } catch(e){ return 'Unbekannter Fehler'; }
+  }
+  window.addEventListener('error', (event) => {
+    console.warn('Fehler abgefangen:', safeErrorText(event?.error || event?.message));
+    event.preventDefault();
+  });
+  window.addEventListener('unhandledrejection', (event) => {
+    console.warn('Unbehandelte Promise-Ablehnung:', safeErrorText(event?.reason));
+    event.preventDefault();
+  });
 
   const AVATAR_COLORS = [
     'linear-gradient(135deg,#00a2ff,#7c3aed)',
@@ -1426,17 +1516,57 @@
     renderAuthArea(null);
   }
 
-  // --- Wartungsmodus: hier auf true/false schalten ---
-  const MAINTENANCE_MODE = true;
+  // --- Wartungsmodus: wird jetzt live aus Supabase gelesen, statt fest im Code zu stehen ---
+  let maintenanceMode = false;
+
+  async function loadMaintenanceMode(){
+    try {
+      const { data, error } = await supabaseClient
+        .from('app_config')
+        .select('maintenance_mode')
+        .eq('id', 1)
+        .single();
+      if(error){
+        console.error('Konnte Wartungsstatus nicht laden:', error.message || error.details || 'Unbekannter Fehler');
+        return;
+      }
+      maintenanceMode = !!data?.maintenance_mode;
+    } catch(err){
+      // Netzwerk-/Fetch-Fehler (z. B. falsche URL, CORS, Tabelle/Policy fehlt) landen hier statt
+      // als ungefangene Promise-Ablehnung mit nicht klonbaren Objekten (z. B. Headers).
+      console.error('Konnte Wartungsstatus nicht laden (Netzwerkfehler):', err?.message || String(err));
+    }
+  }
+
+  async function setMaintenanceMode(turnOn){
+    try {
+      const { error } = await supabaseClient
+        .from('app_config')
+        .update({ maintenance_mode: turnOn })
+        .eq('id', 1);
+      if(!error) maintenanceMode = turnOn;
+      return error;
+    } catch(err){
+      return { message: err?.message || 'Netzwerkfehler beim Speichern.' };
+    }
+  }
 
   async function loadProfile(){
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    if(MAINTENANCE_MODE && !isAdminEmail(user?.email)){
-      document.getElementById('maintenanceScreen').style.display = 'flex';
-      document.querySelector('.sidebar').style.display = 'none';
-      document.querySelector('.main').style.display = 'none';
+    await loadMaintenanceMode();
+    let user = null;
+    try {
+      const res = await supabaseClient.auth.getUser();
+      user = res?.data?.user || null;
+    } catch(err){
+      console.warn('Konnte Nutzer nicht laden:', safeErrorText(err));
+    }
+    if(maintenanceMode && !isAdminEmail(user?.email)){
+      showMaintenanceScreen();
       return;
     }
+    document.getElementById('maintenanceScreen').style.display = 'none';
+    document.querySelector('.sidebar').style.display = '';
+    document.querySelector('.main').style.display = '';
     if(!user){
       currentUserId = null; currentUserEmail = null; isAdmin = false;
       renderAuthArea(null);
@@ -1464,7 +1594,119 @@
     renderAuthArea(profile, user.email);
   }
 
-  // --- Zeitbasierte Begrüßung im Hero-Header ---
+  // --- Wartungsscreen: handgezeichneter Hammer auf Canvas, leicht animiert ---
+  function initMaintenanceCanvas(){
+    const canvas = document.getElementById('maintCanvas');
+    if(!canvas || canvas.dataset.started) return;
+    canvas.dataset.started = '1';
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+
+    function roundRect(x, y, w, h, r){
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+    }
+
+    function drawHammer(angleDeg, impact){
+      ctx.clearRect(0, 0, W, H);
+
+      // sanfter Kreis-Untergrund im Kartenlook
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(W/2, H/2, 58, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(79,127,224,.06)';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(79,127,224,.16)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.restore();
+
+      // Auftreff-Impuls (kurzer Ring beim Schlag)
+      if(impact > 0){
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(W*0.40, H*0.72, 10 + impact*14, 0, Math.PI*2);
+        ctx.strokeStyle = `rgba(194,160,106,${0.5 * (1-impact)})`;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      ctx.save();
+      // Drehpunkt = Griffende, wie bei einer schwingenden Hand
+      ctx.translate(W*0.62, H*0.32);
+      ctx.rotate(angleDeg * Math.PI/180);
+
+      // Griff (Messing)
+      const handleLen = 60, handleW = 9;
+      const handleGrad = ctx.createLinearGradient(-handleW/2, 0, handleW/2, 0);
+      handleGrad.addColorStop(0, '#e4c88f');
+      handleGrad.addColorStop(0.5, '#c2a06a');
+      handleGrad.addColorStop(1, '#8a6f45');
+      ctx.fillStyle = handleGrad;
+      roundRect(-handleW/2, -4, handleW, handleLen, 4);
+      ctx.fill();
+
+      // Kopf (Stahl)
+      const headW = 46, headH = 20;
+      const headGrad = ctx.createLinearGradient(-headW/2, 0, headW/2, 0);
+      headGrad.addColorStop(0, '#d5dbe4');
+      headGrad.addColorStop(0.5, '#93a0b3');
+      headGrad.addColorStop(1, '#4c5566');
+      ctx.fillStyle = headGrad;
+      roundRect(-headW/2, -4-headH, headW, headH, 5);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(0,0,0,.3)';
+      ctx.lineWidth = 1;
+      roundRect(-headW/2, -4-headH, headW, headH, 5);
+      ctx.stroke();
+
+      // Glanzlicht auf dem Kopf
+      ctx.fillStyle = 'rgba(255,255,255,.4)';
+      roundRect(-headW/2+5, -4-headH+3, headW-10, 3, 1.5);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    let start = null;
+    function loop(ts){
+      if(!start) start = ts;
+      const t = (ts - start) / 1000;
+      const cycle = t % 1.6;
+      let angle = 0, impact = 0;
+      if(cycle < 0.55){
+        // ausholen
+        angle = -50 * Math.sin((cycle/0.55) * Math.PI/2);
+      } else if(cycle < 0.72){
+        // zuschlagen
+        const p = (cycle - 0.55) / 0.17;
+        angle = -50 * (1 - p);
+        if(p > 0.85) impact = (p - 0.85) / 0.15;
+      } else {
+        // kurze Pause
+        angle = 0;
+        impact = Math.max(0, 1 - (cycle - 0.72) / 0.3);
+      }
+      drawHammer(angle, impact);
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+  }
+
+  function showMaintenanceScreen(){
+    document.getElementById('maintenanceScreen').style.display = 'flex';
+    document.querySelector('.sidebar').style.display = 'none';
+    document.querySelector('.main').style.display = 'none';
+    initMaintenanceCanvas();
+  }
+
+
   const heroGreeting = document.getElementById('heroGreeting');
   function greetingText(name){
     const h = new Date().getHours();
@@ -1594,6 +1836,29 @@
     });
   });
 
+  // --- Wartungsmodus-Umschalter (nur sichtbar/wirksam für den Adminaccount) ---
+  document.querySelectorAll('#maintenanceToggle .gender-opt').forEach(opt => {
+    opt.addEventListener('click', async () => {
+      if(!isAdmin) return;
+      const turnOn = opt.dataset.maint === 'on';
+      const hint = document.getElementById('maintenanceHint');
+      hint.style.color = '';
+      hint.textContent = 'Speichere...';
+      const error = await setMaintenanceMode(turnOn);
+      if(error){
+        hint.style.color = 'var(--danger)';
+        hint.textContent = error.message;
+        return;
+      }
+      document.querySelectorAll('#maintenanceToggle .gender-opt').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      hint.textContent = turnOn
+        ? 'Wartungsmodus ist jetzt aktiv. Nur dein Adminkonto hat weiter Zugriff.'
+        : 'Wartungsmodus ist jetzt deaktiviert.';
+      showToast(turnOn ? 'Wartungsmodus aktiviert.' : 'Wartungsmodus deaktiviert.');
+    });
+  });
+
   function openSettings(email){
     document.getElementById('profileError').textContent = '';
     document.getElementById('profileHint').textContent = '';
@@ -1601,10 +1866,16 @@
     document.getElementById('pwHint').textContent = '';
     document.getElementById('resetFromSettingsHint').textContent = '';
     document.getElementById('genderHint').textContent = '';
+    document.getElementById('maintenanceHint').textContent = '';
     document.getElementById('pwForm').reset();
 
     avatarDataUrl = currentUserId ? loadAvatarForUser(currentUserId) : null;
     renderRailBadges();
+
+    document.getElementById('adminTabBtn').style.display = isAdmin ? 'flex' : 'none';
+    document.querySelectorAll('#maintenanceToggle .gender-opt').forEach(o => {
+      o.classList.toggle('selected', (o.dataset.maint === 'on') === maintenanceMode);
+    });
 
     document.querySelectorAll('#settingsGenderSelect .gender-opt').forEach(o => {
       o.classList.toggle('selected', currentProfile && o.dataset.gender === currentProfile.gender);
