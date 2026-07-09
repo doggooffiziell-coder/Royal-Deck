@@ -791,6 +791,31 @@
     display:flex;gap:11px;align-items:flex-start;margin-bottom:10px;
   }
   .ac-preview .panel-icon{margin:0;}
+
+  .panel-tabs{display:flex;gap:6px;padding:8px 16px 6px;}
+  .panel-tab{
+    padding:6px 13px;border-radius:20px;border:1px solid var(--border);background:transparent;
+    color:var(--muted);font-size:11.5px;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:.15s;
+  }
+  .panel-tab:hover{color:var(--text);}
+  .panel-tab.active{background:var(--surface-2);color:var(--accent-hi);border-color:var(--accent-dim);}
+
+  .notif-settings-panel{
+    display:none;position:absolute;top:44px;right:14px;width:220px;background:var(--surface);
+    border:1px solid var(--border);border-radius:10px;padding:12px;z-index:60;
+    box-shadow:0 14px 34px rgba(0,0,0,.5);
+  }
+  .notif-settings-panel.open{display:block;}
+  .ns-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;font-size:12.5px;color:var(--text);}
+  .ns-row input[type="checkbox"]{accent-color:var(--accent);width:15px;height:15px;}
+  .ns-divider{height:1px;background:var(--border);margin:6px 0;}
+  .ns-btn{
+    width:100%;padding:9px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);
+    color:var(--accent-hi);font-size:12px;font-weight:600;cursor:pointer;margin-top:2px;font-family:var(--font-body);transition:.15s;
+  }
+  .ns-btn:hover{border-color:var(--accent-dim);}
+
+  .panel-sub{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
   .panel-item{display:flex;align-items:flex-start;gap:11px;padding:11px 16px;cursor:pointer;transition:.12s;position:relative;}
   .panel-item:hover{background:var(--surface-2);}
   .panel-item .panel-text{flex:1;min-width:0;}
@@ -1762,6 +1787,11 @@
             <div class="panel-head" id="notifPanelHead">
               <span>Benachrichtigungen</span>
             </div>
+            <div class="notif-settings-panel" id="notifSettingsPanel"></div>
+            <div class="panel-tabs" id="notifTabs">
+              <button type="button" class="panel-tab active" data-tab="all">Alle</button>
+              <button type="button" class="panel-tab" data-tab="unread">Ungelesen</button>
+            </div>
             <div id="notifBody"></div>
           </div>
         </div>
@@ -2489,6 +2519,8 @@
   let currentUserId = null;
   let currentUserEmail = null;
   let isAdmin = false;
+  let notifTab = 'all'; // 'all' | 'unread' — Filter für die Benachrichtigungsliste
+  let notifSortUnreadFirst = false; // Einstellung aus dem Benachrichtigungs-Einstellungen-Panel
 
   function isAdminEmail(email){
     return !!email && email.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase();
@@ -2615,6 +2647,49 @@
     });
   }
 
+  function notifSettingsBtnHTML(){
+    return `<div class="panel-head-expand-btn" data-notif-settings-btn title="Einstellungen">
+      <svg viewBox="0 0 24 24"><path d="M19.4 13a7.9 7.9 0 000-2l2.1-1.6-2-3.4-2.5 1a8 8 0 00-1.7-1L14.9 3H9.1l-.4 2.9a8 8 0 00-1.7 1l-2.5-1-2 3.4L4.6 11a7.9 7.9 0 000 2l-2.1 1.6 2 3.4 2.5-1a8 8 0 001.7 1l.4 2.9h5.8l.4-2.9a8 8 0 001.7-1l2.5 1 2-3.4z"/></svg>
+    </div>`;
+  }
+
+  function renderNotifSettingsPanel(){
+    const panel = document.getElementById('notifSettingsPanel');
+    if(!panel) return;
+    panel.innerHTML = `
+      <div class="ns-row">
+        <span>Ungelesene zuerst</span>
+        <input type="checkbox" id="nsSortUnread" ${notifSortUnreadFirst ? 'checked' : ''}>
+      </div>
+      <div class="ns-divider"></div>
+      <button type="button" class="ns-btn" id="nsMarkAllRead">Alle als gelesen markieren</button>`;
+    document.getElementById('nsSortUnread').addEventListener('change', e => {
+      notifSortUnreadFirst = e.target.checked;
+      renderNotifList();
+    });
+    document.getElementById('nsMarkAllRead').addEventListener('click', async () => {
+      const unread = notifications.filter(n => !n.read);
+      if(unread.length === 0){ return; }
+      unread.forEach(n => n.read = true);
+      updateNotifBadge();
+      panel.classList.remove('open');
+      renderNotifList();
+      showToast('Alle Benachrichtigungen als gelesen markiert.');
+      for(const n of unread){ await setNotifReadState(n.id, { read: true }); }
+    });
+  }
+
+  function wireNotifSettingsBtn(container){
+    container.querySelector('[data-notif-settings-btn]')?.addEventListener('click', e => {
+      e.stopPropagation();
+      const panel = document.getElementById('notifSettingsPanel');
+      if(!panel) return;
+      const willOpen = !panel.classList.contains('open');
+      panel.classList.toggle('open', willOpen);
+      if(willOpen) renderNotifSettingsPanel();
+    });
+  }
+
   function renderNotifPanelHead(){
     const head = document.getElementById('notifPanelHead');
     if(!head) return;
@@ -2623,18 +2698,22 @@
         <span>Benachrichtigungen</span>
         <div class="panel-head-btns">
           ${expandBtnHTML()}
+          ${notifSettingsBtnHTML()}
           <div class="panel-head-admin-btn" id="notifAdminBtn" title="Neue Benachrichtigung an alle senden">
             <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"/></svg>
           </div>
         </div>`;
       document.getElementById('notifAdminBtn').addEventListener('click', () => {
+        document.getElementById('notifSettingsPanel')?.classList.remove('open');
         document.getElementById('notifBody').style.display = 'none';
+        document.getElementById('notifTabs').style.display = 'none';
         renderAdminComposeForm();
       });
     } else {
-      head.innerHTML = `<span>Benachrichtigungen</span><div class="panel-head-btns">${expandBtnHTML()}</div>`;
+      head.innerHTML = `<span>Benachrichtigungen</span><div class="panel-head-btns">${expandBtnHTML()}${notifSettingsBtnHTML()}</div>`;
     }
     wireExpandBtn(head);
+    wireNotifSettingsBtn(head);
     document.getElementById('notifDropdown').classList.toggle('expanded', isPanelExpanded());
   }
 
@@ -2741,6 +2820,7 @@
     document.getElementById('acCancel').addEventListener('click', () => {
       wrap.remove();
       document.getElementById('notifBody').style.display = '';
+      document.getElementById('notifTabs').style.display = '';
     });
     document.getElementById('acSend').addEventListener('click', async () => {
       const title = titleInput.value.trim();
@@ -2771,6 +2851,7 @@
       setTimeout(() => {
         wrap.remove();
         document.getElementById('notifBody').style.display = '';
+        document.getElementById('notifTabs').style.display = '';
         renderNotifList();
       }, 700);
     });
@@ -2781,8 +2862,11 @@
     if(existingCompose) existingCompose.remove();
     renderNotifPanelHead();
     const body = document.getElementById('notifBody');
+    const tabs = document.getElementById('notifTabs');
     body.style.display = '';
     if(!currentProfile){
+      if(tabs) tabs.style.display = 'none';
+      document.getElementById('notifSettingsPanel')?.classList.remove('open');
       body.innerHTML = loggedOutPanelHTML('notif');
       document.getElementById('loginFromNotifPanel')?.addEventListener('click', () => {
         document.getElementById('notifDropdown').classList.remove('open');
@@ -2790,11 +2874,20 @@
       });
       return;
     }
+    if(tabs) tabs.style.display = '';
     if(notifications.length === 0){
       body.innerHTML = `<div class="panel-empty-list">Keine Benachrichtigungen.</div>`;
       return;
     }
-    body.innerHTML = notifications.map(n => `
+    let list = notifTab === 'unread' ? notifications.filter(n => !n.read) : notifications.slice();
+    if(notifSortUnreadFirst){
+      list = list.slice().sort((a, b) => (a.read === b.read) ? 0 : (a.read ? 1 : -1));
+    }
+    if(list.length === 0){
+      body.innerHTML = `<div class="panel-empty-list">Keine ungelesenen Benachrichtigungen.</div>`;
+      return;
+    }
+    body.innerHTML = list.map(n => `
       <div class="panel-item ${n.read ? 'read' : ''}" data-id="${n.id}">
         <div class="panel-icon">${n.icon}</div>
         <div class="panel-text">
@@ -2830,6 +2923,8 @@
       updateNotifBadge();
       setNotifReadState(id, { read: true });
     }
+    document.getElementById('notifSettingsPanel')?.classList.remove('open');
+    document.getElementById('notifTabs').style.display = 'none';
     const body = document.getElementById('notifBody');
     body.innerHTML = `
       <div class="notif-detail">
@@ -2879,10 +2974,21 @@
     renderNotifList();
   });
   setupPanelToggle('mailBtn', 'mailDropdown', renderMailBody);
+  document.querySelectorAll('#notifTabs .panel-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      notifTab = tab.dataset.tab;
+      document.querySelectorAll('#notifTabs .panel-tab').forEach(t => t.classList.toggle('active', t === tab));
+      document.getElementById('notifSettingsPanel')?.classList.remove('open');
+      renderNotifList();
+    });
+  });
   document.addEventListener('click', e => {
     if(!e.target.closest('.icon-btn-wrap')){
       document.querySelectorAll('.panel-dropdown').forEach(d => d.classList.remove('open'));
       document.querySelectorAll('.icon-btn.active').forEach(el => el.classList.remove('active'));
+      document.getElementById('notifSettingsPanel')?.classList.remove('open');
+    } else if(!e.target.closest('.notif-settings-panel') && !e.target.closest('[data-notif-settings-btn]')){
+      document.getElementById('notifSettingsPanel')?.classList.remove('open');
     }
     if(!e.target.closest('.user-chip')){
       document.getElementById('dropdown')?.classList.remove('open');
