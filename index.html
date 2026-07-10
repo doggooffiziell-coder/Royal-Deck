@@ -1326,6 +1326,37 @@
   }
   .wl-item .wl-main-badge svg{width:13px;height:13px;fill:currentColor;}
   .wl-empty{font-size:12px;color:var(--faint);padding:6px 2px;}
+  /* Chip-Verwaltung im Admin-Panel */
+  .chipadm-list{margin-top:14px;display:flex;flex-direction:column;gap:10px;}
+  .chipadm-row{
+    background:var(--surface-2);border:1px solid var(--border-soft);border-radius:10px;
+    padding:11px 13px;display:flex;flex-direction:column;gap:10px;
+  }
+  .chipadm-top{display:flex;align-items:center;gap:10px;}
+  .chipadm-info{flex:1;min-width:0;}
+  .chipadm-uname{font-size:13.5px;font-weight:600;color:var(--text);}
+  .chipadm-uname .chipadm-self-tag{
+    font-size:10px;font-weight:700;color:var(--accent-ink);background:var(--accent-hi);
+    padding:1px 6px;border-radius:5px;margin-left:6px;letter-spacing:.2px;vertical-align:middle;
+  }
+  .chipadm-balance{font-size:12px;color:var(--muted);font-family:var(--font-mono);margin-top:1px;}
+  .chipadm-balance b{color:var(--accent-hi);font-weight:600;}
+  .chipadm-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+  .chipadm-actions input{
+    width:120px;height:34px;border-radius:8px;border:1px solid var(--border);
+    background:var(--surface);color:var(--text);padding:0 10px;font-size:13px;outline:none;
+    font-family:var(--font-mono);
+  }
+  .chipadm-actions input:focus{border-color:var(--accent-dim);box-shadow:0 0 0 3px var(--accent-soft);}
+  .chipadm-quick{display:flex;flex-wrap:wrap;gap:6px;}
+  .chipadm-quick button{
+    font-size:11px;padding:5px 9px;border-radius:7px;border:1px solid var(--border);
+    background:var(--surface);color:var(--muted);cursor:pointer;font-family:var(--font-mono);transition:.15s;
+  }
+  .chipadm-quick button:hover{border-color:var(--accent-dim);color:var(--text);}
+  .chipadm-hint{font-size:11.5px;color:var(--faint);min-height:14px;}
+  .chipadm-hint.err{color:var(--danger);}
+  .chipadm-hint.ok{color:var(--success);}
 
   /* --------- admin control room (redesign) ---------
      Eigene, bewusst technischere Optik statt der Gäste-Felt-Karten:
@@ -2647,6 +2678,7 @@
 
               <div class="adm-tabs" id="admTabs">
                 <div class="adm-tab active" data-adm-tab="status">Status</div>
+                <div class="adm-tab" data-adm-tab="chips">Chips</div>
                 <div class="adm-tab" data-adm-tab="whitelists">Whitelists</div>
                 <div class="adm-tab" data-adm-tab="admins">Adminzugriff</div>
               </div>
@@ -2740,6 +2772,26 @@
                     <div class="hint" id="wlHintSoon"></div>
                     <div class="wl-list" id="wlListSoon"></div>
                   </div>
+                </div>
+              </div>
+
+              <!-- ===== Reiter: Chips ===== -->
+              <div class="adm-panel" id="adm-panel-chips">
+                <div class="adm-card wide" data-accent="gold">
+                  <div class="adm-card-head">
+                    <div class="adm-card-icon">
+                      <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>
+                    </div>
+                    <div class="adm-card-title">Chips verwalten</div>
+                  </div>
+                  <p class="adm-card-note">Suche einen Spieler über den Benutzernamen und passe seinen Punktestand an. Funktioniert auch für dein eigenes Konto — Änderungen wirken sofort.</p>
+                  <div class="wl-add-row">
+                    <input id="chipSearchInput" type="text" placeholder="Benutzername suchen…">
+                    <button type="button" id="chipSearchBtn">Suchen</button>
+                  </div>
+                  <div class="hint" id="chipSearchHint"></div>
+                  <button type="button" class="adm-ghost-btn" id="chipSelfBtn" style="margin-top:10px;">Meinen eigenen Account bearbeiten</button>
+                  <div id="chipSearchResults" class="chipadm-list"></div>
                 </div>
               </div>
 
@@ -5437,6 +5489,140 @@
     hint.textContent = 'Admin-Zugriff erteilt.';
     showToast('Admin-Zugriff erteilt.');
     await loadAdminList();
+  });
+
+  // --- Admin: Chips für beliebige Spieler (inkl. sich selbst) anpassen ---
+  // Läuft serverseitig über die RPC-Funktion admin_adjust_chips, die selbst prüft,
+  // ob der Aufrufer Admin ist (siehe SQL, das dem Nutzer separat mitgeteilt wurde).
+  // So funktioniert es unabhängig von RLS-Policies auf der profiles-Tabelle.
+  function chipadmRowHTML(user){
+    const isSelf = user.id === currentUserId;
+    return `
+      <div class="chipadm-row" data-uid="${user.id}">
+        <div class="chipadm-top">
+          ${friendAvatarHTML(user.name || user.username)}
+          <div class="chipadm-info">
+            <div class="chipadm-uname">@${user.username || '—'}${isSelf ? '<span class="chipadm-self-tag">DU</span>' : ''}</div>
+            <div class="chipadm-balance">Aktuell: <b class="chipadm-current">${(user.chips || 0).toLocaleString('de-DE')}</b> Punkte</div>
+          </div>
+        </div>
+        <div class="chipadm-quick">
+          <button type="button" data-quick="1000">+1.000</button>
+          <button type="button" data-quick="5000">+5.000</button>
+          <button type="button" data-quick="25000">+25.000</button>
+          <button type="button" data-quick="100000">+100.000</button>
+          <button type="button" data-quick="-1000">−1.000</button>
+          <button type="button" data-quick="-5000">−5.000</button>
+        </div>
+        <div class="chipadm-actions">
+          <input type="number" class="chipadm-amount" placeholder="Betrag" step="1">
+          <button type="button" class="fr-btn primary" data-action="add">Hinzufügen</button>
+          <button type="button" class="fr-btn" data-action="sub">Abziehen</button>
+          <button type="button" class="fr-btn" data-action="set">Auf Wert setzen</button>
+        </div>
+        <div class="chipadm-hint"></div>
+      </div>`;
+  }
+
+  async function chipadmApply(rowEl, targetUserId, amount, mode){
+    const hint = rowEl.querySelector('.chipadm-hint');
+    hint.textContent = ''; hint.className = 'chipadm-hint';
+    if(!Number.isFinite(amount)){
+      hint.textContent = 'Bitte eine gültige Zahl eingeben.';
+      hint.classList.add('err');
+      return;
+    }
+    const rpcAmount = mode === 'sub' ? -Math.abs(amount) : amount;
+    rowEl.querySelectorAll('button').forEach(b => b.disabled = true);
+    const { data, error } = await supabaseClient.rpc('admin_adjust_chips', {
+      target_user_id: targetUserId,
+      amount: rpcAmount,
+      set_absolute: mode === 'set'
+    });
+    rowEl.querySelectorAll('button').forEach(b => b.disabled = false);
+    if(error){
+      hint.textContent = error.message;
+      hint.classList.add('err');
+      return;
+    }
+    const newChips = data && (data.chips ?? data[0]?.chips);
+    rowEl.querySelector('.chipadm-current').textContent = (newChips || 0).toLocaleString('de-DE');
+    rowEl.querySelector('.chipadm-amount').value = '';
+    hint.textContent = 'Gespeichert.';
+    hint.classList.add('ok');
+    showToast('Chips aktualisiert.');
+    // Wenn es das eigene Konto ist, sofort überall im UI nachziehen.
+    if(targetUserId === currentUserId && currentProfile){
+      currentProfile.chips = newChips || 0;
+      bjSyncBalanceDisplay();
+      updateProfileConsole();
+      renderRailBadges();
+    }
+  }
+
+  function chipadmWireRow(rowEl){
+    const targetUserId = rowEl.dataset.uid;
+    rowEl.querySelectorAll('[data-quick]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const delta = parseInt(btn.dataset.quick, 10);
+        chipadmApply(rowEl, targetUserId, Math.abs(delta), delta < 0 ? 'sub' : 'add');
+      });
+    });
+    rowEl.querySelector('[data-action="add"]').addEventListener('click', () => {
+      const amount = parseInt(rowEl.querySelector('.chipadm-amount').value, 10);
+      chipadmApply(rowEl, targetUserId, amount, 'add');
+    });
+    rowEl.querySelector('[data-action="sub"]').addEventListener('click', () => {
+      const amount = parseInt(rowEl.querySelector('.chipadm-amount').value, 10);
+      chipadmApply(rowEl, targetUserId, amount, 'sub');
+    });
+    rowEl.querySelector('[data-action="set"]').addEventListener('click', () => {
+      const amount = parseInt(rowEl.querySelector('.chipadm-amount').value, 10);
+      chipadmApply(rowEl, targetUserId, amount, 'set');
+    });
+  }
+
+  async function chipadmSearch(term){
+    const results = document.getElementById('chipSearchResults');
+    const hint = document.getElementById('chipSearchHint');
+    hint.textContent = '';
+    if(!term){
+      results.innerHTML = '';
+      return;
+    }
+    const { data, error } = await supabaseClient.rpc('admin_lookup_chips', { search_term: term });
+    if(error){
+      hint.textContent = error.message;
+      results.innerHTML = '';
+      return;
+    }
+    if(!data || !data.length){
+      results.innerHTML = '';
+      hint.textContent = 'Kein Spieler gefunden.';
+      return;
+    }
+    results.innerHTML = data.map(chipadmRowHTML).join('');
+    results.querySelectorAll('.chipadm-row').forEach(chipadmWireRow);
+  }
+
+  document.getElementById('chipSearchBtn').addEventListener('click', () => {
+    chipadmSearch(document.getElementById('chipSearchInput').value.trim());
+  });
+  document.getElementById('chipSearchInput').addEventListener('keydown', e => {
+    if(e.key === 'Enter') chipadmSearch(document.getElementById('chipSearchInput').value.trim());
+  });
+  document.getElementById('chipSelfBtn').addEventListener('click', () => {
+    if(!currentProfile || !currentUserId) return;
+    const results = document.getElementById('chipSearchResults');
+    document.getElementById('chipSearchHint').textContent = '';
+    document.getElementById('chipSearchInput').value = '';
+    results.innerHTML = chipadmRowHTML({
+      id: currentUserId,
+      username: currentProfile.username,
+      name: currentProfile.name,
+      chips: currentProfile.chips
+    });
+    results.querySelectorAll('.chipadm-row').forEach(chipadmWireRow);
   });
 
   function openSettings(email){
