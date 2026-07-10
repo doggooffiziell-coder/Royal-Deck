@@ -146,7 +146,7 @@
   /* --- HUD-Rail: alles oben rechts in einer durchgehenden Glas-Leiste,
      getrennt durch feine Gold-Trennlinien statt einzelner Boxen --- */
   .hud-rail{
-    display:flex;align-items:stretch;gap:0;padding:4px;border-radius:18px;
+    display:flex;align-items:stretch;gap:0;padding:5px;border-radius:18px;
     background:linear-gradient(180deg,rgba(24,40,30,.85),rgba(10,18,14,.92));
     border:1px solid var(--border-soft);
     box-shadow:inset 0 0 0 1px rgba(212,175,106,.06),inset 0 1px 0 rgba(255,255,255,.03),0 10px 26px rgba(0,0,0,.4);
@@ -154,32 +154,33 @@
   .hud-divider{width:1px;align-self:stretch;margin:6px 3px;flex-shrink:0;
     background:linear-gradient(180deg,transparent,rgba(212,175,106,.28),transparent);}
 
+  /* Status-Kapsel: Level-Ring + Chips in einem Element, der Ring zeigt live den
+     XP-Fortschritt zum nächsten Level — dieselbe Sprache wie der Avatar-Ring. */
   .points-chip{
-    display:flex;align-items:center;gap:9px;padding:5px 14px 5px 6px;border-radius:14px;cursor:default;
-    transition:.18s;
+    display:flex;align-items:center;gap:10px;padding:5px 15px 5px 5px;border-radius:16px;cursor:default;
+    transition:.18s;position:relative;
   }
-  .points-chip:hover{background:rgba(212,175,106,.07);}
+  .points-chip:hover{background:rgba(212,175,106,.08);}
   .points-chip .chip-coin{
-    width:28px;height:28px;border-radius:50%;flex-shrink:0;position:relative;
-    background:repeating-conic-gradient(var(--accent-hi) 0deg 15deg,var(--accent-dim) 15deg 30deg);
-    box-shadow:0 0 0 2px var(--panel),0 0 0 3px rgba(212,175,106,.35),0 0 10px rgba(212,175,106,.2);
+    width:32px;height:32px;border-radius:50%;flex-shrink:0;position:relative;box-sizing:border-box;padding:2.5px;
+    background:conic-gradient(var(--accent-hi) calc(var(--ring-pct,35) * 1%),rgba(212,175,106,.16) 0);
     display:flex;align-items:center;justify-content:center;
-    animation:chipSpin 14s linear infinite;
   }
-  @keyframes chipSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
   .points-chip .chip-coin-inner{
-    width:19px;height:19px;border-radius:50%;
+    width:100%;height:100%;border-radius:50%;
     background:radial-gradient(circle at 34% 30%,var(--accent-hi),var(--accent) 65%,var(--accent-dim));
     display:flex;align-items:center;justify-content:center;
+    box-shadow:0 0 0 2px var(--panel);
   }
-  .points-chip .chip-coin-inner svg{width:11px;height:11px;fill:var(--accent-ink);}
-  .points-chip .chip-text{display:flex;flex-direction:column;line-height:1.2;gap:1px;}
+  .points-chip .chip-coin-inner svg{width:12px;height:12px;fill:var(--accent-ink);}
+  .points-chip .chip-text{display:flex;flex-direction:column;line-height:1.25;gap:2px;}
   .points-chip .chip-level{font-size:11.5px;font-weight:700;color:var(--accent-hi);letter-spacing:.3px;font-family:var(--font-body);}
-  .points-chip .chip-points{font-size:11px;color:var(--muted);font-family:var(--font-mono);letter-spacing:.2px;}
+  .points-chip .chip-points{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);font-family:var(--font-mono);letter-spacing:.2px;}
+  .points-chip .chip-points svg{width:10px;height:10px;fill:var(--accent-dim);flex-shrink:0;}
 
   .hud-rail .icon-btn-wrap{display:flex;}
   .hud-rail .icon-btn{
-    width:38px;height:38px;border-radius:12px;background:transparent;display:flex;align-items:center;
+    width:40px;height:40px;border-radius:12px;background:transparent;display:flex;align-items:center;
     justify-content:center;cursor:pointer;color:var(--muted);position:relative;transition:.16s;
     border:1px solid transparent;margin:auto;
   }
@@ -192,9 +193,10 @@
   .icon-btn svg{width:18px;height:18px;fill:currentColor;}
   .badge{
     position:absolute;top:-3px;right:-3px;background:var(--danger);color:#1a0808;font-size:9px;
-    width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;
+    min-width:15px;height:15px;padding:0 3px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;
     border:2px solid var(--panel);box-shadow:0 0 6px rgba(220,80,80,.5);
   }
+  .badge.badge-gold{background:var(--accent-hi);color:var(--accent-ink);box-shadow:0 0 6px rgba(212,175,106,.5);}
 
   /* Alpha-Hinweise: dezent, aber überall dort sichtbar wo der Nutzer zuerst hinschaut */
   .alpha-tag{
@@ -1010,26 +1012,50 @@
   .mini-btn.primary:hover{background:var(--accent-hi);color:var(--accent-ink);}
   .panel-empty-list{padding:24px 16px;text-align:center;font-size:12.5px;color:var(--muted);}
   .panel-icon{
-    width:30px;height:30px;border-radius:8px;background:var(--surface-2);display:flex;align-items:center;
-    justify-content:center;flex-shrink:0;
+    width:34px;height:34px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;
+    justify-content:center;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(212,175,106,.14);
   }
-  .panel-icon svg{width:14px;height:14px;fill:var(--accent-hi);}
+  .panel-icon svg{width:15px;height:15px;fill:var(--accent-hi);}
+  .panel-type-tag{
+    display:inline-block;font-size:9px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;
+    color:var(--accent-hi);background:var(--accent-soft);border:1px solid rgba(212,175,106,.3);
+    border-radius:5px;padding:1px 6px;margin-bottom:4px;
+  }
+  .panel-item[data-type="achievement"] .panel-icon{background:rgba(212,175,106,.2);box-shadow:inset 0 0 0 1px rgba(212,175,106,.4);}
+  .panel-item[data-type="welcome"] .panel-icon{background:rgba(76,191,131,.16);box-shadow:inset 0 0 0 1px rgba(76,191,131,.35);}
+  .panel-item[data-type="welcome"] .panel-icon svg{fill:var(--success);}
+  .panel-item[data-type="welcome"] .panel-type-tag{color:var(--success);background:rgba(76,191,131,.12);border-color:rgba(76,191,131,.35);}
+  .panel-item[data-type="security"] .panel-icon{background:rgba(193,68,60,.16);box-shadow:inset 0 0 0 1px rgba(193,68,60,.35);}
+  .panel-item[data-type="security"] .panel-icon svg{fill:var(--danger);}
+  .panel-item[data-type="security"] .panel-type-tag{color:var(--danger);background:rgba(193,68,60,.12);border-color:rgba(193,68,60,.35);}
   .panel-title{font-size:12.5px;font-weight:600;color:var(--text);}
   .panel-sub{font-size:11.5px;color:var(--muted);margin-top:2px;}
   .panel-empty{padding:20px 16px;font-size:12.5px;color:var(--muted);text-align:center;line-height:1.5;}
 
   /* user-chip dropdown header */
   .dropdown .dd-head{
-    display:flex;align-items:center;gap:10px;padding:13px 14px;border-bottom:1px solid var(--border);
+    display:flex;align-items:center;gap:11px;padding:15px 15px 14px;
+    background:linear-gradient(180deg,rgba(212,175,106,.06),transparent);
+    border-bottom:1px solid var(--border);
   }
   .dropdown .dd-head .avatar{display:flex;align-items:center;
-    justify-content:center;color:var(--accent-ink);font-weight:700;font-size:14px;flex-shrink:0;}
-  .dropdown .dd-head .avatar-ring{width:42px;height:42px;border-radius:12px;}
+    justify-content:center;color:var(--accent-ink);font-weight:700;font-size:15px;flex-shrink:0;}
+  .dropdown .dd-head .avatar-ring{width:46px;height:46px;border-radius:13px;}
   .dropdown .dd-info{min-width:0;flex:1;}
-  .dropdown .dd-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .dropdown .dd-name{font-size:13.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--font-display);}
   .dropdown .dd-level{font-size:11px;color:var(--muted);margin-top:3px;font-family:var(--font-mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .dropdown .dd-menu{padding:6px;}
-  .dropdown .dd-menu div{border-radius:7px;padding:9px 10px;}
+  .dropdown .dd-menu div{border-radius:9px;padding:8px 10px;gap:11px;}
+  .dropdown .dd-menu .dd-icon-circle{
+    width:26px;height:26px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;
+    justify-content:center;flex-shrink:0;transition:.15s;
+  }
+  .dropdown .dd-menu div:hover .dd-icon-circle{background:var(--accent-soft);}
+  .dropdown .dd-menu div svg{width:13px;height:13px;}
+  .dropdown .dd-menu-divider{height:1px;background:var(--border);margin:5px 8px;}
+  .dropdown .dd-menu #logoutBtn:hover{color:var(--danger);}
+  .dropdown .dd-menu #logoutBtn:hover .dd-icon-circle{background:rgba(193,68,60,.15);}
+  .dropdown .dd-menu #logoutBtn:hover .dd-icon-circle svg{fill:var(--danger);}
 
   /* signed-out state inside notification / mail panels */
   .panel-loggedout{
@@ -2701,9 +2727,9 @@
     <div class="alpha-tag" title="Royal Deck befindet sich noch in der Alpha-Phase – es kann zu Bugs, Datenverlust oder Änderungen ohne Vorwarnung kommen.">ALPHA BUILD</div>
     <div class="top-right">
       <div class="hud-rail">
-        <div class="points-chip" id="pointsDisplay" title="Dein Level basiert auf deinen Einsätzen, nicht auf deinem Kontostand">
+        <div class="points-chip" id="pointsDisplay" title="Dein Level basiert auf deinen Einsätzen, nicht auf deinem Kontostand" style="--ring-pct:8">
           <div class="chip-coin"><div class="chip-coin-inner"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg></div></div>
-          <div class="chip-text"><span class="chip-level">Level 1</span><span class="chip-points">0 Chips</span></div>
+          <div class="chip-text"><span class="chip-level">Level 1</span><span class="chip-points"><svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 4.5 2 7.5V16.5C2 19.5 6.5 22 12 22S22 19.5 22 16.5V7.5C22 4.5 17.5 2 12 2ZM12 4C16.4 4 20 5.6 20 7.5S16.4 11 12 11 4 9.4 4 7.5 7.6 4 12 4Z"/></svg>0 Chips</span></div>
         </div>
 
         <div class="hud-divider"></div>
@@ -2729,6 +2755,7 @@
         <div class="icon-btn-wrap">
           <div class="icon-btn" id="mailBtn">
             <svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 4l-8 5-8-5V6l8 5 8-5z"/></svg>
+            <div class="badge badge-gold" id="mailBadge">0</div>
           </div>
           <div class="dropdown panel-dropdown" id="mailDropdown">
             <div class="panel-head" id="mailPanelHead">
@@ -5366,7 +5393,28 @@
 
   const ADMIN_EMAIL = 'doggo.offiziell@gmail.com';
   const DEFAULT_NOTIF_ICON = '<svg viewBox="0 0 24 24"><path d="M12 22a2 2 0 002-2h-4a2 2 0 002 2zm6-6v-5a6 6 0 10-12 0v5l-2 2v1h16v-1z"/></svg>';
-  let notifications = []; // gemergte Liste: { id, title, sub, body, created_at, read, archived }
+
+  // Jede Zeile in "notifications" hat jetzt ein "type"-Feld. Damit wird entschieden,
+  // ob ein Eintrag unter Benachrichtigungen (Server-News, Erfolge, Willkommen, Sicherheit)
+  // oder unter Nachrichten (persönliche Nachrichten, type = 'message') auftaucht.
+  // WICHTIG: Falls die Spalte "type" in Supabase noch nicht existiert, in der SQL-Konsole:
+  //   alter table public.notifications add column if not exists type text not null default 'announcement';
+  const NOTIF_TYPE_META = {
+    announcement: { label:'Ankündigung',
+      icon:'<svg viewBox="0 0 24 24"><path d="M3 11l18-7-7 18-2-8z"/></svg>' },
+    achievement: { label:'Erfolg',
+      icon:'<svg viewBox="0 0 24 24"><path d="M5 16L3 5l5.5 4L12 3l3.5 6L21 5l-2 11H5m0 2h14v2H5v-2z"/></svg>' },
+    welcome: { label:'Willkommen',
+      icon:'<svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 8 1.3 8 4v2H4v-2c0-2.7 5.3-4 8-4zm0-2a4 4 0 100-8 4 4 0 000 8z"/></svg>' },
+    security: { label:'Sicherheit',
+      icon:'<svg viewBox="0 0 24 24"><path d="M12 2L4 5v6c0 5.5 3.8 10.7 8 12 4.2-1.3 8-6.5 8-12V5z"/></svg>' },
+    message: { label:'Nachricht',
+      icon:'<svg viewBox="0 0 24 24"><path d="M4 4h16v12H5.2L4 17.2zm2 3v2h12V7zm0 4v2h8v-2z"/></svg>' },
+  };
+  function notifTypeMeta(type){ return NOTIF_TYPE_META[type] || NOTIF_TYPE_META.announcement; }
+
+  let notifications = []; // Benachrichtigungen: alles außer type = 'message' — { id, title, sub, body, type, created_at, read, archived }
+  let messages = []; // Nachrichten: nur type = 'message'
   let currentUserId = null;
   let currentUserEmail = null;
   let isAdmin = false;
@@ -5399,13 +5447,13 @@
   }
 
   async function loadNotifications(){
-    if(!currentUserId){ notifications = []; updateNotifBadge(); return; }
+    if(!currentUserId){ notifications = []; messages = []; updateNotifBadge(); updateMailBadge(); return; }
     const { data: allNotifs, error: e1 } = await supabaseClient
       .from('notifications')
-      .select('id, title, sub, body, created_at, target_user_id')
+      .select('id, title, sub, body, type, created_at, target_user_id')
       .or(`target_user_id.is.null,target_user_id.eq.${currentUserId}`)
       .order('created_at', { ascending:false });
-    if(e1){ console.error(e1); notifications = []; updateNotifBadge(); return; }
+    if(e1){ console.error(e1); notifications = []; messages = []; updateNotifBadge(); updateMailBadge(); return; }
 
     const { data: reads, error: e2 } = await supabaseClient
       .from('notification_reads')
@@ -5416,20 +5464,30 @@
     const readMap = {};
     (reads || []).forEach(r => { readMap[r.notification_id] = r; });
 
-    notifications = (allNotifs || [])
-      .map(n => ({
-        id: n.id,
-        title: n.title,
-        sub: n.sub,
-        body: n.body,
-        date: formatNotifDate(n.created_at),
-        icon: DEFAULT_NOTIF_ICON,
-        read: !!readMap[n.id]?.read,
-        archived: !!readMap[n.id]?.archived,
-      }))
+    const merged = (allNotifs || [])
+      .map(n => {
+        const type = n.type || 'announcement';
+        return {
+          id: n.id,
+          title: n.title,
+          sub: n.sub,
+          body: n.body,
+          type,
+          date: formatNotifDate(n.created_at),
+          icon: notifTypeMeta(type).icon,
+          read: !!readMap[n.id]?.read,
+          archived: !!readMap[n.id]?.archived,
+        };
+      })
       .filter(n => !n.archived);
 
+    // Nachrichten (persönlich, type = 'message') laufen jetzt getrennt von den
+    // Server-Benachrichtigungen (Ankündigungen, Erfolge, Willkommen, Sicherheit).
+    notifications = merged.filter(n => n.type !== 'message');
+    messages = merged.filter(n => n.type === 'message');
+
     updateNotifBadge();
+    updateMailBadge();
   }
 
   async function setNotifReadState(notificationId, patch){
@@ -5444,6 +5502,15 @@
     if(!badge) return;
     if(!currentProfile){ badge.style.display = 'none'; return; }
     const unread = notifications.filter(n => !n.read).length;
+    if(unread > 0){ badge.textContent = unread; badge.style.display = 'flex'; }
+    else { badge.style.display = 'none'; }
+  }
+
+  function updateMailBadge(){
+    const badge = document.getElementById('mailBadge');
+    if(!badge) return;
+    if(!currentProfile){ badge.style.display = 'none'; return; }
+    const unread = messages.filter(m => !m.read).length;
     if(unread > 0){ badge.textContent = unread; badge.style.display = 'flex'; }
     else { badge.style.display = 'none'; }
   }
@@ -5577,29 +5644,30 @@
   }
 
   // Schnellvorlagen für den Admin-Broadcast — Klick füllt Titel/Kurzbeschreibung/Text vor,
-  // bleiben danach frei editierbar.
+  // bleiben danach frei editierbar. "type" bestimmt, mit welchem Icon/Tag der Eintrag
+  // später in Benachrichtigungen erscheint.
   const ADMIN_NOTIF_TEMPLATES = [
-    { id:'maintenance', label:'Wartung',
+    { id:'maintenance', label:'Wartung', type:'announcement',
       icon:'<svg viewBox="0 0 24 24"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.7 4.7C.6 7.1 1 10.1 3 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.4-.4.4-1.1 0-1.4z"/></svg>',
       title:'Geplante Wartungsarbeiten', sub:'Am Sonntag zwischen 02:00 und 04:00 Uhr',
       body:'Am Sonntag finden geplante Wartungsarbeiten statt. Die Plattform ist zwischen 02:00 und 04:00 Uhr nicht erreichbar. Wir bitten um euer Verständnis.' },
-    { id:'bonus', label:'Bonus-Aktion',
+    { id:'bonus', label:'Bonus-Aktion', type:'announcement',
       icon:'<svg viewBox="0 0 24 24"><path d="M20 6h-2.2c.1-.3.2-.6.2-1a2.5 2.5 0 00-4.5-1.5L12 5l-1.5-1.5A2.5 2.5 0 006 5c0 .4.1.7.2 1H4a2 2 0 00-2 2v2h20V8a2 2 0 00-2-2zM2 21a2 2 0 002 2h7v-9H2zm11 2h7a2 2 0 002-2v-7h-9z"/></svg>',
       title:'Neue Bonus-Aktion', sub:'20% Bonus auf deine nächste Einzahlung',
       body:'Sichere dir jetzt 20% Bonus auf deine nächste Einzahlung. Die Aktion läuft nur diese Woche, also sei schnell!' },
-    { id:'security', label:'Sicherheit',
+    { id:'security', label:'Sicherheit', type:'security',
       icon:'<svg viewBox="0 0 24 24"><path d="M12 2L4 5v6c0 5.5 3.8 10.7 8 12 4.2-1.3 8-6.5 8-12V5z"/></svg>',
       title:'Sicherheitswarnung', sub:'Ungewöhnliche Aktivität auf deinem Konto',
       body:'Wir haben ungewöhnliche Aktivitäten auf deinem Konto festgestellt. Bitte überprüfe deine Anmeldedaten und ändere dein Passwort, falls nötig.' },
-    { id:'welcome', label:'Willkommen',
+    { id:'welcome', label:'Willkommen', type:'welcome',
       icon:'<svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 8 1.3 8 4v2H4v-2c0-2.7 5.3-4 8-4zm0-2a4 4 0 100-8 4 4 0 000 8z"/></svg>',
       title:'Willkommen an Bord!', sub:'Schön, dass du da bist',
       body:'Schön, dass du da bist. Entdecke alle Funktionen und starte jetzt durch.' },
-    { id:'level', label:'Level-Update',
+    { id:'level', label:'Level-Update', type:'achievement',
       icon:'<svg viewBox="0 0 24 24"><path d="M5 16L3 5l5.5 4L12 3l3.5 6L21 5l-2 11H5zm0 2h14v2H5z"/></svg>',
       title:'Neues Level-System', sub:'Wir haben Level & Belohnungen überarbeitet',
       body:'Wir haben unser Level-System überarbeitet. Schau vorbei und sieh dir deine neuen Vorteile an.' },
-    { id:'custom', label:'Eigene',
+    { id:'custom', label:'Eigene', type:'announcement',
       icon:'<svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.8 9.94l-3.75-3.75L3 17.25zM20.7 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>',
       title:'', sub:'', body:'' }
   ];
@@ -5637,11 +5705,16 @@
     function renderPreview(){
       const t = titleInput.value.trim() || 'Titel der Benachrichtigung';
       const s = subInput.value.trim() || 'Kurzbeschreibung erscheint hier';
+      const tplType = ADMIN_NOTIF_TEMPLATES.find(x => x.id === activeTemplate)?.type || 'announcement';
+      const meta = notifTypeMeta(tplType);
       document.getElementById('acPreview').innerHTML = `
-        <div class="panel-icon">${DEFAULT_NOTIF_ICON}</div>
-        <div class="panel-text">
-          <div class="panel-title">${t}</div>
-          <div class="panel-sub">${s}</div>
+        <div class="panel-item" data-type="${tplType}" style="padding:0;cursor:default;">
+          <div class="panel-icon">${meta.icon}</div>
+          <div class="panel-text">
+            <div class="panel-type-tag">${meta.label}</div>
+            <div class="panel-title">${t}</div>
+            <div class="panel-sub">${s}</div>
+          </div>
         </div>`;
     }
 
@@ -5687,9 +5760,10 @@
       const sendBtn = document.getElementById('acSend');
       sendBtn.disabled = true;
       sendBtn.textContent = 'Sende...';
+      const tplType = ADMIN_NOTIF_TEMPLATES.find(x => x.id === activeTemplate)?.type || 'announcement';
       const { error } = await supabaseClient
         .from('notifications')
-        .insert({ title, sub: sub || null, body: bodyText, created_by: currentUserId, target_user_id: null });
+        .insert({ title, sub: sub || null, body: bodyText, type: tplType, created_by: currentUserId, target_user_id: null });
       sendBtn.disabled = false;
       sendBtn.textContent = 'Senden';
       if(error){
@@ -5739,9 +5813,10 @@
       return;
     }
     body.innerHTML = list.map(n => `
-      <div class="panel-item ${n.read ? 'read' : ''}" data-id="${n.id}">
+      <div class="panel-item ${n.read ? 'read' : ''}" data-id="${n.id}" data-type="${n.type}">
         <div class="panel-icon">${n.icon}</div>
         <div class="panel-text">
+          <div class="panel-type-tag">${notifTypeMeta(n.type).label}</div>
           <div class="panel-title">${n.title}</div>
           <div class="panel-sub">${n.sub || ''}</div>
         </div>
@@ -5763,7 +5838,22 @@
       });
       return;
     }
-    body.innerHTML = `<div class="panel-empty">Noch keine Nachrichten. Füge Freunde hinzu, um zu chatten.</div>`;
+    if(messages.length === 0){
+      body.innerHTML = `<div class="panel-empty">Noch keine Nachrichten. Füge Freunde hinzu, um zu chatten.</div>`;
+      return;
+    }
+    body.innerHTML = messages.map(m => `
+      <div class="panel-item ${m.read ? 'read' : ''}" data-id="${m.id}">
+        <div class="panel-icon">${m.icon}</div>
+        <div class="panel-text">
+          <div class="panel-title">${m.title}</div>
+          <div class="panel-sub">${m.sub || ''}</div>
+        </div>
+        ${m.read ? '' : '<div class="unread-dot"></div>'}
+      </div>`).join('');
+    body.querySelectorAll('.panel-item').forEach(el => {
+      el.addEventListener('click', () => openMessage(el.dataset.id));
+    });
   }
 
   async function openNotif(id){
@@ -5784,6 +5874,7 @@
           Zurück
         </button>
         <div class="notif-detail-icon">${n.icon}</div>
+        <div class="panel-type-tag" style="margin-bottom:8px;">${notifTypeMeta(n.type).label}</div>
         <div class="notif-detail-title">${n.title}</div>
         <div class="notif-detail-meta">${n.date}</div>
         <p class="notif-detail-body">${n.body}</p>
@@ -5804,9 +5895,46 @@
     });
   }
 
+  async function openMessage(id){
+    const m = messages.find(x => x.id === id);
+    if(!m) return;
+    if(!m.read){
+      m.read = true;
+      updateMailBadge();
+      setNotifReadState(id, { read: true });
+    }
+    const body = document.getElementById('mailBody');
+    body.innerHTML = `
+      <div class="notif-detail">
+        <button class="notif-back" id="mailBackBtn">
+          <svg viewBox="0 0 24 24"><path d="M15 4l-8 8 8 8 1.4-1.4L9.8 12l6.6-6.6z"/></svg>
+          Zurück
+        </button>
+        <div class="notif-detail-icon">${m.icon}</div>
+        <div class="notif-detail-title">${m.title}</div>
+        <div class="notif-detail-meta">${m.date}</div>
+        <p class="notif-detail-body">${m.body}</p>
+        <div class="notif-detail-actions">
+          <button class="mini-btn" id="mailArchiveBtn">Archivieren</button>
+          <button class="mini-btn primary" id="mailBackBtn2">Fertig</button>
+        </div>
+      </div>`;
+    document.getElementById('mailBackBtn').addEventListener('click', renderMailBody);
+    document.getElementById('mailBackBtn2').addEventListener('click', renderMailBody);
+    document.getElementById('mailArchiveBtn').addEventListener('click', async () => {
+      const idx = messages.findIndex(x => x.id === id);
+      if(idx > -1) messages.splice(idx, 1);
+      updateMailBadge();
+      renderMailBody();
+      showToast('Nachricht archiviert.');
+      await setNotifReadState(id, { read: true, archived: true });
+    });
+  }
+
   renderNotifList();
   renderMailBody();
   updateNotifBadge();
+  updateMailBadge();
 
   // --- Notification & mail panel toggles ---
   function setupPanelToggle(btnId, dropdownId, onOpen){
@@ -6477,7 +6605,8 @@
     pointsDisplay.style.display = 'flex';
     const level = getLevel();
     const ringPct = Math.max(4, ((getXp() % XP_PER_LEVEL) / XP_PER_LEVEL) * 100);
-    pointsDisplay.innerHTML = `<div class="chip-coin"><div class="chip-coin-inner"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg></div></div><div class="chip-text"><span class="chip-level">Level ${level}</span><span class="chip-points">${(profile.chips||0).toLocaleString('de-DE')} Chips</span></div>`;
+    pointsDisplay.style.setProperty('--ring-pct', ringPct);
+    pointsDisplay.innerHTML = `<div class="chip-coin"><div class="chip-coin-inner"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg></div></div><div class="chip-text"><span class="chip-level">Level ${level}</span><span class="chip-points"><svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 4.5 2 7.5V16.5C2 19.5 6.5 22 12 22S22 19.5 22 16.5V7.5C22 4.5 17.5 2 12 2ZM12 4C16.4 4 20 5.6 20 7.5S16.4 11 12 11 4 9.4 4 7.5 7.6 4 12 4Z"/></svg>${(profile.chips||0).toLocaleString('de-DE')} Chips</span></div>`;
     const initial = profile.name.charAt(0).toUpperCase();
     const chips = profile.chips || 0;
     const avatarPreset = getPreset(avatarDataUrl);
@@ -6513,11 +6642,12 @@
           </div>
           <div class="dd-menu">
             <div id="openSettingsBtn">
-              <svg viewBox="0 0 24 24"><path d="M19.4 13a7.9 7.9 0 000-2l2.1-1.6-2-3.4-2.5 1a8 8 0 00-1.7-1L14.9 3H9.1l-.4 2.9a8 8 0 00-1.7 1l-2.5-1-2 3.4L4.6 11a7.9 7.9 0 000 2l-2.1 1.6 2 3.4 2.5-1a8 8 0 001.7 1l.4 2.9h5.8l.4-2.9a8 8 0 001.7-1l2.5 1 2-3.4z"/></svg>
+              <div class="dd-icon-circle"><svg viewBox="0 0 24 24"><path d="M19.4 13a7.9 7.9 0 000-2l2.1-1.6-2-3.4-2.5 1a8 8 0 00-1.7-1L14.9 3H9.1l-.4 2.9a8 8 0 00-1.7 1l-2.5-1-2 3.4L4.6 11a7.9 7.9 0 000 2l-2.1 1.6 2 3.4 2.5-1a8 8 0 001.7 1l.4 2.9h5.8l.4-2.9a8 8 0 001.7-1l2.5 1 2-3.4z" fill="var(--accent-hi)"/></svg></div>
               Einstellungen
             </div>
+            <div class="dd-menu-divider"></div>
             <div id="logoutBtn">
-              <svg viewBox="0 0 24 24"><path d="M16 13v-2H7V8l-5 4 5 4v-3zM20 3H10v2h10v14H10v2h10a2 2 0 002-2V5a2 2 0 00-2-2z"/></svg>
+              <div class="dd-icon-circle"><svg viewBox="0 0 24 24"><path d="M16 13v-2H7V8l-5 4 5 4v-3zM20 3H10v2h10v14H10v2h10a2 2 0 002-2V5a2 2 0 00-2-2z" fill="var(--muted)"/></svg></div>
               Abmelden
             </div>
           </div>
