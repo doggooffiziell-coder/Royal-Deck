@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Royal Deck – Casino Spiel</title>
+<title>Royal Deck – Casino Spiel (Alpha)</title>
 <meta name="description" content="🃏 Poker, Blackjack & mehr am virtuellen Tisch. Schnapp dir deinen Platz – kein Echtgeld, nur pure Spannung. ♠️♣️">
 <meta property="og:title" content="Royal Deck">
 <meta property="og:description" content="🃏 Poker, Blackjack & mehr am virtuellen Tisch. Schnapp dir deinen Platz – kein Echtgeld, nur pure Spannung. ♠️♣️">
@@ -194,6 +194,22 @@
     position:absolute;top:-3px;right:-3px;background:var(--danger);color:#1a0808;font-size:9px;
     width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;
     border:2px solid var(--panel);box-shadow:0 0 6px rgba(220,80,80,.5);
+  }
+
+  /* Alpha-Hinweise: dezent, aber überall dort sichtbar wo der Nutzer zuerst hinschaut */
+  .alpha-tag{
+    display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;
+    font-family:var(--font-mono);font-size:9.5px;font-weight:600;letter-spacing:.6px;
+    color:var(--accent-hi);background:var(--accent-soft);border:1px solid rgba(212,175,106,.35);
+    white-space:nowrap;
+  }
+  .alpha-tag:before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent-hi);
+    box-shadow:0 0 5px var(--accent-hi);}
+  .brand-alpha-badge{
+    position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);
+    background:linear-gradient(180deg,var(--accent-hi),var(--accent-dim));color:var(--accent-ink);
+    font-family:var(--font-mono);font-size:7px;font-weight:700;letter-spacing:.4px;
+    padding:1px 5px;border-radius:5px;box-shadow:0 0 6px rgba(212,175,106,.5);z-index:2;
   }
 
   .avatar{
@@ -2631,8 +2647,9 @@
 </div>
 
 <div class="sidebar">
-  <div class="brand" title="Royal Table">
+  <div class="brand" title="Royal Table – Alpha Build" style="position:relative;">
     <svg viewBox="0 0 24 24"><path fill="var(--accent-hi)" d="M12 2l2.6 5.9 6.4.6-4.8 4.3 1.5 6.3L12 15.8 6.3 19.1l1.5-6.3-4.8-4.3 6.4-.6z" opacity="0.9"/></svg>
+    <div class="brand-alpha-badge">ALPHA</div>
   </div>
   <div class="nav-item active">
     <svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9h-5v-6H11v6H6v-9H3z"/></svg>
@@ -2678,6 +2695,7 @@
       <svg viewBox="0 0 24 24"><path d="M15.5 14h-.8l-.3-.3a6.5 6.5 0 10-.7.7l.3.3v.8l5 5L20.5 19zm-6 0a4.5 4.5 0 110-9 4.5 4.5 0 010 9z"/></svg>
       <input placeholder="Spiele, Erlebnisse suchen">
     </div>
+    <div class="alpha-tag" title="Royal Deck befindet sich noch in der Alpha-Phase – es kann zu Bugs, Datenverlust oder Änderungen ohne Vorwarnung kommen.">ALPHA BUILD</div>
     <div class="top-right">
       <div class="hud-rail">
         <div class="points-chip" id="pointsDisplay" title="Dein Level basiert auf deinen Einsätzen, nicht auf deinem Kontostand">
