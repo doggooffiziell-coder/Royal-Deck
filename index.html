@@ -330,6 +330,52 @@
   .section-head a svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;transition:.15s;}
   .section-head a:hover svg{transform:translateX(2px);}
 
+  /* ================= Entdecken — Katalog-Seite mit "Zur Bibliothek
+     hinzufügen"-Buttons pro Karte ================= */
+  .discover-hero{
+    position:relative;overflow:hidden;border-radius:22px;padding:34px 32px;margin-bottom:8px;
+    background:
+      radial-gradient(ellipse 700px 400px at 85% -20%, rgba(212,175,106,.16), transparent 60%),
+      linear-gradient(150deg,var(--felt-hi),var(--felt));
+    border:1px solid rgba(212,175,106,.22);
+  }
+  .discover-hero-eyebrow{
+    display:inline-flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;
+    letter-spacing:2px;text-transform:uppercase;color:var(--accent-hi);margin-bottom:14px;
+  }
+  .discover-hero-eyebrow svg{width:14px;height:14px;fill:var(--accent-hi);}
+  .discover-hero h1{font-family:var(--font-display);font-style:italic;font-weight:600;font-size:30px;color:var(--text);margin-bottom:10px;}
+  .discover-hero p{font-size:13.5px;color:var(--muted);max-width:520px;line-height:1.55;}
+
+  .discover-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;}
+  .discover-card{
+    position:relative;overflow:hidden;border-radius:18px;min-height:210px;
+    background:linear-gradient(150deg,var(--c1,#182b21),var(--c2,#24402e));
+    border:1px solid rgba(212,175,106,.2);display:flex;flex-direction:column;justify-content:space-between;
+    padding:20px 22px;transition:.2s;
+  }
+  .discover-card:hover{border-color:rgba(212,175,106,.4);transform:translateY(-2px);box-shadow:0 14px 28px rgba(0,0,0,.35);}
+  .discover-card-suit{position:absolute;top:12px;right:16px;font-family:var(--font-display);font-style:italic;font-size:26px;color:rgba(255,255,255,.16);}
+  .discover-card-eyebrow{font-family:var(--font-mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(242,236,221,.55);margin-bottom:6px;}
+  .discover-card h3{font-family:var(--font-display);font-style:italic;font-size:21px;font-weight:600;color:var(--text);margin-bottom:8px;}
+  .discover-card p{font-size:12.5px;color:rgba(242,236,221,.72);line-height:1.5;max-width:260px;}
+  .discover-card-add-btn{
+    margin-top:16px;align-self:flex-start;display:inline-flex;align-items:center;gap:7px;
+    padding:9px 16px;border-radius:9px;border:1px solid rgba(212,175,106,.35);
+    background:rgba(10,18,14,.55);color:var(--accent-hi);font-size:12.5px;font-weight:600;
+    font-family:var(--font-body);cursor:pointer;transition:.15s;backdrop-filter:blur(2px);
+  }
+  .discover-card-add-btn:hover{background:var(--accent-hi);color:var(--accent-ink);border-color:var(--accent-hi);}
+  .discover-card-add-btn svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+  .discover-card-add-btn.added{background:rgba(76,191,131,.14);border-color:rgba(76,191,131,.4);color:var(--success);}
+  .discover-card-add-btn.added:hover{background:rgba(76,191,131,.22);color:var(--success);}
+  .discover-card.locked{
+    background:var(--surface);border-color:var(--border);align-items:center;justify-content:center;text-align:center;gap:6px;
+  }
+  .discover-card.locked svg{width:26px;height:26px;fill:var(--faint);opacity:.6;margin-bottom:4px;}
+  .discover-card-locked-label{font-family:var(--font-display);font-style:italic;font-size:14px;color:var(--faint);}
+  .discover-card-locked-sub{font-family:var(--font-mono);font-size:10.5px;color:var(--faint);}
+
   /* ================= Spieltische — komplette Neufassung =================
      Breite, quer liegende "Tisch"-Kacheln statt kleiner Quadrate: mehr Vorschau
      direkt auf der Karte (Titel, Beschreibung, CTA), ein per Mausbewegung
@@ -3548,6 +3594,25 @@
     <div class="row" id="row1"></div>
   </div>
 
+  <div class="content" id="discoverView" style="display:none;">
+    <div class="discover-hero">
+      <div class="discover-hero-eyebrow">
+        <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-6h2zm0-8h-2V7h2z"/></svg>
+        Entdecken
+      </div>
+      <h1>Erweitere deine Bibliothek</h1>
+      <p>Alle Tische von Royal Table an einem Ort – füg dir die Spiele hinzu, die du am Tisch haben willst.</p>
+    </div>
+
+    <div class="section-head">
+      <div class="section-head-text">
+        <div class="section-eyebrow">Alle Spiele</div>
+        <h2>Casino Katalog</h2>
+      </div>
+    </div>
+    <div class="discover-grid" id="discoverGrid"></div>
+  </div>
+
   <div class="content" id="friendsView" style="display:none;">
     <div class="friends-wrap">
       <div class="friends-head">
@@ -3878,6 +3943,77 @@
   const heroStatTablesEl = document.getElementById('heroStatTables');
   if(heroStatTablesEl) heroStatTablesEl.textContent = games.length;
 
+  // ---- Bibliothek (Entdecken -> "Zur Bibliothek hinzufügen") ----
+  // Merkt sich pro Nutzer, welche Spiele hinzugefügt wurden. Läuft lokal
+  // über localStorage, da es sich nur um eine Merkliste ohne Serverzwang handelt.
+  function libraryStorageKey(){
+    return 'rdLibrary_' + (currentUserId || 'guest');
+  }
+  function getLibrary(){
+    try { return JSON.parse(localStorage.getItem(libraryStorageKey())) || []; }
+    catch(e){ return []; }
+  }
+  function saveLibrary(list){
+    try { localStorage.setItem(libraryStorageKey(), JSON.stringify(list)); } catch(e){}
+  }
+  function isInLibrary(name){
+    return getLibrary().includes(name);
+  }
+  function toggleLibrary(name, btn){
+    const list = getLibrary();
+    const idx = list.indexOf(name);
+    const nowAdded = idx === -1;
+    if(nowAdded) list.push(name); else list.splice(idx, 1);
+    saveLibrary(list);
+    if(btn) setAddBtnState(btn, nowAdded);
+    showToast(nowAdded ? `${name} zur Bibliothek hinzugefügt` : `${name} aus der Bibliothek entfernt`);
+  }
+  function setAddBtnState(btn, added){
+    btn.classList.toggle('added', added);
+    btn.innerHTML = added
+      ? `<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>In Bibliothek`
+      : `<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Zur Bibliothek hinzufügen`;
+  }
+
+  function renderDiscover(){
+    const el = document.getElementById('discoverGrid');
+    if(!el) return;
+    el.innerHTML = '';
+    games.forEach(g => {
+      const card = document.createElement('div');
+      card.className = 'discover-card';
+      card.style.setProperty('--c1', g.c1);
+      card.style.setProperty('--c2', g.c2);
+      card.innerHTML = `
+        <div>
+          <div class="discover-card-suit">${g.suit}</div>
+          <div class="discover-card-eyebrow">Casino-Tisch</div>
+          <h3>${g.name}</h3>
+          <p>${g.desc}</p>
+        </div>
+        <button type="button" class="discover-card-add-btn"></button>
+      `;
+      const btn = card.querySelector('.discover-card-add-btn');
+      setAddBtnState(btn, isInLibrary(g.name));
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        toggleLibrary(g.name, btn);
+      });
+      card.addEventListener('click', () => openGame(g.name));
+      el.appendChild(card);
+    });
+    for(let i = 0; i < PLACEHOLDER_SLOTS; i++){
+      const card = document.createElement('div');
+      card.className = 'discover-card locked';
+      card.innerHTML = `
+        <svg viewBox="0 0 24 24"><path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-9h-1V6a5 5 0 00-10 0v2H6a2 2 0 00-2 2v9a2 2 0 002 2h12a2 2 0 002-2v-9a2 2 0 00-2-2zM9 6a3 3 0 016 0v2H9z"/></svg>
+        <div class="discover-card-locked-label">Bald verfügbar</div>
+        <div class="discover-card-locked-sub">Neues Spiel folgt</div>
+      `;
+      el.appendChild(card);
+    }
+  }
+
 
   // --- Toast (kurzes Feedback für Aktionen ohne eigene Ansicht) ---
   let toastTimer = null;
@@ -3980,9 +4116,12 @@
     if(e.key === 'Escape' && gloOverlay.classList.contains('open')) gloClose();
   });
 
-  // Hero-CTA scrollt zu den Spielen
+  // Hero-CTA führt direkt zur Entdecken-Seite
   document.getElementById('heroCta').addEventListener('click', () => {
-    document.getElementById('gamesSection').scrollIntoView({ behavior:'smooth', block:'start' });
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const discoverNav = [...document.querySelectorAll('.nav-item')].find(n => n.querySelector('span')?.textContent === 'Entdecken');
+    if(discoverNav) discoverNav.classList.add('active');
+    switchMainView('discover');
   });
   document.getElementById('allGamesLink').addEventListener('click', () => {
     document.getElementById('gamesSection').scrollIntoView({ behavior:'smooth', block:'start' });
@@ -3991,6 +4130,7 @@
   // Sidebar-Navigation: Home und Freunde sind gebaut, restliche Bereiche folgen später
   function switchMainView(view){
     const home = document.getElementById('homeView');
+    const discover = document.getElementById('discoverView');
     const friends = document.getElementById('friendsView');
     const blackjack = document.getElementById('blackjackView');
     const slot = document.getElementById('slotView');
@@ -3998,8 +4138,16 @@
     blackjack.style.display = 'none';
     slot.style.display = 'none';
     if(view !== 'blackjack') bjStopMusic();
-    if(view === 'friends'){
+    if(view === 'discover'){
       home.style.display = 'none';
+      friends.style.display = 'none';
+      rewards.style.display = 'none';
+      discover.style.display = '';
+      discover.scrollTo({ top:0 });
+      renderDiscover();
+    } else if(view === 'friends'){
+      home.style.display = 'none';
+      discover.style.display = 'none';
       rewards.style.display = 'none';
       friends.style.display = '';
       friends.scrollTo({ top:0 });
@@ -4011,18 +4159,21 @@
       loadFriendsData();
     } else if(view === 'blackjack'){
       home.style.display = 'none';
+      discover.style.display = 'none';
       friends.style.display = 'none';
       rewards.style.display = 'none';
       blackjack.style.display = '';
       blackjack.scrollTo({ top:0 });
     } else if(view === 'slot'){
       home.style.display = 'none';
+      discover.style.display = 'none';
       friends.style.display = 'none';
       rewards.style.display = 'none';
       slot.style.display = '';
       slot.scrollTo({ top:0 });
     } else if(view === 'rewards'){
       home.style.display = 'none';
+      discover.style.display = 'none';
       friends.style.display = 'none';
       rewards.style.display = '';
       rewards.scrollTo({ top:0 });
@@ -4033,6 +4184,7 @@
       }
       refreshDailyBonusUI();
     } else {
+      discover.style.display = 'none';
       friends.style.display = 'none';
       rewards.style.display = 'none';
       home.style.display = '';
@@ -4047,6 +4199,8 @@
       const label = item.querySelector('span')?.textContent;
       if(label === 'Home'){
         switchMainView('home');
+      } else if(label === 'Entdecken'){
+        switchMainView('discover');
       } else if(label === 'Freunde'){
         switchMainView('friends');
       } else if(label === 'Belohnungen'){
