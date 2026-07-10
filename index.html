@@ -2375,7 +2375,7 @@
     </div>
     <div class="top-right">
       <div class="hud-rail">
-        <div class="points-chip" id="pointsDisplay" title="Dein Level basiert auf deinen Chips">
+        <div class="points-chip" id="pointsDisplay" title="Dein Level basiert auf deinen Einsätzen, nicht auf deinem Kontostand">
           <div class="chip-coin"><div class="chip-coin-inner"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg></div></div>
           <div class="chip-text"><span class="chip-level">Level 1</span><span class="chip-points">0 Chips</span></div>
         </div>
@@ -3739,15 +3739,10 @@
     return cards.length === 2 && bjHandValue(cards) === 21;
   }
 
-  // Aktualisiert ALLE Chip- und Level-Anzeigen im Interface aus currentProfile.chips.
-  // Wichtig: das ist die einzige Stelle, die den Level-Wert live nachzieht — vorher
-  // wurde beim Gewinnen/Verlieren (Spiele) und beim Admin-Chip-Ausgleich nur der
-  // Punktestand aktualisiert, nicht aber "Level X" in der Kopfzeile, im Nutzer-Menü
-  // und im Dropdown. Dadurch konnte der angezeigte Level nach dem Entfernen
-  // "gecheateter" Chips hängen bleiben, weil er erst beim nächsten vollständigen
-  // Neuladen (renderAuthArea) neu berechnet wurde. Jetzt läuft jede Chip-Änderung
-  // (Gewinn, Verlust, Admin-Korrektur) über diese Funktion, sodass Level immer exakt
-  // Math.floor(chips / 100) entspricht — in beide Richtungen.
+  // Aktualisiert ALLE Chip- und Level-Anzeigen im Interface. Chips kommen aus
+  // currentProfile.chips, das Level dagegen aus der separaten XP (siehe getLevel()
+  // weiter unten) — beide laufen über diese eine Funktion, damit Kopfzeile,
+  // Nutzer-Menü und Dropdown immer synchron sind.
   // ---- Levelbelohnungen ----
   // Einmalige Chip-Boni bei bestimmten Levels. Nutzt localStorage zum Merken,
   // welche Stufen schon abgeholt wurden (kein zusätzliches Supabase-Feld nötig,
@@ -3764,6 +3759,40 @@
   ];
   const LEVEL_REWARD_ICON = '<svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>';
   const LEVEL_CHECK_ICON = '<svg viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>';
+
+  // ---- XP / Level-System — komplett getrennt vom Chip-Kontostand ----
+  // Vorher wurde das Level direkt aus den Chips berechnet (Level = Chips / 100).
+  // Das führte dazu, dass das Abholen des täglichen Bonus (+10.000 Chips) oder
+  // eine Admin-Korrektur sofort mehrere Level auf einmal gab, obwohl gar nicht
+  // gespielt wurde. Jetzt sammelt man XP nur durchs tatsächliche Spielen (Einsätze
+  // bei Blackjack/Slots) — Chip-Gewinne, Boni und Admin-Anpassungen ändern das
+  // Level nicht mehr. XP wird wie die Levelbelohnungen in localStorage gehalten
+  // (kein neues Supabase-Feld nötig). Bestandsspieler werden beim ersten Aufruf
+  // mit ihrem bisherigen Chip-Stand als Start-XP geseedet, damit ihr Level nicht
+  // rückwirkend abstürzt — ab da zählen nur noch Einsätze.
+  function xpKey(){ return 'rt_xp_' + (currentUserId || 'guest'); }
+  function getXp(){
+    try {
+      const raw = localStorage.getItem(xpKey());
+      if(raw === null){
+        const seed = Math.max(0, (currentProfile && currentProfile.chips) || 0);
+        localStorage.setItem(xpKey(), String(seed));
+        return seed;
+      }
+      return Number(raw) || 0;
+    } catch(e){ return (currentProfile && currentProfile.chips) || 0; }
+  }
+  function addXp(amount){
+    if(!amount || amount <= 0) return;
+    try { localStorage.setItem(xpKey(), String(getXp() + amount)); } catch(e){}
+  }
+  function getLevel(){ return Math.max(1, Math.floor(getXp() / 100)); }
+  // Nach einem Einsatz: XP gutschreiben und Level-/Belohnungsanzeige sofort nachziehen.
+  function gainXp(amount){
+    addXp(amount);
+    bjSyncBalanceDisplay();
+    checkLevelRewards();
+  }
 
   function lvlRewardsKey(){ return 'rt_level_rewards_' + (currentUserId || 'guest'); }
   function lvlRewardsSeededKey(){ return lvlRewardsKey() + '_seeded'; }
@@ -3792,7 +3821,7 @@
   }
   async function checkLevelRewards(){
     if(!currentProfile) return;
-    const level = Math.max(1, Math.floor((currentProfile.chips || 0) / 100));
+    const level = getLevel();
     seedLevelRewardsIfNeeded(level);
     const claimed = getClaimedLevelRewards();
     for(const r of LEVEL_REWARDS){
@@ -3810,9 +3839,9 @@
         pulseAvatarRing();
       }
     }
-    renderLevelRewardsGrid(level, currentProfile.chips || 0);
+    renderLevelRewardsGrid(level, getXp());
   }
-  function renderLevelRewardsGrid(level, chips){
+  function renderLevelRewardsGrid(level, xp){
     const grid = document.getElementById('levelRewardsGrid');
     if(!grid) return;
     const claimed = getClaimedLevelRewards();
@@ -3833,9 +3862,9 @@
     if(curEl) curEl.textContent = `Level ${level}`;
     if(nextEl && fillEl){
       if(nextReward){
-        const chipsIntoLevel = chips % 100;
-        nextEl.textContent = `noch ${(nextReward.level * 100 - chips).toLocaleString('de-DE')} Chips bis Lvl ${nextReward.level}`;
-        fillEl.style.width = Math.min(100, chipsIntoLevel) + '%';
+        const xpIntoLevel = xp % 100;
+        nextEl.textContent = `noch ${(nextReward.level * 100 - xp).toLocaleString('de-DE')} XP bis Lvl ${nextReward.level}`;
+        fillEl.style.width = Math.min(100, xpIntoLevel) + '%';
       } else {
         nextEl.textContent = 'Alle Stufen erreicht 👑';
         fillEl.style.width = '100%';
@@ -3846,8 +3875,9 @@
   function bjSyncBalanceDisplay(){
     const chips = (currentProfile && currentProfile.chips) || 0;
     const val = chips.toLocaleString('de-DE');
-    const level = Math.max(1, Math.floor(chips / 100));
-    const ringPct = Math.max(4, chips % 100);
+    const xp = getXp();
+    const level = getLevel();
+    const ringPct = Math.max(4, xp % 100);
     const chipPointsEl = document.querySelector('#pointsDisplay .chip-points');
     if(chipPointsEl) chipPointsEl.textContent = val + ' Chips';
     const chipLevelEl = document.querySelector('#pointsDisplay .chip-level');
@@ -3868,7 +3898,7 @@
       });
     }
     updateProfileConsole();
-    renderLevelRewardsGrid(level, chips);
+    renderLevelRewardsGrid(level, xp);
   }
   async function bjAdjustChips(delta){
     if(!currentProfile) return;
@@ -4103,6 +4133,7 @@
     bjPendingBet = 0;
     bjPlayChipSound();
     await bjAdjustChips(-bet);
+    gainXp(bet);
 
     bjState = {
       hands: [{ cards: [bjDrawCard(), bjDrawCard()], bet, status: 'playing', splitFromAce:false }],
@@ -4188,6 +4219,7 @@
     if(balance < hand.bet) { showToast('Nicht genug Chips zum Verdoppeln.'); return; }
     bjPlayChipSound();
     await bjAdjustChips(-hand.bet);
+    gainXp(hand.bet);
     hand.bet *= 2;
     hand.cards.push(bjDrawCard());
     hand.status = bjHandValue(hand.cards) > 21 ? 'bust' : 'stand';
@@ -4202,6 +4234,7 @@
     if(balance < hand.bet) { showToast('Nicht genug Chips zum Splitten.'); return; }
     bjPlayChipSound();
     await bjAdjustChips(-hand.bet);
+    gainXp(hand.bet);
     const isAceSplit = hand.cards[0].rank === 'A';
     const secondCard = hand.cards.pop();
     hand.cards.push(bjDrawCard());
@@ -4521,6 +4554,7 @@
     document.querySelectorAll('.slot-reel-window').forEach(w => w.classList.remove('slot-win-glow'));
     slotPlaySpinSound();
     await bjAdjustChips(-slotBet);
+    gainXp(slotBet);
 
     const finalSymbols = [slotPickSymbol(), slotPickSymbol(), slotPickSymbol()];
     await Promise.all([0, 1, 2].map(i => slotSpinReel(i, finalSymbols[i])));
@@ -5905,8 +5939,8 @@
     currentProfile = profile;
     updateHeroGreeting(profile.name);
     pointsDisplay.style.display = 'flex';
-    const level = Math.max(1, Math.floor((profile.chips || 0) / 100));
-    const ringPct = Math.max(4, (profile.chips || 0) % 100);
+    const level = getLevel();
+    const ringPct = Math.max(4, getXp() % 100);
     pointsDisplay.innerHTML = `<div class="chip-coin"><div class="chip-coin-inner"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg></div></div><div class="chip-text"><span class="chip-level">Level ${level}</span><span class="chip-points">${(profile.chips||0).toLocaleString('de-DE')} Chips</span></div>`;
     const initial = profile.name.charAt(0).toUpperCase();
     const chips = profile.chips || 0;
@@ -6078,7 +6112,7 @@
     const desc = document.getElementById('profConsoleDesc');
     if(!label || !desc || !currentProfile) return;
     const chips = currentProfile.chips || 0;
-    const level = Math.max(1, Math.floor(chips / 100));
+    const level = getLevel();
     label.textContent = `Level ${level} · ${chips.toLocaleString('de-DE')} Chips`;
     desc.textContent = isAdmin ? 'Admin-Konto — voller Zugriff' : 'Standard-Konto';
   }
