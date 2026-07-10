@@ -1284,6 +1284,23 @@
   }
   .maint-logout-link:hover{text-decoration:underline;}
 
+  .alpha-request-btn{
+    display:inline-flex;align-items:center;gap:9px;margin:4px auto 0;
+    background:linear-gradient(120deg,rgba(212,175,106,.16),rgba(212,175,106,.06));
+    border:1px solid rgba(212,175,106,.4);color:var(--accent-hi);
+    padding:12px 26px;border-radius:10px;font-weight:700;font-size:13px;letter-spacing:.2px;
+    cursor:pointer;font-family:var(--font-body);transition:.18s;
+  }
+  .alpha-request-btn svg{width:15px;height:15px;fill:var(--accent-hi);flex-shrink:0;}
+  .alpha-request-btn:hover{background:linear-gradient(120deg,var(--accent-hi),#c79a4e);color:var(--accent-ink);}
+  .alpha-request-btn:hover svg{fill:var(--accent-ink);}
+  .alpha-request-btn.sent{
+    background:rgba(76,191,131,.12);border-color:rgba(76,191,131,.4);color:var(--success);cursor:default;
+  }
+  .alpha-request-btn.sent svg{fill:var(--success);}
+  .alpha-request-btn.sent:hover{background:rgba(76,191,131,.12);color:var(--success);}
+  .alpha-request-btn:disabled{opacity:.65;cursor:default;}
+
   /* --------- maintenance preview close button --------- */
   #maintenancePreviewExit{
     position:absolute;top:22px;right:22px;
@@ -1641,6 +1658,11 @@
   .adm-tab:hover{color:var(--text);}
   .adm-tab.active{color:var(--accent-hi);}
   .adm-tab.active:after{background:var(--accent-hi);}
+  .adm-tab-badge{
+    display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;
+    padding:0 4px;margin-left:6px;border-radius:8px;background:var(--danger);color:#fff;
+    font-size:9.5px;font-weight:700;letter-spacing:0;vertical-align:2px;
+  }
 
   .adm-panel{display:none;}
   .adm-panel.active{display:block;animation:modalIn .2s ease;}
@@ -2588,6 +2610,12 @@
     <p class="soon-desc soon-desc-note">Eine vorab Registrierung ist bereits möglich, gewährt jedoch derzeit noch keinerlei Zugriff auf die Seite.</p>
     <div class="soon-divider"></div>
 
+    <button type="button" class="alpha-request-btn" id="alphaRequestBtn">
+      <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>
+      Alpha Zugriff anfordern
+    </button>
+    <div class="maint-status-line" id="alphaRequestHint"></div>
+
     <div class="maint-login-row" id="soonAuthRow">
       <button type="button" class="maint-login-btn" id="soonLoginBtn">Anmelden</button>
     </div>
@@ -3398,6 +3426,7 @@
                 <div class="adm-tab active" data-adm-tab="status">Status</div>
                 <div class="adm-tab" data-adm-tab="chips">Chips</div>
                 <div class="adm-tab" data-adm-tab="whitelists">Whitelists</div>
+                <div class="adm-tab" data-adm-tab="alpha">Alpha Access<span class="adm-tab-badge" id="alphaReqBadge" style="display:none;"></span></div>
                 <div class="adm-tab" data-adm-tab="admins">Adminzugriff</div>
               </div>
 
@@ -3510,6 +3539,21 @@
                   <div class="hint" id="chipSearchHint"></div>
                   <button type="button" class="adm-ghost-btn" id="chipSelfBtn" style="margin-top:10px;">Meinen eigenen Account bearbeiten</button>
                   <div id="chipSearchResults" class="chipadm-list"></div>
+                </div>
+              </div>
+
+              <!-- ===== Reiter: Alpha Access ===== -->
+              <div class="adm-panel" id="adm-panel-alpha">
+                <div class="adm-card wide" data-accent="gold">
+                  <div class="adm-card-head">
+                    <div class="adm-card-icon">
+                      <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>
+                    </div>
+                    <div class="adm-card-title">Alpha-Zugriff-Anfragen</div>
+                  </div>
+                  <p class="adm-card-note">Spieler, die auf dem "launcht bald"-Screen auf "Alpha Zugriff anfordern" getippt haben. Freischalten setzt die E-Mail automatisch auf die Coming-Soon-Whitelist.</p>
+                  <div class="hint" id="alphaReqHint"></div>
+                  <div class="wl-list" id="alphaReqList"></div>
                 </div>
               </div>
 
@@ -7233,6 +7277,144 @@
     await loadComingSoonWhitelist();
   });
 
+  // --- Alpha-Zugriff: Nutzer stellt Anfrage über den "launcht bald"-Screen ---
+  async function checkOwnAlphaRequest(uid, uemail){
+    const btn = document.getElementById('alphaRequestBtn');
+    const hint = document.getElementById('alphaRequestHint');
+    if(!btn) return;
+    const userId = uid !== undefined ? uid : currentUserId;
+    if(!userId){
+      btn.disabled = false;
+      btn.classList.remove('sent');
+      btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>Alpha Zugriff anfordern`;
+      hint.textContent = 'Melde dich zuerst an, um Zugriff anzufragen.';
+      return;
+    }
+    const { data, error } = await supabaseClient
+      .from('alpha_access_requests')
+      .select('status')
+      .eq('user_id', userId)
+      .maybeSingle();
+    if(error || !data){
+      btn.disabled = false;
+      btn.classList.remove('sent');
+      hint.textContent = '';
+      return;
+    }
+    if(data.status === 'approved'){
+      btn.disabled = true;
+      btn.classList.add('sent');
+      btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Zugriff freigeschaltet`;
+      hint.textContent = 'Lade die Seite neu, sobald der Coming-Soon-Modus für dich aufgehoben wurde.';
+    } else if(data.status === 'rejected'){
+      btn.disabled = false;
+      btn.classList.remove('sent');
+      hint.textContent = 'Deine letzte Anfrage wurde abgelehnt — du kannst es erneut versuchen.';
+    } else {
+      btn.disabled = true;
+      btn.classList.add('sent');
+      btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Anfrage gesendet`;
+      hint.textContent = 'Wir melden uns, sobald dein Zugriff freigeschaltet ist.';
+    }
+  }
+
+  document.getElementById('alphaRequestBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('alphaRequestBtn');
+    const hint = document.getElementById('alphaRequestHint');
+    if(!currentUserId){
+      hint.textContent = 'Melde dich zuerst an, um Zugriff anzufragen.';
+      openModal('login');
+      return;
+    }
+    btn.disabled = true;
+    btn.textContent = 'Sende Anfrage...';
+    const { error } = await supabaseClient.from('alpha_access_requests').insert({
+      user_id: currentUserId,
+      email: currentUserEmail,
+      username: currentProfile?.username || null,
+      status: 'pending'
+    });
+    if(error){
+      btn.disabled = false;
+      hint.textContent = error.message.includes('duplicate') ? 'Du hast bereits eine Anfrage gestellt.' : error.message;
+      await checkOwnAlphaRequest();
+      return;
+    }
+    showToast('Alpha-Zugriff angefragt.');
+    await checkOwnAlphaRequest();
+  });
+
+  // --- Admin: Alpha-Zugriff-Anfragen verwalten ---
+  async function loadAlphaRequests(){
+    const list = document.getElementById('alphaReqList');
+    const badge = document.getElementById('alphaReqBadge');
+    if(!list || !isAdmin) return;
+    const { data, error } = await supabaseClient
+      .from('alpha_access_requests')
+      .select('id, email, username, status, created_at')
+      .order('created_at', { ascending: true });
+    if(error){
+      list.innerHTML = `<div class="wl-empty">Fehler beim Laden: ${error.message}</div>`;
+      return;
+    }
+    const pending = (data || []).filter(r => r.status === 'pending');
+    if(badge){
+      if(pending.length > 0){ badge.style.display = ''; badge.textContent = pending.length; }
+      else { badge.style.display = 'none'; }
+    }
+    if(!data || data.length === 0){
+      list.innerHTML = `<div class="wl-empty">Noch keine Alpha-Zugriff-Anfragen.</div>`;
+      return;
+    }
+    list.innerHTML = data.map(row => `
+      <div class="wl-item" data-id="${row.id}">
+        <span class="wl-email">${row.username ? '@' + row.username + ' · ' : ''}${row.email} <span class="hint" style="display:inline;">(${row.status === 'pending' ? 'offen' : row.status === 'approved' ? 'freigeschaltet' : 'abgelehnt'})</span></span>
+        <div class="wl-actions">
+          ${row.status !== 'approved' ? `<button type="button" class="adm-ghost-btn alpha-approve-btn" style="padding:6px 12px;font-size:11.5px;">Freischalten</button>` : ''}
+          ${row.status !== 'rejected' ? `<button type="button" class="adm-ghost-btn alpha-reject-btn" style="padding:6px 12px;font-size:11.5px;">Ablehnen</button>` : ''}
+          <div class="wl-remove" title="Anfrage entfernen">
+            <svg viewBox="0 0 24 24"><path d="M18.3 5.7L12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7 2.9 18.3 9.2 12 2.9 5.7 4.3 4.3l6.3 6.3 6.3-6.3z"/></svg>
+          </div>
+        </div>
+      </div>`).join('');
+    list.querySelectorAll('.alpha-approve-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const item = btn.closest('.wl-item');
+        const id = item.dataset.id;
+        const row = data.find(r => String(r.id) === String(id));
+        if(!row) return;
+        const { error: upError } = await supabaseClient.from('alpha_access_requests').update({ status: 'approved' }).eq('id', id);
+        if(upError){ showToast(upError.message); return; }
+        if(row.email){
+          await supabaseClient.from('coming_soon_whitelist').insert({ email: row.email.toLowerCase() }).select();
+        }
+        showToast(`${row.email} freigeschaltet.`);
+        await loadAlphaRequests();
+        await loadComingSoonWhitelist();
+      });
+    });
+    list.querySelectorAll('.alpha-reject-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const item = btn.closest('.wl-item');
+        const id = item.dataset.id;
+        const { error: upError } = await supabaseClient.from('alpha_access_requests').update({ status: 'rejected' }).eq('id', id);
+        if(upError){ showToast(upError.message); return; }
+        showToast('Anfrage abgelehnt.');
+        await loadAlphaRequests();
+      });
+    });
+    list.querySelectorAll('.wl-remove').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const item = btn.closest('.wl-item');
+        const id = item.dataset.id;
+        const { error: delError } = await supabaseClient.from('alpha_access_requests').delete().eq('id', id);
+        if(delError){ showToast(delError.message); return; }
+        showToast('Anfrage entfernt.');
+        await loadAlphaRequests();
+      });
+    });
+  }
+
   // --- Admin: Admin-Zugriff verwalten (per Benutzername oder E-Mail) ---
   async function loadAdminList(){
     const list = document.getElementById('adminList');
@@ -7472,6 +7654,7 @@
       loadWhitelist();
       loadComingSoonWhitelist();
       loadAdminList();
+      loadAlphaRequests();
     }
 
     document.querySelectorAll('#settingsGenderSelect .gender-opt').forEach(o => {
