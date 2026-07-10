@@ -383,6 +383,14 @@
      spielfarbiger Ambient-Glow. Bewegt sich klar weg vom reinen Icon-Quadrat,
      bleibt aber in der Gold/Filz-Materialsprache der Seite. */
   .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:22px;}
+  .row-empty{
+    grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;gap:8px;padding:56px 24px;border:1.5px dashed var(--border);border-radius:16px;
+    color:var(--muted);background:rgba(212,175,106,.02);
+  }
+  .row-empty svg{width:30px;height:30px;stroke:var(--accent-dim);stroke-width:1.6;fill:none;margin-bottom:6px;}
+  .row-empty p{font-family:var(--font-display);font-size:17px;color:var(--text);font-weight:600;}
+  .row-empty span{font-size:13.5px;color:var(--faint);max-width:360px;}
   .card{cursor:pointer;}
 
   .table-card{
@@ -3885,7 +3893,18 @@
   function makeRow(id){
     const el = document.getElementById(id);
     el.innerHTML = '';
-    games.forEach((g, i) => {
+    const libraryGames = games.filter(g => isInLibrary(g.name));
+    if(libraryGames.length === 0){
+      el.innerHTML = `
+        <div class="row-empty">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          <p>Deine Bibliothek ist noch leer.</p>
+          <span>Füg dir Spiele unter „Entdecken“ hinzu, damit sie hier erscheinen.</span>
+        </div>
+      `;
+      return;
+    }
+    libraryGames.forEach((g, i) => {
       const card = document.createElement('div');
       card.className = 'card';
       card.innerHTML = `
@@ -3966,6 +3985,7 @@
     if(nowAdded) list.push(name); else list.splice(idx, 1);
     saveLibrary(list);
     if(btn) setAddBtnState(btn, nowAdded);
+    makeRow('row1');
     showToast(nowAdded ? `${name} zur Bibliothek hinzugefügt` : `${name} aus der Bibliothek entfernt`);
   }
   function setAddBtnState(btn, added){
@@ -6305,6 +6325,7 @@
   async function logout(){
     await supabaseClient.auth.signOut();
     currentUserId = null; currentUserEmail = null; isAdmin = false; notifications = [];
+    makeRow('row1');
     document.getElementById('usernameOverlay').classList.remove('open');
     unsubscribeFriendRequests();
     switchMainView('home');
@@ -6639,6 +6660,7 @@
 
     if(!user){
       currentUserId = null; currentUserEmail = null; isAdmin = false;
+      makeRow('row1');
       renderAuthArea(null);
       return;
     }
@@ -6672,6 +6694,7 @@
     currentUserId = user.id;
     currentUserEmail = user.email;
     isAdmin = admin;
+    if(userChanged) makeRow('row1');
     // Profilbild-Auswahl wird jetzt in der DB gespeichert (avatar_symbol/avatar_color/avatar_symbol_color)
     // und bei jedem Laden aus dem Profil übernommen. Nur wenn diese Spalten (noch) leer sind,
     // greifen die Standardwerte.
