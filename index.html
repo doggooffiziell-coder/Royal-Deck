@@ -383,11 +383,12 @@
   .table-card-cta{
     display:inline-block;color:rgba(242,236,221,.78);
     font-family:var(--font-body);font-weight:600;font-size:13px;letter-spacing:.2px;
-    transition:opacity .22s ease, transform .3s cubic-bezier(.16,1,.3,1);
+    filter:blur(0px);
+    transition:opacity .3s cubic-bezier(.4,0,.2,1), transform .38s cubic-bezier(.34,1.56,.64,1), filter .3s ease;
   }
-  /* Text loest sich beim Hover auf ... */
-  .table-card:hover .table-card-cta{opacity:0;transform:translateY(8px);pointer-events:none;}
-  /* ...und macht Platz fuer den Hinweis am unteren Kartenrand */
+  /* Text loest sich beim Hover in einem weichen Unschaerfe-Wisch auf ... */
+  .table-card:hover .table-card-cta{opacity:0;transform:translateY(-9px);filter:blur(3px);pointer-events:none;}
+  /* ...und der Hinweis am unteren Kartenrand schaerft sich zeitversetzt dagegen ein */
   .table-card-hint{
     position:absolute;left:0;right:0;bottom:0;z-index:3;
     display:flex;align-items:center;justify-content:center;gap:7px;
@@ -396,11 +397,11 @@
     border-top:1px solid rgba(212,175,106,.18);
     font-family:var(--font-mono);font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;
     color:rgba(240,211,142,.88);
-    opacity:0;transform:translateY(10px);
-    transition:opacity .3s ease .06s, transform .35s cubic-bezier(.16,1,.3,1) .06s;
+    opacity:0;transform:translateY(11px);filter:blur(4px);
+    transition:opacity .35s cubic-bezier(.4,0,.2,1) .09s, transform .42s cubic-bezier(.34,1.56,.64,1) .09s, filter .35s ease .09s;
     pointer-events:none;
   }
-  .table-card:hover .table-card-hint{opacity:1;transform:translateY(0);}
+  .table-card:hover .table-card-hint{opacity:1;transform:translateY(0);filter:blur(0px);}
   .table-card-hint svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round;flex-shrink:0;animation:tableHintPulse 1.5s ease-in-out infinite;}
   @keyframes tableHintPulse{0%,100%{transform:scale(1);opacity:.8;}50%{transform:scale(1.16);opacity:1;}}
 
