@@ -2076,6 +2076,7 @@
   .glo-overlay{
     display:none;position:fixed;inset:0;z-index:1800;
     background:#070b09;overflow:hidden;
+    --gc1:var(--surface-2);--gc2:var(--surface);
   }
   .glo-overlay.open{display:block;}
   .glo-stripes{
@@ -2085,70 +2086,122 @@
   }
   .glo-vignette{
     position:absolute;inset:0;
-    background:radial-gradient(ellipse 900px 700px at 50% 40%, rgba(212,175,106,.06), transparent 65%),
+    background:radial-gradient(ellipse 1000px 760px at 32% 50%, rgba(212,175,106,.07), transparent 62%),
       linear-gradient(180deg, rgba(7,11,9,.2), rgba(7,11,9,.85) 85%);
   }
   .glo-watermark{
     position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
     font-family:var(--font-marquee);font-weight:800;text-transform:uppercase;
-    font-size:min(20vw,260px);line-height:1;color:var(--accent);opacity:.06;
+    font-size:min(16vw,220px);line-height:1;color:var(--accent);opacity:.04;
     white-space:nowrap;letter-spacing:2px;pointer-events:none;user-select:none;
   }
   .glo-close{
-    position:absolute;top:22px;right:24px;width:38px;height:38px;border-radius:50%;
+    position:absolute;top:22px;right:24px;width:40px;height:40px;border-radius:50%;
     background:rgba(255,255,255,.04);border:1px solid var(--border-soft);color:var(--muted);
-    display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s;z-index:2;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.18s;z-index:3;
   }
-  .glo-close:hover{color:var(--text);border-color:var(--accent-dim);background:rgba(255,255,255,.08);}
-  .glo-close svg{width:16px;height:16px;fill:currentColor;}
-  .glo-screens{
+  .glo-close:hover{color:var(--accent-hi);border-color:rgba(240,211,142,.4);background:rgba(212,175,106,.08);transform:rotate(90deg);}
+  .glo-close svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;}
+
+  /* ---------- Bühne: Karten-Visual links, Inhalt rechts ---------- */
+  .glo-stage{
     position:relative;z-index:1;height:100%;display:flex;align-items:center;justify-content:center;
+    gap:60px;padding:0 40px;max-width:920px;margin:0 auto;
   }
+
+  /* the signature "dealt card" -- mirrors the lobby's game thumbnails,
+     recolored per-game via --gc1/--gc2, so opening a table feels like
+     the card itself has been drawn and flipped face-up */
+  .glo-plate{flex-shrink:0;width:250px;perspective:1000px;}
+  .glo-plate-card{
+    aspect-ratio:3/4;border-radius:24px;position:relative;overflow:hidden;
+    background:linear-gradient(150deg,var(--gc1),var(--gc2));
+    border:1px solid rgba(212,175,106,.28);
+    box-shadow:0 34px 70px rgba(0,0,0,.55), inset 0 0 0 1px rgba(0,0,0,.25);
+    animation:gloPlateFloat 6s ease-in-out infinite;
+    display:flex;align-items:center;justify-content:center;
+  }
+  @keyframes gloPlateFloat{0%,100%{transform:translateY(0) rotate(-1deg);}50%{transform:translateY(-10px) rotate(1deg);}}
+  .glo-plate-card:before, .glo-plate-card:after{
+    content:attr(data-suit);position:absolute;font-family:var(--font-display);font-style:italic;
+    font-size:18px;color:rgba(242,236,221,.6);line-height:1;pointer-events:none;
+  }
+  .glo-plate-card:before{top:14px;left:16px;}
+  .glo-plate-card:after{bottom:14px;right:16px;transform:rotate(180deg);}
+  .glo-plate-suit{
+    font-family:var(--font-display);font-size:clamp(58px,9vw,86px);color:rgba(242,236,221,.92);
+    text-shadow:0 0 40px rgba(240,211,142,.25);
+  }
+  .glo-plate-sheen{
+    position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(115deg,rgba(255,255,255,.16) 0%,transparent 30%,transparent 70%,rgba(255,255,255,.06) 100%);
+  }
+
+  .glo-screens{position:relative;flex:1;min-width:0;max-width:380px;min-height:250px;display:flex;align-items:center;}
   .glo-screen{
-    display:flex;flex-direction:column;align-items:flex-start;gap:6px;
-    padding:0 32px;width:100%;max-width:440px;
+    display:flex;flex-direction:column;align-items:flex-start;gap:6px;width:100%;
     opacity:0;transform:translateY(14px) scale(.985);
     transition:opacity .32s cubic-bezier(.16,1,.3,1), transform .32s cubic-bezier(.16,1,.3,1);
     pointer-events:none;position:absolute;
   }
   .glo-screen.active{opacity:1;transform:translateY(0) scale(1);pointer-events:auto;position:relative;}
-  .glo-screen.glo-screen-loading{align-items:center;text-align:center;}
+  .glo-screen.glo-screen-loading{align-items:center;text-align:center;width:100%;}
   .glo-eyebrow{
     font-family:var(--font-mono);font-size:11px;letter-spacing:2px;color:var(--accent-dim);
-    text-transform:uppercase;margin-bottom:2px;
+    text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:8px;
   }
+  .glo-eyebrow:before{content:"";width:14px;height:1px;background:var(--accent-dim);}
   .glo-title{
-    font-family:var(--font-marquee);font-weight:800;text-transform:uppercase;
-    font-size:38px;letter-spacing:1px;color:var(--text);margin-bottom:20px;
+    font-family:var(--font-display);font-style:italic;font-weight:600;
+    font-size:40px;letter-spacing:-.5px;color:var(--text);margin-bottom:22px;line-height:1.05;
   }
-  .glo-menu{display:flex;flex-direction:column;align-items:flex-start;width:100%;}
+  .glo-menu{display:flex;flex-direction:column;align-items:stretch;width:100%;gap:10px;}
   .glo-item{
-    background:none;border:none;padding:12px 2px;cursor:pointer;text-align:left;width:100%;
-    font-family:var(--font-marquee);font-weight:700;text-transform:uppercase;
-    font-size:20px;letter-spacing:2.5px;color:var(--text);transition:.15s;
-    border-top:1px solid var(--border-soft);
+    display:flex;align-items:center;justify-content:space-between;gap:14px;
+    background:linear-gradient(180deg,rgba(24,40,30,.55),rgba(10,18,14,.65));
+    border:1px solid var(--border-soft);border-radius:12px;cursor:pointer;text-align:left;width:100%;
+    padding:15px 18px;font-family:var(--font-body);font-weight:600;
+    font-size:14.5px;letter-spacing:.2px;color:var(--text);
+    transition:.2s cubic-bezier(.16,1,.3,1);
   }
-  .glo-menu .glo-item:last-child{border-bottom:1px solid var(--border-soft);}
-  .glo-item:hover, .glo-item:focus-visible{color:var(--accent-hi);letter-spacing:3.5px;outline:none;}
+  .glo-item:hover, .glo-item:focus-visible{
+    border-color:rgba(240,211,142,.4);color:var(--accent-hi);transform:translateX(3px);outline:none;
+    background:linear-gradient(180deg,rgba(212,175,106,.12),rgba(212,175,106,.04));
+    box-shadow:0 10px 22px rgba(0,0,0,.35);
+  }
+  .glo-item-arrow{width:15px;height:15px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;opacity:.45;transition:.2s;}
+  .glo-item:hover .glo-item-arrow{opacity:1;transform:translateX(3px);}
+  .glo-item-primary{
+    background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:var(--accent-ink);border-color:transparent;
+    box-shadow:0 12px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.35);
+    font-weight:700;
+  }
+  .glo-item-primary:hover{filter:brightness(1.06);transform:translateY(-2px);color:var(--accent-ink);box-shadow:0 16px 30px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.35);}
+  .glo-item-primary .glo-item-arrow{stroke:var(--accent-ink);opacity:.75;}
+  .glo-item-ghost{
+    background:none;border:1px dashed var(--border-soft);color:var(--muted);font-weight:500;
+  }
+  .glo-item-ghost:hover{color:var(--text);border-color:var(--border);background:rgba(255,255,255,.03);transform:none;box-shadow:none;}
   .glo-item-sub{
-    display:block;font-family:var(--font-body);text-transform:none;font-size:11.5px;
-    letter-spacing:.2px;color:var(--faint);font-weight:500;margin-top:3px;
+    display:block;font-size:11px;letter-spacing:.2px;color:var(--faint);font-weight:500;margin-top:3px;
   }
-  .glo-item-locked{color:var(--faint);cursor:pointer;}
-  .glo-item-locked:hover{color:var(--muted);letter-spacing:2.5px;}
+  .glo-item-locked{color:var(--faint);cursor:default;opacity:.7;}
+  .glo-item-locked:hover{color:var(--faint);transform:none;border-color:var(--border-soft);background:linear-gradient(180deg,rgba(24,40,30,.55),rgba(10,18,14,.65));box-shadow:none;}
   .glo-item-locked .glo-item-sub{color:var(--faint);}
 
   /* ---------- Kurze Ladesequenz vor dem Startmenü ---------- */
   .glo-load-badge{
-    width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-    background:radial-gradient(circle at 35% 30%, var(--surface-2), var(--surface));
-    border:1px solid var(--border-soft);margin-bottom:22px;position:relative;
+    width:84px;height:84px;border-radius:20px;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(150deg,var(--gc1),var(--gc2));
+    border:1px solid rgba(212,175,106,.28);margin-bottom:24px;position:relative;
+    box-shadow:0 20px 40px rgba(0,0,0,.5), inset 0 0 0 1px rgba(0,0,0,.25);
   }
   .glo-load-badge:before{
-    content:"";position:absolute;inset:-6px;border-radius:50%;border:1px solid transparent;
-    border-top-color:var(--accent);border-right-color:var(--accent-dim);animation:gloSpin .9s linear infinite;
+    content:"";position:absolute;inset:-7px;border-radius:24px;border:1px solid transparent;
+    border-top-color:var(--accent-hi);border-right-color:var(--accent-dim);animation:gloSpin .9s linear infinite;
   }
-  .glo-load-badge span{font-family:var(--font-display);font-style:italic;font-size:30px;color:var(--accent-hi);}
+  .glo-load-badge span{font-family:var(--font-display);font-style:italic;font-size:32px;color:rgba(242,236,221,.92);text-shadow:0 0 24px rgba(240,211,142,.3);}
   @keyframes gloSpin{ to{transform:rotate(360deg);} }
   .glo-load-label{
     font-family:var(--font-mono);font-size:11.5px;letter-spacing:3px;text-transform:uppercase;
@@ -2159,9 +2212,17 @@
     height:100%;width:0%;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--accent-hi));
     transition:width .85s cubic-bezier(.4,0,.2,1);
   }
-  @media (max-width:640px){
-    .glo-title{font-size:28px;}
-    .glo-item{font-size:16px;letter-spacing:1.8px;}
+  @media (max-width:760px){
+    .glo-stage{flex-direction:column;gap:26px;padding:0 28px;}
+    .glo-plate{width:130px;}
+    .glo-plate-card{aspect-ratio:1/1;border-radius:18px;animation:none;}
+    .glo-plate-suit{font-size:44px;}
+    .glo-screens{max-width:340px;min-height:220px;}
+    .glo-screen{align-items:center;text-align:center;}
+    .glo-eyebrow{justify-content:center;}
+    .glo-eyebrow:before{display:none;}
+    .glo-title{font-size:27px;margin-bottom:16px;}
+    .glo-item{justify-content:center;}
   }
 </style>
 </head>
@@ -3467,29 +3528,54 @@
   <div class="glo-vignette"></div>
   <div class="glo-watermark" id="gloWatermark">Blackjack</div>
   <div class="glo-close" id="gloCloseBtn" title="Schließen"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
-  <div class="glo-screens">
-    <div class="glo-screen glo-screen-loading" id="gloScreenLoading">
-      <div class="glo-load-badge"><span id="gloLoadSuit">♣</span></div>
-      <div class="glo-load-label" id="gloLoadLabel">Blackjack wird geladen</div>
-      <div class="glo-load-track"><div class="glo-load-fill" id="gloLoadFill"></div></div>
+
+  <div class="glo-stage">
+    <div class="glo-plate">
+      <div class="glo-plate-card" id="gloPlateCard" data-suit="♣">
+        <div class="glo-plate-suit" id="gloPlateSuit">♣</div>
+        <div class="glo-plate-sheen"></div>
+      </div>
     </div>
-    <div class="glo-screen" id="gloScreenIntro">
-      <div class="glo-eyebrow" id="gloEyebrow">Casino-Tisch</div>
-      <div class="glo-title" id="gloTitleIntro">Blackjack</div>
-      <nav class="glo-menu">
-        <button type="button" class="glo-item" id="gloPlayBtn">Spielen</button>
-        <button type="button" class="glo-item" id="gloRulesBtn">Regeln</button>
-        <button type="button" class="glo-item" id="gloBackBtn">Zurück</button>
-      </nav>
-    </div>
-    <div class="glo-screen" id="gloScreenMode">
-      <div class="glo-eyebrow">Spielmodus wählen</div>
-      <div class="glo-title" id="gloTitleMode">Blackjack</div>
-      <nav class="glo-menu">
-        <button type="button" class="glo-item" id="gloSoloBtn">Solo Spielen</button>
-        <button type="button" class="glo-item glo-item-locked" id="gloMultiBtn">Multiplayer Spielen<span class="glo-item-sub">Bald verfügbar</span></button>
-        <button type="button" class="glo-item" id="gloModeBackBtn">Zurück</button>
-      </nav>
+
+    <div class="glo-screens">
+      <div class="glo-screen glo-screen-loading" id="gloScreenLoading">
+        <div class="glo-load-badge"><span id="gloLoadSuit">♣</span></div>
+        <div class="glo-load-label" id="gloLoadLabel">Blackjack wird geladen</div>
+        <div class="glo-load-track"><div class="glo-load-fill" id="gloLoadFill"></div></div>
+      </div>
+      <div class="glo-screen" id="gloScreenIntro">
+        <div class="glo-eyebrow" id="gloEyebrow">Casino-Tisch</div>
+        <div class="glo-title" id="gloTitleIntro">Blackjack</div>
+        <nav class="glo-menu">
+          <button type="button" class="glo-item glo-item-primary" id="gloPlayBtn">
+            <span>Spielen</span>
+            <svg class="glo-item-arrow" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+          </button>
+          <button type="button" class="glo-item" id="gloRulesBtn">
+            <span>Regeln</span>
+            <svg class="glo-item-arrow" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+          </button>
+          <button type="button" class="glo-item glo-item-ghost" id="gloBackBtn">
+            <span>Zurück</span>
+          </button>
+        </nav>
+      </div>
+      <div class="glo-screen" id="gloScreenMode">
+        <div class="glo-eyebrow">Spielmodus wählen</div>
+        <div class="glo-title" id="gloTitleMode">Blackjack</div>
+        <nav class="glo-menu">
+          <button type="button" class="glo-item glo-item-primary" id="gloSoloBtn">
+            <span>Solo Spielen</span>
+            <svg class="glo-item-arrow" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+          </button>
+          <button type="button" class="glo-item glo-item-locked" id="gloMultiBtn">
+            <span>Multiplayer Spielen<span class="glo-item-sub">Bald verfügbar</span></span>
+          </button>
+          <button type="button" class="glo-item glo-item-ghost" id="gloModeBackBtn">
+            <span>Zurück</span>
+          </button>
+        </nav>
+      </div>
     </div>
   </div>
 </div>
@@ -3597,6 +3683,10 @@
     document.getElementById('gloEyebrow').textContent = 'Casino-Tisch';
     document.getElementById('gloLoadSuit').textContent = game.suit;
     document.getElementById('gloLoadLabel').textContent = `${game.name} wird geladen`;
+    gloOverlay.style.setProperty('--gc1', game.c1);
+    gloOverlay.style.setProperty('--gc2', game.c2);
+    document.getElementById('gloPlateCard').setAttribute('data-suit', game.suit);
+    document.getElementById('gloPlateSuit').textContent = game.suit;
     gloOverlay.classList.add('open');
     gloShowScreen(gloScreenLoading);
 
