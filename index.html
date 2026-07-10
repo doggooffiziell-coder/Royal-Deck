@@ -2107,10 +2107,12 @@
   .glo-screen{
     display:flex;flex-direction:column;align-items:flex-start;gap:6px;
     padding:0 32px;width:100%;max-width:440px;
-    opacity:0;transform:translateY(10px);transition:opacity .28s ease, transform .28s ease;
+    opacity:0;transform:translateY(14px) scale(.985);
+    transition:opacity .32s cubic-bezier(.16,1,.3,1), transform .32s cubic-bezier(.16,1,.3,1);
     pointer-events:none;position:absolute;
   }
-  .glo-screen.active{opacity:1;transform:translateY(0);pointer-events:auto;position:relative;}
+  .glo-screen.active{opacity:1;transform:translateY(0) scale(1);pointer-events:auto;position:relative;}
+  .glo-screen.glo-screen-loading{align-items:center;text-align:center;}
   .glo-eyebrow{
     font-family:var(--font-mono);font-size:11px;letter-spacing:2px;color:var(--accent-dim);
     text-transform:uppercase;margin-bottom:2px;
@@ -2135,6 +2137,28 @@
   .glo-item-locked{color:var(--faint);cursor:pointer;}
   .glo-item-locked:hover{color:var(--muted);letter-spacing:2.5px;}
   .glo-item-locked .glo-item-sub{color:var(--faint);}
+
+  /* ---------- Kurze Ladesequenz vor dem Startmenü ---------- */
+  .glo-load-badge{
+    width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(circle at 35% 30%, var(--surface-2), var(--surface));
+    border:1px solid var(--border-soft);margin-bottom:22px;position:relative;
+  }
+  .glo-load-badge:before{
+    content:"";position:absolute;inset:-6px;border-radius:50%;border:1px solid transparent;
+    border-top-color:var(--accent);border-right-color:var(--accent-dim);animation:gloSpin .9s linear infinite;
+  }
+  .glo-load-badge span{font-family:var(--font-display);font-style:italic;font-size:30px;color:var(--accent-hi);}
+  @keyframes gloSpin{ to{transform:rotate(360deg);} }
+  .glo-load-label{
+    font-family:var(--font-mono);font-size:11.5px;letter-spacing:3px;text-transform:uppercase;
+    color:var(--muted);margin-bottom:18px;
+  }
+  .glo-load-track{width:200px;height:3px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden;}
+  .glo-load-fill{
+    height:100%;width:0%;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--accent-hi));
+    transition:width .85s cubic-bezier(.4,0,.2,1);
+  }
   @media (max-width:640px){
     .glo-title{font-size:28px;}
     .glo-item{font-size:16px;letter-spacing:1.8px;}
@@ -3444,7 +3468,12 @@
   <div class="glo-watermark" id="gloWatermark">Blackjack</div>
   <div class="glo-close" id="gloCloseBtn" title="Schließen"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
   <div class="glo-screens">
-    <div class="glo-screen active" id="gloScreenIntro">
+    <div class="glo-screen glo-screen-loading" id="gloScreenLoading">
+      <div class="glo-load-badge"><span id="gloLoadSuit">♣</span></div>
+      <div class="glo-load-label" id="gloLoadLabel">Blackjack wird geladen</div>
+      <div class="glo-load-track"><div class="glo-load-fill" id="gloLoadFill"></div></div>
+    </div>
+    <div class="glo-screen" id="gloScreenIntro">
       <div class="glo-eyebrow" id="gloEyebrow">Casino-Tisch</div>
       <div class="glo-title" id="gloTitleIntro">Blackjack</div>
       <nav class="glo-menu">
@@ -3547,12 +3576,15 @@
 
   // ---- Spiel-Startmenü (Zwischenbildschirm: Spielen/Regeln/Zurück → Solo/Multiplayer) ----
   let gloCurrentGame = null;
+  let gloLoadTimer = null;
   const gloOverlay = document.getElementById('gloOverlay');
+  const gloScreenLoading = document.getElementById('gloScreenLoading');
   const gloScreenIntro = document.getElementById('gloScreenIntro');
   const gloScreenMode = document.getElementById('gloScreenMode');
+  const gloAllScreens = [gloScreenLoading, gloScreenIntro, gloScreenMode];
 
   function gloShowScreen(el){
-    [gloScreenIntro, gloScreenMode].forEach(s => s.classList.remove('active'));
+    gloAllScreens.forEach(s => s.classList.remove('active'));
     el.classList.add('active');
   }
   function gloOpen(name){
@@ -3563,10 +3595,23 @@
     document.getElementById('gloTitleIntro').textContent = game.name;
     document.getElementById('gloTitleMode').textContent = game.name;
     document.getElementById('gloEyebrow').textContent = 'Casino-Tisch';
-    gloShowScreen(gloScreenIntro);
+    document.getElementById('gloLoadSuit').textContent = game.suit;
+    document.getElementById('gloLoadLabel').textContent = `${game.name} wird geladen`;
     gloOverlay.classList.add('open');
+    gloShowScreen(gloScreenLoading);
+
+    // Kurze Ladesequenz: Balken füllt sich, danach cleaner Crossfade ins Startmenü.
+    const fill = document.getElementById('gloLoadFill');
+    fill.style.width = '0%';
+    void fill.offsetWidth; // Reflow erzwingen, damit die Breiten-Transition sauber bei 0 startet
+    requestAnimationFrame(() => { fill.style.width = '100%'; });
+    clearTimeout(gloLoadTimer);
+    gloLoadTimer = setTimeout(() => {
+      if(gloOverlay.classList.contains('open')) gloShowScreen(gloScreenIntro);
+    }, 900);
   }
   function gloClose(){
+    clearTimeout(gloLoadTimer);
     gloOverlay.classList.remove('open');
     gloCurrentGame = null;
   }
