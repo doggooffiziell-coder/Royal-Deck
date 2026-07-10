@@ -3788,7 +3788,12 @@
     try { localStorage.setItem(xpKey(), String(seed)); } catch(e){}
     return seed;
   }
-  function getLevel(){ return Math.max(1, Math.floor(getXp() / 100)); }
+  // XP-Bedarf pro Level. Vorher war das quasi 100 (1 Level pro 100 gesetzten Chips) —
+  // bei Einsätzen von 100-500 Chips pro Runde ging das viel zu schnell (mehrere Level
+  // pro Hand). Jetzt braucht's XP_PER_LEVEL XP für ein Level, also entsprechend mehr
+  // gespielte Runden. Bei Bedarf hier einfach den Wert anpassen.
+  const XP_PER_LEVEL = 2000;
+  function getLevel(){ return Math.max(1, Math.floor(getXp() / XP_PER_LEVEL)); }
   // Nach einem Einsatz: XP sofort lokal gutschreiben (UI reagiert ohne Wartezeit),
   // danach im Hintergrund in Supabase persistieren, damit es im Table Editor unter
   // profiles.xp auftaucht und geräteübergreifend erhalten bleibt.
@@ -3873,9 +3878,9 @@
     if(curEl) curEl.textContent = `Level ${level}`;
     if(nextEl && fillEl){
       if(nextReward){
-        const xpIntoLevel = xp % 100;
-        nextEl.textContent = `noch ${(nextReward.level * 100 - xp).toLocaleString('de-DE')} XP bis Lvl ${nextReward.level}`;
-        fillEl.style.width = Math.min(100, xpIntoLevel) + '%';
+        const xpIntoLevel = xp % XP_PER_LEVEL;
+        nextEl.textContent = `noch ${(nextReward.level * XP_PER_LEVEL - xp).toLocaleString('de-DE')} XP bis Lvl ${nextReward.level}`;
+        fillEl.style.width = Math.min(100, (xpIntoLevel / XP_PER_LEVEL) * 100) + '%';
       } else {
         nextEl.textContent = 'Alle Stufen erreicht 👑';
         fillEl.style.width = '100%';
@@ -3888,7 +3893,7 @@
     const val = chips.toLocaleString('de-DE');
     const xp = getXp();
     const level = getLevel();
-    const ringPct = Math.max(4, xp % 100);
+    const ringPct = Math.max(4, ((xp % XP_PER_LEVEL) / XP_PER_LEVEL) * 100);
     const chipPointsEl = document.querySelector('#pointsDisplay .chip-points');
     if(chipPointsEl) chipPointsEl.textContent = val + ' Chips';
     const chipLevelEl = document.querySelector('#pointsDisplay .chip-level');
@@ -5953,7 +5958,7 @@
     updateHeroGreeting(profile.name);
     pointsDisplay.style.display = 'flex';
     const level = getLevel();
-    const ringPct = Math.max(4, getXp() % 100);
+    const ringPct = Math.max(4, ((getXp() % XP_PER_LEVEL) / XP_PER_LEVEL) * 100);
     pointsDisplay.innerHTML = `<div class="chip-coin"><div class="chip-coin-inner"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg></div></div><div class="chip-text"><span class="chip-level">Level ${level}</span><span class="chip-points">${(profile.chips||0).toLocaleString('de-DE')} Chips</span></div>`;
     const initial = profile.name.charAt(0).toUpperCase();
     const chips = profile.chips || 0;
