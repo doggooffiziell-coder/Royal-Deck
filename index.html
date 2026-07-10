@@ -326,7 +326,7 @@
     background:linear-gradient(150deg,var(--c1),var(--c2));
     border:1px solid rgba(212,175,106,.2);
     box-shadow:0 20px 40px rgba(0,0,0,.4), inset 0 0 0 1px rgba(0,0,0,.25);
-    transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateZ(0);
+    transform:perspective(700px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) scale(var(--s,1)) translateZ(0);
     transition:transform .18s cubic-bezier(.16,1,.3,1), box-shadow .25s ease, border-color .25s ease;
     display:flex;align-items:flex-end;
   }
@@ -3722,16 +3722,20 @@
         </div>
       `;
       const tableEl = card.querySelector('.table-card');
+      tableEl.addEventListener('pointerenter', () => {
+        tableEl.style.setProperty('--s', '1.02');
+      });
       tableEl.addEventListener('pointermove', e => {
         const r = tableEl.getBoundingClientRect();
         const px = (e.clientX - r.left) / r.width - 0.5;
         const py = (e.clientY - r.top) / r.height - 0.5;
-        tableEl.style.setProperty('--ry', (px * 8) + 'deg');
-        tableEl.style.setProperty('--rx', (py * -6) + 'deg');
+        tableEl.style.setProperty('--ry', (px * 15) + 'deg');
+        tableEl.style.setProperty('--rx', (py * -11) + 'deg');
       });
       tableEl.addEventListener('pointerleave', () => {
         tableEl.style.setProperty('--ry', '0deg');
         tableEl.style.setProperty('--rx', '0deg');
+        tableEl.style.setProperty('--s', '1');
       });
       card.addEventListener('click', () => openGame(g.name));
       el.appendChild(card);
