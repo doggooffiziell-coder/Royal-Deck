@@ -1271,6 +1271,26 @@
     100%{transform:translateX(350%);}
   }
 
+  /* --------- Coming-Soon: Alpha-Zugriff anfordern --------- */
+  .soon-alpha-request{margin-top:16px;display:flex;flex-direction:column;align-items:center;}
+  .soon-alpha-form{display:none;flex-direction:column;gap:10px;margin-top:12px;width:100%;max-width:300px;}
+  .soon-alpha-form.show{display:flex;}
+  .soon-alpha-form input{
+    height:42px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);
+    padding:0 14px;font-size:13.5px;outline:none;transition:.15s;font-family:var(--font-body);
+  }
+  .soon-alpha-form input::placeholder{color:var(--faint);}
+  .soon-alpha-form input:focus{border-color:var(--accent-dim);box-shadow:0 0 0 3px var(--accent-soft);}
+  .soon-alpha-form button{
+    height:42px;border-radius:8px;border:none;background:var(--accent);color:var(--accent-ink);
+    font-weight:600;font-size:13.5px;cursor:pointer;font-family:var(--font-body);transition:.15s;
+  }
+  .soon-alpha-form button:hover{background:var(--accent-hi);}
+  .soon-alpha-form button:disabled{opacity:.55;cursor:default;}
+  .soon-alpha-hint{font-size:12px;color:var(--muted);text-align:center;margin-top:8px;max-width:300px;line-height:1.5;}
+  .soon-alpha-hint.error{color:var(--danger);}
+  .soon-alpha-hint.success{color:var(--success);}
+
   .maint-login-row{margin-top:8px;display:flex;gap:10px;align-items:center;justify-content:center;}
   .maint-login-btn{
     background:var(--accent);color:var(--accent-ink);border:none;padding:10px 22px;border-radius:8px;
@@ -1283,23 +1303,6 @@
     background:none;border:none;color:var(--accent-hi);font-size:12px;font-weight:600;cursor:pointer;margin-top:8px;
   }
   .maint-logout-link:hover{text-decoration:underline;}
-
-  .alpha-request-btn{
-    display:inline-flex;align-items:center;gap:9px;margin:4px auto 0;
-    background:linear-gradient(120deg,rgba(212,175,106,.16),rgba(212,175,106,.06));
-    border:1px solid rgba(212,175,106,.4);color:var(--accent-hi);
-    padding:12px 26px;border-radius:10px;font-weight:700;font-size:13px;letter-spacing:.2px;
-    cursor:pointer;font-family:var(--font-body);transition:.18s;
-  }
-  .alpha-request-btn svg{width:15px;height:15px;fill:var(--accent-hi);flex-shrink:0;}
-  .alpha-request-btn:hover{background:linear-gradient(120deg,var(--accent-hi),#c79a4e);color:var(--accent-ink);}
-  .alpha-request-btn:hover svg{fill:var(--accent-ink);}
-  .alpha-request-btn.sent{
-    background:rgba(76,191,131,.12);border-color:rgba(76,191,131,.4);color:var(--success);cursor:default;
-  }
-  .alpha-request-btn.sent svg{fill:var(--success);}
-  .alpha-request-btn.sent:hover{background:rgba(76,191,131,.12);color:var(--success);}
-  .alpha-request-btn:disabled{opacity:.65;cursor:default;}
 
   /* --------- maintenance preview close button --------- */
   #maintenancePreviewExit{
@@ -1567,6 +1570,24 @@
   }
   .wl-item .wl-main-badge svg{width:13px;height:13px;fill:currentColor;}
   .wl-empty{font-size:12px;color:var(--faint);padding:6px 2px;}
+  /* --------- admin: Alpha-Access-Anfragen --------- */
+  .wl-item.alpha-req{align-items:center;}
+  .wl-item .wl-person{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0;}
+  .wl-item .wl-name{font-size:13.5px;color:var(--text);font-weight:600;font-family:var(--font-body);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .wl-item .wl-sub{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .wl-status-pill{flex-shrink:0;font-size:10.5px;font-weight:700;letter-spacing:.3px;padding:3px 9px;border-radius:20px;
+    background:rgba(212,175,106,.12);color:var(--accent-hi);border:1px solid rgba(212,175,106,.28);}
+  .wl-status-pill.is-active{background:rgba(76,191,131,.14);color:var(--success);border-color:rgba(76,191,131,.32);}
+  .wl-activate-btn{
+    flex-shrink:0;height:30px;padding:0 14px;border-radius:7px;border:1px solid var(--accent-dim);
+    background:transparent;color:var(--accent-hi);font-weight:600;font-size:12px;cursor:pointer;
+    font-family:var(--font-body);transition:.15s;
+  }
+  .wl-activate-btn:hover{background:var(--accent-soft);}
+  .wl-activate-btn.is-active{border-color:var(--success);color:var(--success);}
+  .wl-activate-btn.is-active:hover{background:rgba(76,191,131,.12);}
+  .wl-activate-btn:disabled{opacity:.55;cursor:default;}
   /* Chip-Verwaltung im Admin-Panel */
   .chipadm-list{margin-top:14px;display:flex;flex-direction:column;gap:10px;}
   .chipadm-row{
@@ -1658,11 +1679,6 @@
   .adm-tab:hover{color:var(--text);}
   .adm-tab.active{color:var(--accent-hi);}
   .adm-tab.active:after{background:var(--accent-hi);}
-  .adm-tab-badge{
-    display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;
-    padding:0 4px;margin-left:6px;border-radius:8px;background:var(--danger);color:#fff;
-    font-size:9.5px;font-weight:700;letter-spacing:0;vertical-align:2px;
-  }
 
   .adm-panel{display:none;}
   .adm-panel.active{display:block;animation:modalIn .2s ease;}
@@ -2610,11 +2626,15 @@
     <p class="soon-desc soon-desc-note">Eine vorab Registrierung ist bereits möglich, gewährt jedoch derzeit noch keinerlei Zugriff auf die Seite.</p>
     <div class="soon-divider"></div>
 
-    <button type="button" class="alpha-request-btn" id="alphaRequestBtn">
-      <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>
-      Alpha Zugriff anfordern
-    </button>
-    <div class="maint-status-line" id="alphaRequestHint"></div>
+    <div class="soon-alpha-request">
+      <button type="button" class="maint-login-btn" id="soonAlphaRequestBtn">Alpha-Zugriff anfordern</button>
+      <form class="soon-alpha-form" id="soonAlphaForm" autocomplete="off">
+        <input type="text" id="soonAlphaName" placeholder="Dein Name" required>
+        <input type="email" id="soonAlphaEmail" placeholder="Deine E-Mail-Adresse" required>
+        <button type="submit" id="soonAlphaSubmitBtn">Anfrage senden</button>
+      </form>
+      <div class="soon-alpha-hint" id="soonAlphaHint"></div>
+    </div>
 
     <div class="maint-login-row" id="soonAuthRow">
       <button type="button" class="maint-login-btn" id="soonLoginBtn">Anmelden</button>
@@ -3426,7 +3446,7 @@
                 <div class="adm-tab active" data-adm-tab="status">Status</div>
                 <div class="adm-tab" data-adm-tab="chips">Chips</div>
                 <div class="adm-tab" data-adm-tab="whitelists">Whitelists</div>
-                <div class="adm-tab" data-adm-tab="alpha">Alpha Access<span class="adm-tab-badge" id="alphaReqBadge" style="display:none;"></span></div>
+                <div class="adm-tab" data-adm-tab="alpha">Alpha Access</div>
                 <div class="adm-tab" data-adm-tab="admins">Adminzugriff</div>
               </div>
 
@@ -3522,6 +3542,21 @@
                 </div>
               </div>
 
+              <!-- ===== Reiter: Alpha Access ===== -->
+              <div class="adm-panel" id="adm-panel-alpha">
+                <div class="adm-card wide" data-accent="gold">
+                  <div class="adm-card-head">
+                    <div class="adm-card-icon">
+                      <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>
+                    </div>
+                    <div class="adm-card-title">Alpha-Zugriff – Anfragen</div>
+                  </div>
+                  <p class="adm-card-note">Spieler, die auf dem Coming-Soon-Bildschirm Alpha-Zugriff angefordert haben. „Aktivieren“ schaltet die E-Mail-Adresse automatisch für den Coming-Soon-Modus frei (Eintrag in der Coming-Soon-Whitelist).</p>
+                  <div class="hint" id="alphaReqHint"></div>
+                  <div class="wl-list" id="alphaReqList"></div>
+                </div>
+              </div>
+
               <!-- ===== Reiter: Chips ===== -->
               <div class="adm-panel" id="adm-panel-chips">
                 <div class="adm-card wide" data-accent="gold">
@@ -3539,21 +3574,6 @@
                   <div class="hint" id="chipSearchHint"></div>
                   <button type="button" class="adm-ghost-btn" id="chipSelfBtn" style="margin-top:10px;">Meinen eigenen Account bearbeiten</button>
                   <div id="chipSearchResults" class="chipadm-list"></div>
-                </div>
-              </div>
-
-              <!-- ===== Reiter: Alpha Access ===== -->
-              <div class="adm-panel" id="adm-panel-alpha">
-                <div class="adm-card wide" data-accent="gold">
-                  <div class="adm-card-head">
-                    <div class="adm-card-icon">
-                      <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>
-                    </div>
-                    <div class="adm-card-title">Alpha-Zugriff-Anfragen</div>
-                  </div>
-                  <p class="adm-card-note">Spieler, die auf dem "launcht bald"-Screen auf "Alpha Zugriff anfordern" getippt haben. Freischalten setzt die E-Mail automatisch auf die Coming-Soon-Whitelist.</p>
-                  <div class="hint" id="alphaReqHint"></div>
-                  <div class="wl-list" id="alphaReqList"></div>
                 </div>
               </div>
 
@@ -5437,6 +5457,20 @@
     })
     .subscribe();
 
+  // Alpha-Zugriff-Anfragen: Admins sehen neue/aktualisierte Anfragen sofort, ohne neu zu laden.
+  // Wichtig: Realtime muss in Supabase für "alpha_access_requests" aktiviert sein
+  // (Dashboard -> Database -> Publications -> supabase_realtime -> Tabelle einschalten).
+  supabaseClient
+    .channel('alpha_access_requests_changes')
+    .on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'alpha_access_requests'
+    }, () => {
+      if(isAdmin) loadAlphaAccessRequests();
+    })
+    .subscribe();
+
   const AVATAR_COLORS = [
     'linear-gradient(135deg,#00a2ff,#7c3aed)',
     'linear-gradient(135deg,#f0d888,#d4af37)',
@@ -6603,6 +6637,53 @@
   }
   document.getElementById('soonLoginBtn').addEventListener('click', () => openModal('login'));
 
+  // --- "Alpha-Zugriff anfordern" auf dem Coming-Soon-Bildschirm ---
+  // Öffnet ein kleines Formular (Name + E-Mail); Anfragen landen in der Tabelle
+  // "alpha_access_requests" und werden im Admin-Bereich unter "Alpha Access" angezeigt.
+  document.getElementById('soonAlphaRequestBtn').addEventListener('click', () => {
+    const form = document.getElementById('soonAlphaForm');
+    const btn = document.getElementById('soonAlphaRequestBtn');
+    const showing = form.classList.toggle('show');
+    btn.style.display = showing ? 'none' : '';
+    if(showing){
+      const nameInput = document.getElementById('soonAlphaName');
+      const emailInput = document.getElementById('soonAlphaEmail');
+      if(!nameInput.value) nameInput.value = currentProfile?.name || currentProfile?.username || '';
+      if(!emailInput.value) emailInput.value = currentUserEmail || '';
+    }
+  });
+
+  document.getElementById('soonAlphaForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const hint = document.getElementById('soonAlphaHint');
+    const submitBtn = document.getElementById('soonAlphaSubmitBtn');
+    const name = document.getElementById('soonAlphaName').value.trim();
+    const email = document.getElementById('soonAlphaEmail').value.trim();
+    hint.className = 'soon-alpha-hint';
+    hint.textContent = '';
+    if(!name || !email){
+      hint.textContent = 'Bitte Name und E-Mail-Adresse angeben.';
+      hint.classList.add('error');
+      return;
+    }
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sende...';
+    const { error } = await supabaseClient.from('alpha_access_requests').insert({ name, email: email.toLowerCase() });
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Anfrage senden';
+    if(error){
+      hint.textContent = error.message.includes('duplicate') ? 'Für diese E-Mail liegt bereits eine Anfrage vor.' : error.message;
+      hint.classList.add('error');
+      return;
+    }
+    hint.textContent = 'Danke! Wir melden uns, sobald Alpha-Zugriff freigeschaltet wird.';
+    hint.classList.add('success');
+    const form = document.getElementById('soonAlphaForm');
+    form.reset();
+    form.classList.remove('show');
+    document.getElementById('soonAlphaRequestBtn').style.display = '';
+  });
+
   // --- Login/Logout direkt vom Wartungsbildschirm aus ---
   function renderMaintenanceAuthRow(email){
     const row = document.getElementById('maintAuthRow');
@@ -7277,140 +7358,79 @@
     await loadComingSoonWhitelist();
   });
 
-  // --- Alpha-Zugriff: Nutzer stellt Anfrage über den "launcht bald"-Screen ---
-  async function checkOwnAlphaRequest(uid, uemail){
-    const btn = document.getElementById('alphaRequestBtn');
-    const hint = document.getElementById('alphaRequestHint');
-    if(!btn) return;
-    const userId = uid !== undefined ? uid : currentUserId;
-    if(!userId){
-      btn.disabled = false;
-      btn.classList.remove('sent');
-      btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>Alpha Zugriff anfordern`;
-      hint.textContent = 'Melde dich zuerst an, um Zugriff anzufragen.';
-      return;
-    }
-    const { data, error } = await supabaseClient
-      .from('alpha_access_requests')
-      .select('status')
-      .eq('user_id', userId)
-      .maybeSingle();
-    if(error || !data){
-      btn.disabled = false;
-      btn.classList.remove('sent');
-      hint.textContent = '';
-      return;
-    }
-    if(data.status === 'approved'){
-      btn.disabled = true;
-      btn.classList.add('sent');
-      btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Zugriff freigeschaltet`;
-      hint.textContent = 'Lade die Seite neu, sobald der Coming-Soon-Modus für dich aufgehoben wurde.';
-    } else if(data.status === 'rejected'){
-      btn.disabled = false;
-      btn.classList.remove('sent');
-      hint.textContent = 'Deine letzte Anfrage wurde abgelehnt — du kannst es erneut versuchen.';
-    } else {
-      btn.disabled = true;
-      btn.classList.add('sent');
-      btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Anfrage gesendet`;
-      hint.textContent = 'Wir melden uns, sobald dein Zugriff freigeschaltet ist.';
-    }
-  }
-
-  document.getElementById('alphaRequestBtn').addEventListener('click', async () => {
-    const btn = document.getElementById('alphaRequestBtn');
-    const hint = document.getElementById('alphaRequestHint');
-    if(!currentUserId){
-      hint.textContent = 'Melde dich zuerst an, um Zugriff anzufragen.';
-      openModal('login');
-      return;
-    }
-    btn.disabled = true;
-    btn.textContent = 'Sende Anfrage...';
-    const { error } = await supabaseClient.from('alpha_access_requests').insert({
-      user_id: currentUserId,
-      email: currentUserEmail,
-      username: currentProfile?.username || null,
-      status: 'pending'
-    });
-    if(error){
-      btn.disabled = false;
-      hint.textContent = error.message.includes('duplicate') ? 'Du hast bereits eine Anfrage gestellt.' : error.message;
-      await checkOwnAlphaRequest();
-      return;
-    }
-    showToast('Alpha-Zugriff angefragt.');
-    await checkOwnAlphaRequest();
-  });
-
   // --- Admin: Alpha-Zugriff-Anfragen verwalten ---
-  async function loadAlphaRequests(){
+  // Anfragen kommen vom "Alpha-Zugriff anfordern"-Formular auf dem Coming-Soon-Screen
+  // (Tabelle "alpha_access_requests", Spalten: id, name, email, activated, created_at).
+  // "Aktivieren" setzt activated=true UND trägt die E-Mail in die Coming-Soon-Whitelist ein,
+  // damit die Person tatsächlich Zugriff bekommt.
+  async function loadAlphaAccessRequests(){
     const list = document.getElementById('alphaReqList');
-    const badge = document.getElementById('alphaReqBadge');
-    if(!list || !isAdmin) return;
+    if(!isAdmin){ list.innerHTML = ''; return; }
     const { data, error } = await supabaseClient
       .from('alpha_access_requests')
-      .select('id, email, username, status, created_at')
+      .select('id, name, email, activated, created_at')
       .order('created_at', { ascending: true });
     if(error){
       list.innerHTML = `<div class="wl-empty">Fehler beim Laden: ${error.message}</div>`;
       return;
-    }
-    const pending = (data || []).filter(r => r.status === 'pending');
-    if(badge){
-      if(pending.length > 0){ badge.style.display = ''; badge.textContent = pending.length; }
-      else { badge.style.display = 'none'; }
     }
     if(!data || data.length === 0){
       list.innerHTML = `<div class="wl-empty">Noch keine Alpha-Zugriff-Anfragen.</div>`;
       return;
     }
     list.innerHTML = data.map(row => `
-      <div class="wl-item" data-id="${row.id}">
-        <span class="wl-email">${row.username ? '@' + row.username + ' · ' : ''}${row.email} <span class="hint" style="display:inline;">(${row.status === 'pending' ? 'offen' : row.status === 'approved' ? 'freigeschaltet' : 'abgelehnt'})</span></span>
+      <div class="wl-item alpha-req" data-id="${row.id}" data-email="${row.email}">
+        <div class="wl-person">
+          <span class="wl-name">${row.name ? row.name : '(kein Name angegeben)'}</span>
+          <span class="wl-sub">${row.email}</span>
+        </div>
         <div class="wl-actions">
-          ${row.status !== 'approved' ? `<button type="button" class="adm-ghost-btn alpha-approve-btn" style="padding:6px 12px;font-size:11.5px;">Freischalten</button>` : ''}
-          ${row.status !== 'rejected' ? `<button type="button" class="adm-ghost-btn alpha-reject-btn" style="padding:6px 12px;font-size:11.5px;">Ablehnen</button>` : ''}
-          <div class="wl-remove" title="Anfrage entfernen">
-            <svg viewBox="0 0 24 24"><path d="M18.3 5.7L12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7 2.9 18.3 9.2 12 2.9 5.7 4.3 4.3l6.3 6.3 6.3-6.3z"/></svg>
-          </div>
+          <span class="wl-status-pill ${row.activated ? 'is-active' : ''}">${row.activated ? 'Aktiv' : 'Ausstehend'}</span>
+          <button type="button" class="wl-activate-btn ${row.activated ? 'is-active' : ''}" data-activate="${row.id}">
+            ${row.activated ? 'Deaktivieren' : 'Aktivieren'}
+          </button>
         </div>
       </div>`).join('');
-    list.querySelectorAll('.alpha-approve-btn').forEach(btn => {
+    list.querySelectorAll('[data-activate]').forEach(btn => {
       btn.addEventListener('click', async () => {
         const item = btn.closest('.wl-item');
-        const id = item.dataset.id;
-        const row = data.find(r => String(r.id) === String(id));
-        if(!row) return;
-        const { error: upError } = await supabaseClient.from('alpha_access_requests').update({ status: 'approved' }).eq('id', id);
-        if(upError){ showToast(upError.message); return; }
-        if(row.email){
-          await supabaseClient.from('coming_soon_whitelist').insert({ email: row.email.toLowerCase() }).select();
+        const id = btn.dataset.activate;
+        const email = item.dataset.email;
+        const nowActivated = !btn.classList.contains('is-active');
+        btn.disabled = true;
+        const { error: updError } = await supabaseClient
+          .from('alpha_access_requests')
+          .update({ activated: nowActivated })
+          .eq('id', id);
+        if(updError){
+          showToast(updError.message);
+          btn.disabled = false;
+          return;
         }
-        showToast(`${row.email} freigeschaltet.`);
-        await loadAlphaRequests();
-        await loadComingSoonWhitelist();
-      });
-    });
-    list.querySelectorAll('.alpha-reject-btn').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const item = btn.closest('.wl-item');
-        const id = item.dataset.id;
-        const { error: upError } = await supabaseClient.from('alpha_access_requests').update({ status: 'rejected' }).eq('id', id);
-        if(upError){ showToast(upError.message); return; }
-        showToast('Anfrage abgelehnt.');
-        await loadAlphaRequests();
-      });
-    });
-    list.querySelectorAll('.wl-remove').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const item = btn.closest('.wl-item');
-        const id = item.dataset.id;
-        const { error: delError } = await supabaseClient.from('alpha_access_requests').delete().eq('id', id);
-        if(delError){ showToast(delError.message); return; }
-        showToast('Anfrage entfernt.');
-        await loadAlphaRequests();
+        if(nowActivated){
+          // In die Coming-Soon-Whitelist aufnehmen (oder wieder aktivieren, falls dort schon vorhanden).
+          const { data: existingWl } = await supabaseClient
+            .from('coming_soon_whitelist')
+            .select('id, active')
+            .eq('email', email)
+            .maybeSingle();
+          let wlError = null;
+          if(existingWl){
+            if(!existingWl.active){
+              const res = await supabaseClient.from('coming_soon_whitelist').update({ active: true }).eq('id', existingWl.id);
+              wlError = res.error;
+            }
+          } else {
+            const res = await supabaseClient.from('coming_soon_whitelist').insert({ email });
+            wlError = res.error;
+          }
+          if(wlError){ showToast('Aktiviert, aber Whitelist-Eintrag fehlgeschlagen: ' + wlError.message); }
+          else { showToast('Alpha-Zugriff aktiviert — Person ist jetzt auf der Coming-Soon-Whitelist.'); }
+          await loadComingSoonWhitelist();
+        } else {
+          showToast('Alpha-Zugriff-Status zurückgesetzt.');
+        }
+        await loadAlphaAccessRequests();
       });
     });
   }
@@ -7653,8 +7673,8 @@
       updateAdminStatusConsole();
       loadWhitelist();
       loadComingSoonWhitelist();
+      loadAlphaAccessRequests();
       loadAdminList();
-      loadAlphaRequests();
     }
 
     document.querySelectorAll('#settingsGenderSelect .gender-opt').forEach(o => {
