@@ -225,25 +225,13 @@
   .content::-webkit-scrollbar-thumb{background:var(--border);border-radius:6px;}
 
   .hero{
-    height:222px;border-radius:16px;
+    min-height:250px;border-radius:16px;
     background:
-      radial-gradient(ellipse 480px 300px at 82% 20%, rgba(212,175,106,.10), transparent 65%),
+      radial-gradient(ellipse 560px 340px at 80% -14%, rgba(212,175,106,.16), transparent 60%),
+      radial-gradient(circle at 1px 1px, rgba(212,175,106,.05) 1px, transparent 1.4px) 0 0/26px 26px,
       linear-gradient(115deg,#0b1c13,var(--felt) 55%,#0e2417);
-    display:flex;align-items:center;padding:0 46px;color:var(--text);margin-bottom:34px;position:relative;overflow:hidden;
+    display:flex;align-items:center;padding:38px 46px 30px;color:var(--text);margin-bottom:34px;position:relative;overflow:hidden;
     border:1px solid var(--border);box-shadow:inset 0 0 0 1px rgba(212,175,106,.05), 0 18px 40px rgba(0,0,0,.35);
-  }
-  /* engraved card-suit motif — quiet, not a gradient blob */
-  .hero:before{
-    content:"♠";position:absolute;right:16px;top:50%;transform:translateY(-50%);
-    font-size:190px;line-height:1;color:rgba(240,211,142,.05);
-    font-family:var(--font-display);pointer-events:none;
-  }
-  /* signature: a brushed-foil rail along the base of the hero, like the
-     gold trim on a card-table rail — a hairline, not a string of bulbs */
-  .hero:after{
-    content:"";position:absolute;left:24px;right:24px;bottom:0;height:1px;
-    background:linear-gradient(90deg,transparent,var(--accent-dim) 6%,var(--accent-hi) 50%,var(--accent-dim) 94%,transparent);
-    opacity:.9;box-shadow:0 1px 8px rgba(240,211,142,.18);
   }
   .hero-inner{position:relative;z-index:1;}
   .hero-eyebrow{
@@ -266,22 +254,69 @@
   }
   .hero p{font-size:14px;color:var(--muted);margin-bottom:22px;max-width:380px;line-height:1.55;}
   .hero button{
+    display:inline-flex;align-items:center;
     background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:var(--accent-ink);border:none;padding:15px 32px;border-radius:10px;
     font-weight:700;font-size:15px;cursor:pointer;letter-spacing:.2px;transition:.15s;font-family:var(--font-body);
     box-shadow:0 8px 18px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.35);
   }
   .hero button:hover{filter:brightness(1.06);transform:translateY(-1px);}
+  .hero button svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;margin-left:9px;transition:.15s;}
+  .hero button:hover svg{transform:translateX(3px);}
 
-  .section-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px;margin-top:36px;}
+  /* live table count + a nod to "no real money" -- both true, drawn from
+     the same data the game grid renders from */
+  .hero-stats{display:flex;align-items:center;gap:12px;margin-top:22px;font-family:var(--font-mono);font-size:11px;letter-spacing:.4px;color:var(--muted);}
+  .hero-stats strong{color:var(--accent-hi);font-weight:600;}
+  .hero-stat-sep{width:3px;height:3px;border-radius:50%;background:var(--faint);flex-shrink:0;}
+
+  /* signature: a literal row of marquee bulbs along the hero's base,
+     instead of a plain gradient hairline */
+  .hero-marquee{
+    position:absolute;left:30px;right:30px;bottom:18px;height:5px;z-index:1;
+    background-image:radial-gradient(circle,var(--accent-hi) 1.5px,transparent 1.9px);
+    background-size:13px 5px;background-repeat:repeat-x;background-position:center;
+    opacity:.5;filter:drop-shadow(0 0 3px rgba(240,211,142,.45));pointer-events:none;
+  }
+
+  /* a fanned hand of cards, standing in for the old lone watermark suit --
+     recolored to echo the two live tables below so the banner and the
+     grid read as one deck */
+  .hero-cardfan{
+    position:absolute;right:8px;top:50%;transform:translateY(-50%);
+    width:230px;height:170px;pointer-events:none;z-index:0;
+  }
+  .hero-cardfan .fan-card{
+    position:absolute;top:8px;width:100px;height:140px;border-radius:12px;
+    border:1px solid rgba(212,175,106,.22);box-shadow:0 22px 40px rgba(0,0,0,.45), inset 0 0 0 1px rgba(0,0,0,.25);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .hero-cardfan .fan-card:before, .hero-cardfan .fan-card:after{
+    content:attr(data-suit);position:absolute;font-family:var(--font-display);font-style:italic;
+    font-size:12px;color:rgba(242,236,221,.5);line-height:1;
+  }
+  .hero-cardfan .fan-card:before{top:8px;left:9px;}
+  .hero-cardfan .fan-card:after{bottom:8px;right:9px;transform:rotate(180deg);}
+  .hero-cardfan .fan-glyph{font-family:var(--font-display);font-size:38px;color:rgba(242,236,221,.85);}
+  .hero-cardfan .fan-1{right:118px;transform:rotate(-13deg);z-index:1;background:linear-gradient(150deg,#132a1c,#2a4a34);}
+  .hero-cardfan .fan-2{right:58px;top:-4px;transform:rotate(-1deg);z-index:2;background:linear-gradient(150deg,#1c1408,#8a6a35);}
+  .hero-cardfan .fan-3{right:0;transform:rotate(12deg);z-index:3;background:linear-gradient(150deg,#3a0d12,#c1443c);}
+  @media (max-width:900px){ .hero-cardfan{display:none;} }
+
+  .section-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:16px;margin-top:36px;}
+  .section-head .section-head-text .section-eyebrow{
+    font-family:var(--font-mono);font-size:10.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent-dim);margin-bottom:5px;
+  }
   .section-head h2{font-family:var(--font-display);font-style:italic;font-size:19px;font-weight:600;color:var(--text);letter-spacing:-.1px;}
-  .section-head a{font-size:12.5px;color:var(--muted);text-decoration:none;font-weight:500;cursor:pointer;transition:.15s;}
+  .section-head a{font-size:12.5px;color:var(--muted);text-decoration:none;font-weight:500;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:5px;}
   .section-head a:hover{color:var(--accent-hi);}
+  .section-head a svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;transition:.15s;}
+  .section-head a:hover svg{transform:translateX(2px);}
 
   .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,190px));gap:18px;justify-content:center;}
   .card{cursor:pointer;}
   .thumb{
     width:100%;aspect-ratio:1/1;border-radius:12px;background:linear-gradient(150deg,var(--c1),var(--c2));
-    position:relative;overflow:hidden;border:1px solid rgba(212,175,106,.16);transition:.18s;
+    position:relative;overflow:hidden;border:1px solid rgba(212,175,106,.16);transition:.22s cubic-bezier(.16,1,.3,1);
     box-shadow:inset 0 0 0 1px rgba(0,0,0,.25);
   }
   /* corner index pips, like a real playing card */
@@ -291,16 +326,27 @@
   }
   .thumb:before{top:9px;left:10px;}
   .thumb:after{bottom:9px;right:10px;transform:rotate(180deg);}
-  .card:hover .thumb{border-color:rgba(240,211,142,.55);box-shadow:0 14px 28px rgba(0,0,0,.5), inset 0 0 0 1px rgba(0,0,0,.25);transform:translateY(-3px);}
+  .card:hover .thumb{
+    border-color:rgba(240,211,142,.55);transform:translateY(-4px);
+    box-shadow:0 16px 30px rgba(0,0,0,.5), 0 16px 40px -10px var(--c2), inset 0 0 0 1px rgba(0,0,0,.25);
+  }
   .thumb .play{
     position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;
     background:rgba(6,10,8,.55);transition:.15s;backdrop-filter:blur(1px);
   }
   .card:hover .play{opacity:1;}
   .suit{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-    font-size:40px;color:rgba(242,236,221,.85);font-family:var(--font-display);}
+    font-size:40px;color:rgba(242,236,221,.85);font-family:var(--font-display);
+    text-shadow:0 0 30px rgba(240,211,142,.2);}
   .play svg{width:28px;height:28px;fill:var(--accent-hi);}
-  .card h3{font-family:var(--font-display);font-style:italic;font-size:13.5px;font-weight:600;margin-top:11px;line-height:1.3;color:var(--text);}
+  .thumb-live{
+    position:absolute;top:8px;right:9px;display:flex;align-items:center;gap:5px;z-index:2;
+    padding:3px 8px 3px 6px;border-radius:20px;background:rgba(6,10,8,.55);backdrop-filter:blur(2px);
+    font-family:var(--font-mono);font-size:8.5px;letter-spacing:.4px;color:var(--success);text-transform:uppercase;
+  }
+  .thumb-live span{width:5px;height:5px;border-radius:50%;background:var(--success);box-shadow:0 0 6px var(--success);animation:thumbLivePulse 1.8s ease-in-out infinite;flex-shrink:0;}
+  @keyframes thumbLivePulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+  .card h3{font-family:var(--font-display);font-style:italic;font-size:14px;font-weight:600;margin-top:12px;line-height:1.3;color:var(--text);}
   .card .stat{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--faint);margin-top:4px;font-family:var(--font-mono);}
   .card .stat svg{width:10px;height:10px;fill:var(--faint);}
 
@@ -327,8 +373,8 @@
     .sidebar{width:0;overflow:hidden;border:none;}
     .content{padding:16px;}
     .hero h1{font-size:22px;}
-    .hero{padding:0 22px;}
-    .hero:before{font-size:130px;}
+    .hero{padding:28px 22px 40px;min-height:0;}
+    .hero-stats{flex-wrap:wrap;}
   }
 
   /* ---------- Overlay/modal shared styles ---------- */
@@ -3319,6 +3365,12 @@
 
   <div class="content" id="homeView">
     <div class="hero">
+      <div class="hero-cardfan" aria-hidden="true">
+        <div class="fan-card fan-1" data-suit="♠"><span class="fan-glyph">♠</span></div>
+        <div class="fan-card fan-2" data-suit="♣"><span class="fan-glyph">♣</span></div>
+        <div class="fan-card fan-3" data-suit="★"><span class="fan-glyph">★</span></div>
+      </div>
+      <div class="hero-marquee"></div>
       <div class="hero-inner">
         <div class="hero-eyebrow">
           <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>
@@ -3327,13 +3379,22 @@
 
         <h1 id="heroGreeting"></h1>
         <p>Entdecke neue Erlebnisse und spiel mit deinen Freunden am Tisch.</p>
-        <button id="heroCta">Jetzt entdecken</button>
+        <button id="heroCta">Jetzt entdecken<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+
+        <div class="hero-stats">
+          <div class="hero-stat"><strong id="heroStatTables">2</strong> Tische live</div>
+          <div class="hero-stat-sep"></div>
+          <div class="hero-stat">Kein Echtgeld · nur Punkte</div>
+        </div>
       </div>
     </div>
 
     <div class="section-head" id="gamesSection">
-      <h2>Casino Spiele</h2>
-      <a id="allGamesLink">Alle anzeigen</a>
+      <div class="section-head-text">
+        <div class="section-eyebrow">Spielbibliothek</div>
+        <h2>Casino Spiele</h2>
+      </div>
+      <a id="allGamesLink">Alle anzeigen<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a>
     </div>
     <div class="row" id="row1"></div>
   </div>
@@ -3598,6 +3659,7 @@
       card.className = 'card';
       card.innerHTML = `
         <div class="thumb" data-suit="${g.suit}" style="--c1:${g.c1};--c2:${g.c2}">
+          <div class="thumb-live"><span></span>Live</div>
           <div class="suit">${g.suit}</div>
           <div class="play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
         </div>
@@ -3621,6 +3683,9 @@
     }
   }
   makeRow('row1');
+  const heroStatTablesEl = document.getElementById('heroStatTables');
+  if(heroStatTablesEl) heroStatTablesEl.textContent = games.length;
+
 
   // --- Toast (kurzes Feedback für Aktionen ohne eigene Ansicht) ---
   let toastTimer = null;
