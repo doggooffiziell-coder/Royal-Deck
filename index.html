@@ -2021,6 +2021,53 @@
     .reward-card-action{align-items:flex-start;width:100%;}
     .reward-claim-btn{width:100%;}
   }
+
+  /* ---------- Levelbelohnungen ---------- */
+  .level-rewards-section{margin-top:30px;}
+  .level-rewards-headrow{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:6px;}
+  .level-rewards-title{font-family:var(--font-display);font-size:19px;font-weight:600;color:var(--text);}
+  .level-rewards-sub{color:var(--muted);font-size:12.5px;margin-top:2px;}
+  .level-progress-wrap{flex:1;min-width:180px;max-width:280px;}
+  .level-progress-label{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:11px;color:var(--faint);margin-bottom:5px;}
+  .level-progress-track{height:8px;border-radius:4px;background:var(--surface-2);box-shadow:inset 0 0 0 1px rgba(212,175,106,.25);overflow:hidden;}
+  .level-progress-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--accent-hi));transition:width .4s ease;}
+  .level-rewards-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:14px;margin-top:18px;
+  }
+  .level-reward-tile{
+    position:relative;border-radius:14px;padding:16px 12px 14px;text-align:center;
+    background:linear-gradient(160deg,#152418,#0e1a14 75%);
+    border:1px solid var(--border-soft);
+    box-shadow:inset 0 0 0 1px rgba(212,175,106,.08),0 8px 18px rgba(0,0,0,.3);
+    transition:.18s;
+  }
+  .level-reward-tile.unlocked{border-color:rgba(212,175,106,.5);box-shadow:inset 0 0 0 1px rgba(212,175,106,.25),0 0 0 1px rgba(212,175,106,.15),0 10px 22px rgba(0,0,0,.35);}
+  .level-reward-tile.locked{opacity:.5;filter:grayscale(.5);}
+  .level-reward-tile .lrt-icon{
+    width:44px;height:44px;margin:0 auto 8px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(circle at 35% 30%,var(--accent-hi),var(--accent) 60%,var(--accent-dim));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -3px 6px rgba(0,0,0,.25);
+  }
+  .level-reward-tile.locked .lrt-icon{background:var(--surface-2);}
+  .level-reward-tile .lrt-icon svg{width:22px;height:22px;fill:var(--accent-ink);}
+  .level-reward-tile.locked .lrt-icon svg{fill:var(--faint);}
+  .level-reward-tile .lrt-level{font-family:var(--font-mono);font-size:10.5px;color:var(--accent-hi);letter-spacing:.3px;font-weight:700;}
+  .level-reward-tile .lrt-title{font-size:13px;font-weight:600;color:var(--text);margin-top:3px;}
+  .level-reward-tile .lrt-amount{font-family:var(--font-mono);font-size:11.5px;color:var(--muted);margin-top:4px;}
+  .level-reward-tile .lrt-check{
+    position:absolute;top:8px;right:8px;width:16px;height:16px;border-radius:50%;
+    background:var(--success);display:flex;align-items:center;justify-content:center;
+  }
+  .level-reward-tile .lrt-check svg{width:9px;height:9px;fill:#0c2814;}
+
+  /* Kurzer Gold-Puls am Avatar-Ring bei Level-Aufstieg — die Glücksrad-Animation
+     im Header (chip-coin) bleibt davon unberührt. */
+  @keyframes levelUpPulse{
+    0%{box-shadow:0 0 0 0 rgba(212,175,106,.7);}
+    70%{box-shadow:0 0 0 14px rgba(212,175,106,0);}
+    100%{box-shadow:0 0 0 0 rgba(212,175,106,0);}
+  }
+  .avatar-ring.level-pulse{animation:levelUpPulse 1s ease-out;}
 </style>
 </head>
 <body>
@@ -2328,9 +2375,9 @@
     </div>
     <div class="top-right">
       <div class="hud-rail">
-        <div class="points-chip" id="pointsDisplay" title="Dein Level basiert auf deinen Punkten">
+        <div class="points-chip" id="pointsDisplay" title="Dein Level basiert auf deinen Chips">
           <div class="chip-coin"><div class="chip-coin-inner"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg></div></div>
-          <div class="chip-text"><span class="chip-level">Level 1</span><span class="chip-points">0 Punkte</span></div>
+          <div class="chip-text"><span class="chip-level">Level 1</span><span class="chip-points">0 Chips</span></div>
         </div>
 
         <div class="hud-divider"></div>
@@ -2441,7 +2488,7 @@
               <div class="adm-console-dot"></div>
               <div class="adm-console-text">
                 <div class="adm-console-eyebrow">Konto-Übersicht</div>
-                <div class="adm-console-label" id="profConsoleLabel">Level 1 · 0 Punkte</div>
+                <div class="adm-console-label" id="profConsoleLabel">Level 1 · 0 Chips</div>
                 <div class="adm-console-desc" id="profConsoleDesc">Standard-Konto</div>
               </div>
             </div>
@@ -2620,7 +2667,7 @@
                   </div>
                   <p class="adm-card-note">
                     Deine Anfrage wird an unser Team weitergeleitet, dein Konto inkl. Profil, Freunden und
-                    Punkten wird danach unwiderruflich gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.
+                    Chips werden danach unwiderruflich gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.
                   </p>
                   <div class="adm-card-foot">
                     <button type="button" class="adm-ghost-btn" id="requestDeleteAccountBtn" style="color:var(--danger);border-color:rgba(239,107,107,.3);">Löschung beantragen</button>
@@ -2716,7 +2763,7 @@
                       <div class="adm-card-title">Wöchentliche E-Mail-Zusammenfassung</div>
                       <label class="switch"><input type="checkbox" id="notifEmailDigest"><span class="slider"></span></label>
                     </div>
-                    <p class="adm-card-note">Kurzer Überblick über Aktivität, neue Freunde und Punkte per E-Mail.</p>
+                    <p class="adm-card-note">Kurzer Überblick über Aktivität, neue Freunde und Chips per E-Mail.</p>
                   </div>
                 </div>
               </div>
@@ -3047,7 +3094,7 @@
                     </div>
                     <div class="adm-card-title">Chips verwalten</div>
                   </div>
-                  <p class="adm-card-note">Suche einen Spieler über den Benutzernamen und passe seinen Punktestand an. Funktioniert auch für dein eigenes Konto — Änderungen wirken sofort.</p>
+                  <p class="adm-card-note">Suche einen Spieler über den Benutzernamen und passe seinen Chip-Stand an. Funktioniert auch für dein eigenes Konto — Änderungen wirken sofort.</p>
                   <div class="wl-add-row">
                     <input id="chipSearchInput" type="text" placeholder="Benutzername suchen…">
                     <button type="button" id="chipSearchBtn">Suchen</button>
@@ -3292,7 +3339,7 @@
       <div class="reward-card-body">
         <div class="reward-card-title">Täglicher Bonus</div>
         <div class="reward-card-desc">Ein Geschenk des Hauses — einmal alle 24 Stunden, einfach so.</div>
-        <div class="reward-card-amount">+10.000 <span>Punkte</span></div>
+        <div class="reward-card-amount">+10.000 <span>Chips</span></div>
       </div>
       <div class="reward-card-action">
         <button type="button" class="reward-claim-btn" id="dailyBonusBtn">Abholen</button>
@@ -3301,6 +3348,20 @@
     </div>
 
     <div class="reward-more-hint">Weitere Belohnungen — Wochen-Streaks, Erfolge, VIP-Vorteile — folgen in Kürze.</div>
+
+    <div class="level-rewards-section">
+      <div class="level-rewards-headrow">
+        <div>
+          <div class="level-rewards-title">Levelbelohnungen</div>
+          <div class="level-rewards-sub">Steig auf und kassier Chip-Boni fürs Spielen.</div>
+        </div>
+        <div class="level-progress-wrap">
+          <div class="level-progress-label"><span id="lvlProgressCur">Level 1</span><span id="lvlProgressNext"></span></div>
+          <div class="level-progress-track"><div class="level-progress-fill" id="lvlProgressFill" style="width:0%;"></div></div>
+        </div>
+      </div>
+      <div class="level-rewards-grid" id="levelRewardsGrid"></div>
+    </div>
   </div>
 </div>
 
@@ -3519,7 +3580,7 @@
     try { localStorage.setItem(dailyBonusStorageKey(), String(Date.now())); } catch(e){}
     await bjAdjustChips(DAILY_BONUS_AMOUNT);
     bjPlayChipSound();
-    showToast('+10.000 Punkte abgeholt!');
+    showToast('+10.000 Chips abgeholt!');
     refreshDailyBonusUI();
   });
 
@@ -3687,13 +3748,108 @@
   // Neuladen (renderAuthArea) neu berechnet wurde. Jetzt läuft jede Chip-Änderung
   // (Gewinn, Verlust, Admin-Korrektur) über diese Funktion, sodass Level immer exakt
   // Math.floor(chips / 100) entspricht — in beide Richtungen.
+  // ---- Levelbelohnungen ----
+  // Einmalige Chip-Boni bei bestimmten Levels. Nutzt localStorage zum Merken,
+  // welche Stufen schon abgeholt wurden (kein zusätzliches Supabase-Feld nötig,
+  // dadurch kein Risiko für fehlende Spalten wie beim gender-Bug).
+  const LEVEL_REWARDS = [
+    { level:5,  amount:1000,   title:'Einsteiger' },
+    { level:10, amount:2500,   title:'Stammgast' },
+    { level:15, amount:5000,   title:'Profi' },
+    { level:20, amount:10000,  title:'Highroller' },
+    { level:25, amount:15000,  title:'Meister' },
+    { level:30, amount:25000,  title:'Legende' },
+    { level:40, amount:50000,  title:'Ikone' },
+    { level:50, amount:100000, title:'Royal' },
+  ];
+  const LEVEL_REWARD_ICON = '<svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>';
+  const LEVEL_CHECK_ICON = '<svg viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>';
+
+  function lvlRewardsKey(){ return 'rt_level_rewards_' + (currentUserId || 'guest'); }
+  function lvlRewardsSeededKey(){ return lvlRewardsKey() + '_seeded'; }
+  function getClaimedLevelRewards(){
+    try { return JSON.parse(localStorage.getItem(lvlRewardsKey())) || []; } catch(e){ return []; }
+  }
+  function setClaimedLevelRewards(arr){
+    try { localStorage.setItem(lvlRewardsKey(), JSON.stringify(arr)); } catch(e){}
+  }
+  // Beim ersten Kontakt mit dem neuen System werden bereits erreichte Stufen als
+  // "abgeholt" markiert, damit Bestandsspieler nicht rückwirkend für längst
+  // erreichte Level ausgezahlt werden — Belohnungen gibt's ab jetzt für neue Aufstiege.
+  function seedLevelRewardsIfNeeded(level){
+    try {
+      if(localStorage.getItem(lvlRewardsSeededKey())) return;
+      setClaimedLevelRewards(LEVEL_REWARDS.filter(r => r.level <= level).map(r => r.level));
+      localStorage.setItem(lvlRewardsSeededKey(), '1');
+    } catch(e){}
+  }
+  function pulseAvatarRing(){
+    document.querySelectorAll('.avatar-ring').forEach(r => {
+      r.classList.remove('level-pulse');
+      void r.offsetWidth;
+      r.classList.add('level-pulse');
+    });
+  }
+  async function checkLevelRewards(){
+    if(!currentProfile) return;
+    const level = Math.max(1, Math.floor((currentProfile.chips || 0) / 100));
+    seedLevelRewardsIfNeeded(level);
+    const claimed = getClaimedLevelRewards();
+    for(const r of LEVEL_REWARDS){
+      if(level >= r.level && !claimed.includes(r.level)){
+        claimed.push(r.level);
+        setClaimedLevelRewards(claimed);
+        currentProfile.chips = (currentProfile.chips || 0) + r.amount;
+        bjSyncBalanceDisplay();
+        if(currentUserId){
+          try { await supabaseClient.from('profiles').update({ chips: currentProfile.chips }).eq('id', currentUserId); }
+          catch(e){ console.error('Levelbelohnung-Update fehlgeschlagen:', e); }
+        }
+        showToast(`🎉 Level ${r.level} — "${r.title}"! +${r.amount.toLocaleString('de-DE')} Chips`);
+        try { new Audio(BJ_CHIP_SOUND_SRC).play().catch(()=>{}); } catch(e){}
+        pulseAvatarRing();
+      }
+    }
+    renderLevelRewardsGrid(level, currentProfile.chips || 0);
+  }
+  function renderLevelRewardsGrid(level, chips){
+    const grid = document.getElementById('levelRewardsGrid');
+    if(!grid) return;
+    const claimed = getClaimedLevelRewards();
+    grid.innerHTML = LEVEL_REWARDS.map(r => {
+      const unlocked = level >= r.level;
+      return `<div class="level-reward-tile ${unlocked ? 'unlocked' : 'locked'}">
+        ${unlocked ? `<div class="lrt-check">${LEVEL_CHECK_ICON}</div>` : ''}
+        <div class="lrt-icon">${LEVEL_REWARD_ICON}</div>
+        <div class="lrt-level">LEVEL ${r.level}</div>
+        <div class="lrt-title">${r.title}</div>
+        <div class="lrt-amount">+${r.amount.toLocaleString('de-DE')} Chips</div>
+      </div>`;
+    }).join('');
+    const nextReward = LEVEL_REWARDS.find(r => r.level > level);
+    const curEl = document.getElementById('lvlProgressCur');
+    const nextEl = document.getElementById('lvlProgressNext');
+    const fillEl = document.getElementById('lvlProgressFill');
+    if(curEl) curEl.textContent = `Level ${level}`;
+    if(nextEl && fillEl){
+      if(nextReward){
+        const chipsIntoLevel = chips % 100;
+        nextEl.textContent = `noch ${(nextReward.level * 100 - chips).toLocaleString('de-DE')} Chips bis Lvl ${nextReward.level}`;
+        fillEl.style.width = Math.min(100, chipsIntoLevel) + '%';
+      } else {
+        nextEl.textContent = 'Alle Stufen erreicht 👑';
+        fillEl.style.width = '100%';
+      }
+    }
+  }
+
   function bjSyncBalanceDisplay(){
     const chips = (currentProfile && currentProfile.chips) || 0;
     const val = chips.toLocaleString('de-DE');
     const level = Math.max(1, Math.floor(chips / 100));
     const ringPct = Math.max(4, chips % 100);
     const chipPointsEl = document.querySelector('#pointsDisplay .chip-points');
-    if(chipPointsEl) chipPointsEl.textContent = val + ' Punkte';
+    if(chipPointsEl) chipPointsEl.textContent = val + ' Chips';
     const chipLevelEl = document.querySelector('#pointsDisplay .chip-level');
     if(chipLevelEl) chipLevelEl.textContent = 'Level ' + level;
     const bjBalanceEl = document.getElementById('bjBalance');
@@ -3706,17 +3862,19 @@
       const unameRoleEl = document.querySelector('#userChip .uname-role');
       if(unameRoleEl && !isAdmin) unameRoleEl.textContent = 'Level ' + level;
       const ddLevelEl = document.querySelector('#dropdown .dd-level');
-      if(ddLevelEl) ddLevelEl.textContent = `Level ${level} · ${val} Punkte`;
+      if(ddLevelEl) ddLevelEl.textContent = `Level ${level} · ${val} Chips`;
       document.querySelectorAll('#userChip .avatar-ring, #dropdown .avatar-ring').forEach(r => {
         r.style.setProperty('--ring-pct', ringPct);
       });
     }
     updateProfileConsole();
+    renderLevelRewardsGrid(level, chips);
   }
   async function bjAdjustChips(delta){
     if(!currentProfile) return;
     currentProfile.chips = Math.max(0, (currentProfile.chips || 0) + delta);
     bjSyncBalanceDisplay();
+    if(delta > 0) checkLevelRewards();
     if(!currentUserId) return;
     try {
       await supabaseClient.from('profiles').update({ chips: currentProfile.chips }).eq('id', currentUserId);
@@ -3734,7 +3892,7 @@
       btn.innerHTML = `<span class="bj-chip-val">${val >= 1000 ? (val/1000) + 'k' : val}</span>`;
       btn.addEventListener('click', () => {
         const balance = (currentProfile && currentProfile.chips) || 0;
-        if(bjPendingBet + val > balance) { showToast('Nicht genug Punkte.'); return; }
+        if(bjPendingBet + val > balance) { showToast('Nicht genug Chips.'); return; }
         bjPendingBet += val;
         bjPlayChipSound();
         bjRenderBetPanel();
@@ -4027,7 +4185,7 @@
   document.getElementById('bjDoubleBtn').addEventListener('click', async () => {
     const hand = bjCurrentHand();
     const balance = (currentProfile && currentProfile.chips) || 0;
-    if(balance < hand.bet) { showToast('Nicht genug Punkte zum Verdoppeln.'); return; }
+    if(balance < hand.bet) { showToast('Nicht genug Chips zum Verdoppeln.'); return; }
     bjPlayChipSound();
     await bjAdjustChips(-hand.bet);
     hand.bet *= 2;
@@ -4041,7 +4199,7 @@
   document.getElementById('bjSplitBtn').addEventListener('click', async () => {
     const hand = bjCurrentHand();
     const balance = (currentProfile && currentProfile.chips) || 0;
-    if(balance < hand.bet) { showToast('Nicht genug Punkte zum Splitten.'); return; }
+    if(balance < hand.bet) { showToast('Nicht genug Chips zum Splitten.'); return; }
     bjPlayChipSound();
     await bjAdjustChips(-hand.bet);
     const isAceSplit = hand.cards[0].rank === 'A';
@@ -4372,7 +4530,7 @@
       const symbolData = SLOT_SYMBOLS.find(s => s.id === finalSymbols[0]);
       const payout = slotBet * symbolData.pay;
       await bjAdjustChips(payout);
-      msg.textContent = `Gewinn! +${payout.toLocaleString('de-DE')} Punkte`;
+      msg.textContent = `Gewinn! +${payout.toLocaleString('de-DE')} Chips`;
       msg.classList.add('win');
       document.querySelectorAll('.slot-reel-window').forEach(w => w.classList.add('slot-win-glow'));
       bjPlayChipSound();
@@ -5749,7 +5907,7 @@
     pointsDisplay.style.display = 'flex';
     const level = Math.max(1, Math.floor((profile.chips || 0) / 100));
     const ringPct = Math.max(4, (profile.chips || 0) % 100);
-    pointsDisplay.innerHTML = `<div class="chip-coin"><div class="chip-coin-inner"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg></div></div><div class="chip-text"><span class="chip-level">Level ${level}</span><span class="chip-points">${(profile.chips||0).toLocaleString('de-DE')} Punkte</span></div>`;
+    pointsDisplay.innerHTML = `<div class="chip-coin"><div class="chip-coin-inner"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg></div></div><div class="chip-text"><span class="chip-level">Level ${level}</span><span class="chip-points">${(profile.chips||0).toLocaleString('de-DE')} Chips</span></div>`;
     const initial = profile.name.charAt(0).toUpperCase();
     const chips = profile.chips || 0;
     const avatarPreset = getPreset(avatarDataUrl);
@@ -5780,7 +5938,7 @@
               <div class="dd-name">${profile.name}</div>
               ${isAdmin ? adminTagHTML : ''}
               <div class="dd-handle" style="color:var(--accent-hi);font-size:11px;font-weight:600;">${profile.username ? '@' + profile.username : ''}</div>
-              <div class="dd-level">Level ${level} · ${chips.toLocaleString('de-DE')} Punkte</div>
+              <div class="dd-level">Level ${level} · ${chips.toLocaleString('de-DE')} Chips</div>
             </div>
           </div>
           <div class="dd-menu">
@@ -5822,6 +5980,7 @@
     updateNotifBadge();
     renderNotifList();
     renderMailBody();
+    checkLevelRewards();
   }
 
   // --- Settings modal ---
@@ -5920,7 +6079,7 @@
     if(!label || !desc || !currentProfile) return;
     const chips = currentProfile.chips || 0;
     const level = Math.max(1, Math.floor(chips / 100));
-    label.textContent = `Level ${level} · ${chips.toLocaleString('de-DE')} Punkte`;
+    label.textContent = `Level ${level} · ${chips.toLocaleString('de-DE')} Chips`;
     desc.textContent = isAdmin ? 'Admin-Konto — voller Zugriff' : 'Standard-Konto';
   }
 
@@ -6281,7 +6440,7 @@
           ${friendAvatarHTML(user.name || user.username)}
           <div class="chipadm-info">
             <div class="chipadm-uname">@${user.username || '—'}${isSelf ? '<span class="chipadm-self-tag">DU</span>' : ''}</div>
-            <div class="chipadm-balance">Aktuell: <b class="chipadm-current">${(user.chips || 0).toLocaleString('de-DE')}</b> Punkte</div>
+            <div class="chipadm-balance">Aktuell: <b class="chipadm-current">${(user.chips || 0).toLocaleString('de-DE')}</b> Chips</div>
           </div>
         </div>
         <div class="chipadm-quick">
@@ -6335,6 +6494,7 @@
       bjSyncBalanceDisplay();
       updateProfileConsole();
       renderRailBadges();
+      checkLevelRewards();
     }
   }
 
@@ -6749,7 +6909,7 @@
   document.getElementById('requestDeleteAccountBtn')?.addEventListener('click', async () => {
     const ok = await showConfirmDialog({
       title:'Konto wirklich löschen?',
-      message:'Wir leiten deine Löschanfrage an unser Team weiter. Dein Konto, dein Profil und deine Punkte werden danach dauerhaft entfernt.',
+      message:'Wir leiten deine Löschanfrage an unser Team weiter. Dein Konto, dein Profil und deine Chips werden danach dauerhaft entfernt.',
       confirmText:'Löschung beantragen',
       cancelText:'Abbrechen',
       tone:'danger',
