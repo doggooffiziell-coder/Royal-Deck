@@ -2623,7 +2623,7 @@
     <h1 class="soon-title">Royal Deck</h1>
     <div class="soon-subtitle">launcht bald<span class="soon-dots">…</span></div>
     <p class="soon-desc">Wir legen letzte Hand an die Tische, bevor der Saal öffnet.<br>Schau bald wieder vorbei — <strong>es lohnt sich</strong>.</p>
-    <p class="soon-desc soon-desc-note">Eine vorab Registrierung ist bereits möglich, gewährt jedoch derzeit noch keinerlei Zugriff auf die Seite.</p>
+    <p class="soon-desc soon-desc-note">Eine vorab Registrierung ist bereits möglich, gewährt jedoch derzeit noch keinerlei Zugriff auf die Seite. Um Alpha-Zugriff anzufordern, musst du angemeldet sein.</p>
     <div class="soon-divider"></div>
 
     <div class="soon-alpha-request">
@@ -6641,6 +6641,15 @@
   // Öffnet ein kleines Formular (Name + E-Mail); Anfragen landen in der Tabelle
   // "alpha_access_requests" und werden im Admin-Bereich unter "Alpha Access" angezeigt.
   document.getElementById('soonAlphaRequestBtn').addEventListener('click', () => {
+    // Alpha-Zugriff kann nur anfordern, wer angemeldet ist — ohne Login öffnet
+    // sich das Formular nicht, stattdessen wird direkt der Login-Dialog geöffnet.
+    if(!currentUserId){
+      const hint = document.getElementById('soonAlphaHint');
+      hint.className = 'soon-alpha-hint error';
+      hint.textContent = 'Bitte melde dich zuerst an, um Alpha-Zugriff anzufordern.';
+      openModal('login');
+      return;
+    }
     const form = document.getElementById('soonAlphaForm');
     const btn = document.getElementById('soonAlphaRequestBtn');
     const showing = form.classList.toggle('show');
@@ -6661,6 +6670,12 @@
     const email = document.getElementById('soonAlphaEmail').value.trim();
     hint.className = 'soon-alpha-hint';
     hint.textContent = '';
+    if(!currentUserId){
+      hint.textContent = 'Bitte melde dich zuerst an, um Alpha-Zugriff anzufordern.';
+      hint.classList.add('error');
+      openModal('login');
+      return;
+    }
     if(!name || !email){
       hint.textContent = 'Bitte Name und E-Mail-Adresse angeben.';
       hint.classList.add('error');
