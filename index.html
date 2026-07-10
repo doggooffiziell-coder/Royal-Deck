@@ -312,53 +312,102 @@
   .section-head a svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;transition:.15s;}
   .section-head a:hover svg{transform:translateX(2px);}
 
-  .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,190px));gap:18px;justify-content:center;}
+  /* ================= Spieltische — komplette Neufassung =================
+     Breite, quer liegende "Tisch"-Kacheln statt kleiner Quadrate: mehr Vorschau
+     direkt auf der Karte (Titel, Beschreibung, CTA), ein per Mausbewegung
+     kippender 3D-Rahmen, ein durchlaufender Foil-Wisch beim Hover und ein
+     spielfarbiger Ambient-Glow. Bewegt sich klar weg vom reinen Icon-Quadrat,
+     bleibt aber in der Gold/Filz-Materialsprache der Seite. */
+  .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:22px;}
   .card{cursor:pointer;}
-  .thumb{
-    width:100%;aspect-ratio:1/1;border-radius:12px;background:linear-gradient(150deg,var(--c1),var(--c2));
-    position:relative;overflow:hidden;border:1px solid rgba(212,175,106,.16);transition:.22s cubic-bezier(.16,1,.3,1);
-    box-shadow:inset 0 0 0 1px rgba(0,0,0,.25);
-  }
-  /* corner index pips, like a real playing card */
-  .thumb:before, .thumb:after{
-    content:attr(data-suit);position:absolute;font-family:var(--font-display);font-style:italic;
-    font-size:13px;color:rgba(242,236,221,.55);line-height:1;pointer-events:none;
-  }
-  .thumb:before{top:9px;left:10px;}
-  .thumb:after{bottom:9px;right:10px;transform:rotate(180deg);}
-  .card:hover .thumb{
-    border-color:rgba(240,211,142,.55);transform:translateY(-4px);
-    box-shadow:0 16px 30px rgba(0,0,0,.5), 0 16px 40px -10px var(--c2), inset 0 0 0 1px rgba(0,0,0,.25);
-  }
-  .thumb .play{
-    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;
-    background:rgba(6,10,8,.55);transition:.15s;backdrop-filter:blur(1px);
-  }
-  .card:hover .play{opacity:1;}
-  .suit{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-    font-size:40px;color:rgba(242,236,221,.85);font-family:var(--font-display);
-    text-shadow:0 0 30px rgba(240,211,142,.2);}
-  .play svg{width:28px;height:28px;fill:var(--accent-hi);}
-  .thumb-live{
-    position:absolute;top:8px;right:9px;display:flex;align-items:center;gap:5px;z-index:2;
-    padding:3px 8px 3px 6px;border-radius:20px;background:rgba(6,10,8,.55);backdrop-filter:blur(2px);
-    font-family:var(--font-mono);font-size:8.5px;letter-spacing:.4px;color:var(--success);text-transform:uppercase;
-  }
-  .thumb-live span{width:5px;height:5px;border-radius:50%;background:var(--success);box-shadow:0 0 6px var(--success);animation:thumbLivePulse 1.8s ease-in-out infinite;flex-shrink:0;}
-  @keyframes thumbLivePulse{0%,100%{opacity:1;}50%{opacity:.35;}}
-  .card h3{font-family:var(--font-display);font-style:italic;font-size:14px;font-weight:600;margin-top:12px;line-height:1.3;color:var(--text);}
-  .card .stat{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--faint);margin-top:4px;font-family:var(--font-mono);}
-  .card .stat svg{width:10px;height:10px;fill:var(--faint);}
 
-  .card.locked{cursor:default;}
-  .card.locked .thumb{border-style:dashed;}
-  .card.locked .thumb:before, .card.locked .thumb:after{display:none;}
-  .placeholder-thumb{
-    background:var(--surface);display:flex;align-items:center;justify-content:center;
+  .table-card{
+    position:relative;overflow:hidden;border-radius:20px;min-height:200px;
+    background:linear-gradient(150deg,var(--c1),var(--c2));
+    border:1px solid rgba(212,175,106,.2);
+    box-shadow:0 20px 40px rgba(0,0,0,.4), inset 0 0 0 1px rgba(0,0,0,.25);
+    transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateZ(0);
+    transition:transform .18s cubic-bezier(.16,1,.3,1), box-shadow .25s ease, border-color .25s ease;
+    display:flex;align-items:flex-end;
   }
-  .lock-icon{width:26px;height:26px;fill:var(--faint);opacity:.6;}
-  .card.locked h3{color:var(--faint);font-style:normal;}
-  .card.locked .stat{color:var(--faint);}
+  .table-card:hover{
+    border-color:rgba(240,211,142,.5);
+    box-shadow:0 28px 56px rgba(0,0,0,.5), 0 18px 46px -12px var(--c2), inset 0 0 0 1px rgba(0,0,0,.25);
+  }
+  /* faint diagonal weave, echoes the loading-screen texture elsewhere on the site */
+  .table-card-stripes{
+    position:absolute;inset:0;pointer-events:none;
+    background:repeating-linear-gradient(135deg, rgba(242,236,221,.035) 0 2px, transparent 2px 34px);
+  }
+  .table-card-glow{
+    position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(ellipse 320px 240px at 82% 20%, rgba(255,255,255,.16), transparent 65%);
+    mix-blend-mode:soft-light;
+  }
+  /* foil sheen that sweeps across on hover, like light catching gilt edging */
+  .table-card-sheen{
+    position:absolute;top:-60%;left:-70%;width:38%;height:220%;pointer-events:none;
+    background:linear-gradient(75deg,transparent,rgba(255,255,255,.22),transparent);
+    transform:rotate(10deg);transition:left .75s cubic-bezier(.16,1,.3,1);
+  }
+  .table-card:hover .table-card-sheen{left:135%;}
+  /* corner index pips, like a real playing card */
+  .table-card:before, .table-card:after{
+    content:attr(data-suit);position:absolute;font-family:var(--font-display);font-style:italic;
+    font-size:15px;color:rgba(242,236,221,.6);line-height:1;pointer-events:none;z-index:2;
+  }
+  .table-card:before{top:14px;left:16px;}
+  .table-card:after{bottom:14px;right:16px;transform:rotate(180deg);}
+  .table-card-suit{
+    position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;
+    font-family:var(--font-display);font-size:clamp(88px,11vw,132px);color:rgba(242,236,221,.14);
+    animation:tableCardFloat 5s ease-in-out infinite;line-height:1;
+  }
+  @keyframes tableCardFloat{0%,100%{transform:translateY(-50%);}50%{transform:translateY(calc(-50% - 9px));}}
+  .table-card-live{
+    position:absolute;top:14px;right:16px;z-index:3;display:flex;align-items:center;gap:5px;
+    padding:4px 10px 4px 7px;border-radius:20px;background:rgba(6,10,8,.55);backdrop-filter:blur(2px);
+    font-family:var(--font-mono);font-size:9px;letter-spacing:.5px;color:var(--success);text-transform:uppercase;
+  }
+  .table-card-live span{width:5px;height:5px;border-radius:50%;background:var(--success);box-shadow:0 0 6px var(--success);animation:thumbLivePulse 1.8s ease-in-out infinite;flex-shrink:0;}
+  @keyframes thumbLivePulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+
+  .table-card-body{position:relative;z-index:2;padding:24px 26px;max-width:64%;}
+  .table-card-eyebrow{
+    font-family:var(--font-mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;
+    color:rgba(240,211,142,.75);margin-bottom:8px;
+  }
+  .table-card-body h3{font-family:var(--font-display);font-style:italic;font-size:22px;font-weight:600;color:var(--text);line-height:1.15;margin-bottom:8px;}
+  .table-card-body p{font-size:13px;color:rgba(242,236,221,.72);line-height:1.5;margin-bottom:16px;max-width:280px;}
+  .table-card-cta{
+    display:inline-flex;align-items:center;gap:8px;background:rgba(6,10,8,.4);
+    border:1px solid rgba(212,175,106,.32);color:var(--accent-hi);border-radius:9px;
+    padding:9px 16px;font-family:var(--font-body);font-weight:700;font-size:12.5px;letter-spacing:.3px;
+    transition:.18s;backdrop-filter:blur(2px);
+  }
+  .table-card-cta svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;transition:.18s;}
+  .table-card:hover .table-card-cta{background:var(--accent-hi);color:var(--accent-ink);border-color:transparent;}
+  .table-card:hover .table-card-cta svg{stroke:var(--accent-ink);transform:translateX(3px);}
+
+  .card.locked .table-card{
+    background:var(--surface);border-style:dashed;box-shadow:none;transform:none;
+    align-items:center;justify-content:center;flex-direction:column;gap:10px;
+    animation:none;cursor:default;
+  }
+  .card.locked .table-card:before, .card.locked .table-card:after,
+  .card.locked .table-card-stripes, .card.locked .table-card-glow,
+  .card.locked .table-card-suit{display:none;}
+  .card.locked .table-card:hover{border-color:var(--border);box-shadow:none;}
+  .table-card-lock{width:30px;height:30px;fill:var(--faint);opacity:.6;}
+  .table-card-locked-label{font-family:var(--font-display);font-style:italic;font-size:15px;color:var(--faint);}
+  .table-card-locked-sub{font-family:var(--font-mono);font-size:11px;color:var(--faint);}
+
+  @media (max-width:560px){
+    .row{grid-template-columns:1fr;}
+    .table-card{min-height:170px;}
+    .table-card-body{max-width:78%;padding:20px 20px;}
+    .table-card-body h3{font-size:19px;}
+  }
 
   .toast{
     position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
@@ -3658,14 +3707,32 @@
       const card = document.createElement('div');
       card.className = 'card';
       card.innerHTML = `
-        <div class="thumb" data-suit="${g.suit}" style="--c1:${g.c1};--c2:${g.c2}">
-          <div class="thumb-live"><span></span>Live</div>
-          <div class="suit">${g.suit}</div>
-          <div class="play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        <div class="table-card" data-suit="${g.suit}" style="--c1:${g.c1};--c2:${g.c2}">
+          <div class="table-card-stripes"></div>
+          <div class="table-card-glow"></div>
+          <div class="table-card-sheen"></div>
+          <div class="table-card-suit">${g.suit}</div>
+          <div class="table-card-live"><span></span>Live</div>
+          <div class="table-card-body">
+            <div class="table-card-eyebrow">Casino-Tisch</div>
+            <h3>${g.name}</h3>
+            <p>${g.desc}</p>
+            <span class="table-card-cta">Jetzt spielen<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
+          </div>
         </div>
-        <h3>${g.name}</h3>
-        <div class="stat"><svg viewBox="0 0 24 24"><path d="M12 12a5 5 0 100-10 5 5 0 000 10zm0 2c-4 0-8 2-8 5v3h16v-3c0-3-4-5-8-5z"/></svg>${g.desc}</div>
       `;
+      const tableEl = card.querySelector('.table-card');
+      tableEl.addEventListener('pointermove', e => {
+        const r = tableEl.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width - 0.5;
+        const py = (e.clientY - r.top) / r.height - 0.5;
+        tableEl.style.setProperty('--ry', (px * 8) + 'deg');
+        tableEl.style.setProperty('--rx', (py * -6) + 'deg');
+      });
+      tableEl.addEventListener('pointerleave', () => {
+        tableEl.style.setProperty('--ry', '0deg');
+        tableEl.style.setProperty('--rx', '0deg');
+      });
       card.addEventListener('click', () => openGame(g.name));
       el.appendChild(card);
     });
@@ -3673,11 +3740,11 @@
       const card = document.createElement('div');
       card.className = 'card locked';
       card.innerHTML = `
-        <div class="thumb placeholder-thumb">
-          <svg viewBox="0 0 24 24" class="lock-icon"><path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-9h-1V6a5 5 0 00-10 0v2H6a2 2 0 00-2 2v9a2 2 0 002 2h12a2 2 0 002-2v-9a2 2 0 00-2-2zM9 6a3 3 0 016 0v2H9z"/></svg>
+        <div class="table-card">
+          <svg viewBox="0 0 24 24" class="table-card-lock"><path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-9h-1V6a5 5 0 00-10 0v2H6a2 2 0 00-2 2v9a2 2 0 002 2h12a2 2 0 002-2v-9a2 2 0 00-2-2zM9 6a3 3 0 016 0v2H9z"/></svg>
+          <div class="table-card-locked-label">Bald verfügbar</div>
+          <div class="table-card-locked-sub">Neues Spiel folgt</div>
         </div>
-        <h3>Bald verfügbar</h3>
-        <div class="stat">Neues Spiel folgt</div>
       `;
       el.appendChild(card);
     }
