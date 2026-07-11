@@ -7631,11 +7631,19 @@
 
   async function loadProfile(){
     const { data: { user } } = await supabaseClient.auth.getUser();
+    // Session-Globals SOFORT setzen — die Coming-Soon-/Wartungs-Zweige unten steigen früh
+    // per return aus, bevor der Haupt-Pfad currentUserId setzt. Ohne das hält der
+    // Coming-Soon-Screen currentUserId=null, obwohl man eingeloggt ist (der
+    // "Alpha-Zugriff anfordern"-Button dachte deshalb, man sei nicht angemeldet).
+    const prevUserId = currentUserId;
+    currentUserId = user?.id || null;
+    currentUserEmail = user?.email || null;
     maintenanceMode = await fetchMaintenanceMode();
     comingSoonMode = await fetchComingSoonMode();
     updateAdminStatusConsole();
 
     const admin = await checkIsAdmin(user?.email);
+    isAdmin = admin;
     const whitelisted = admin ? true : await isWhitelistedEmail(user?.email);
 
     if(maintenanceMode && !whitelisted){
@@ -7732,11 +7740,8 @@
       }
     }
     if(error){ console.error(error); renderAuthArea(null); return; }
-    const userChanged = currentUserId !== user.id;
+    const userChanged = prevUserId !== user.id;
     currentProfile = profile;
-    currentUserId = user.id;
-    currentUserEmail = user.email;
-    isAdmin = admin;
     if(userChanged) makeRow('row1');
     // Profilbild-Auswahl wird jetzt in der DB gespeichert (avatar_symbol/avatar_color/avatar_symbol_color)
     // und bei jedem Laden aus dem Profil übernommen. Nur wenn diese Spalten (noch) leer sind,
