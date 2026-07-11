@@ -2383,12 +2383,28 @@
   }
   .crossy-chicken.hop{animation:crossyHop .4s ease-in-out;}
   @keyframes crossyHop{0%,100%{transform:translateY(0) rotate(0);}50%{transform:translateY(-20px) rotate(-6deg);}}
-  .crossy-chicken.hit{animation:crossyHit .6s ease-in forwards;}
-  @keyframes crossyHit{
-    0%{transform:rotate(0) translate(0,0);opacity:1;}
-    30%{transform:rotate(25deg) translate(6px,-6px);opacity:1;}
-    100%{transform:rotate(100deg) translate(120px,30px);opacity:0;}
+  /* Überfahren: das Huhn wird platt gedrückt statt weggeschleudert */
+  .crossy-chicken.flat{animation:crossyFlat .5s ease-in forwards;}
+  @keyframes crossyFlat{
+    0%{transform:none;}
+    30%{transform:translateY(-8px);}
+    100%{transform:translateY(20px) scaleY(.18) scaleX(1.5);opacity:.85;}
   }
+
+  /* Versagens-Screen: dunkler Vorhang über der Fahrbahn mit plattem Huhn */
+  .crossy-fail-overlay{
+    position:absolute;inset:0;z-index:6;display:none;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+    background:rgba(12,8,10,.8);
+  }
+  .crossy-fail-overlay.show{display:flex;animation:crossyFailIn .3s ease both;}
+  @keyframes crossyFailIn{from{opacity:0;}to{opacity:1;}}
+  .crossy-fail-chicken{width:170px;height:auto;animation:crossyFailStamp .5s cubic-bezier(.2,1.6,.4,1) both;}
+  @keyframes crossyFailStamp{0%{transform:scale(2.6) rotate(-8deg);opacity:0;}55%{opacity:1;}100%{transform:scale(1) rotate(0);}}
+  .crossy-fail-title{
+    font-family:var(--font-display);font-size:32px;font-weight:700;color:var(--danger);
+    letter-spacing:.5px;text-shadow:0 4px 18px rgba(193,68,60,.45);
+  }
+  .crossy-fail-sub{font-family:var(--font-mono);font-size:13px;color:var(--muted);}
   .crossy-feather{position:absolute;width:8px;height:8px;border-radius:50% 0 50% 50%;background:#f2ecdd;opacity:.9;
     animation:crossyFeather .7s ease-out forwards;}
   @keyframes crossyFeather{0%{transform:translate(0,0) rotate(0);opacity:1;}100%{transform:translate(var(--fx,20px),var(--fy,-30px)) rotate(220deg);opacity:0;}}
@@ -4074,6 +4090,30 @@
         <div class="crossy-chicken" id="crossyChicken">
           <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path d="M19 39v5M27 39v5" stroke="#e8973f" stroke-width="2.6" stroke-linecap="round"/><path d="M19 44l-4 2M27 44l-4 2" stroke="#e8973f" stroke-width="2.2" stroke-linecap="round"/><path d="M12 25c-5-1-8-5-7-10 4 1 7 4 8 7z" fill="#f4efe2" stroke="#d9d2c0" stroke-width="1"/><ellipse cx="22" cy="29" rx="13" ry="11.5" fill="#fdfaf1" stroke="#d9d2c0" stroke-width="1"/><path d="M17 28c4-2.5 9-2 11 1.5-2.5 3.5-8 4-11 1.5z" fill="#efe8d6"/><circle cx="31" cy="16" r="8.5" fill="#fdfaf1" stroke="#d9d2c0" stroke-width="1"/><path d="M27 8.5c-.5-3 1-5.5 3.5-6 .2 1 .8 1.8 1.8 2 .8-.8 2.2-1 3.2-.4-.4 1 .1 2 1 2.4-.3 2.2-2.3 4-4.8 4z" fill="#e2503e"/><path d="M39 14.5l6.5 2.2-6.5 3z" fill="#f2a23c" stroke="#c67f26" stroke-width=".5"/><path d="M33.5 23c.2 2.4-.8 4-2.3 4s-2.6-1.4-2.5-3.4z" fill="#e2503e"/><circle cx="34" cy="14" r="1.7" fill="#232830"/></svg>
         </div>
+        <div class="crossy-fail-overlay" id="crossyFailOverlay">
+          <svg class="crossy-fail-chicken" viewBox="0 0 150 90" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="72" cy="58" rx="54" ry="20" fill="#fdfaf1" stroke="#d9d2c0" stroke-width="1.5"/>
+            <ellipse cx="40" cy="52" rx="18" ry="9" fill="#efe8d6"/>
+            <ellipse cx="95" cy="66" rx="16" ry="8" fill="#efe8d6"/>
+            <ellipse cx="123" cy="50" rx="15" ry="11" fill="#fdfaf1" stroke="#d9d2c0" stroke-width="1.5"/>
+            <path d="M116 38c1-4 4-6 7-6 0 2 1 3 2 3 2-1 4 0 5 1-1 1-1 3 0 4-2 2-5 3-8 2z" fill="#e2503e"/>
+            <path d="M138 48l9 3-9 4z" fill="#f2a23c"/>
+            <path d="M118 46l6 6M124 46l-6 6" stroke="#232830" stroke-width="1.8" stroke-linecap="round"/>
+            <g fill="rgba(35,33,43,.5)">
+              <rect x="56" y="6" width="20" height="7" rx="2.5"/>
+              <rect x="56" y="19" width="20" height="7" rx="2.5"/>
+              <rect x="56" y="32" width="20" height="7" rx="2.5"/>
+              <rect x="56" y="45" width="20" height="7" rx="2.5"/>
+              <rect x="56" y="58" width="20" height="7" rx="2.5"/>
+              <rect x="56" y="71" width="20" height="7" rx="2.5"/>
+            </g>
+            <path d="M20 30q4-6 10-6-2 5-7 8z" fill="#f4efe2"/>
+            <path d="M120 78q5-3 10-1-3 4-8 5z" fill="#f4efe2"/>
+            <path d="M30 75q2-6 8-7-1 5-5 8z" fill="#f4efe2"/>
+          </svg>
+          <div class="crossy-fail-title">Gescheitert!</div>
+          <div class="crossy-fail-sub" id="crossyFailSub"></div>
+        </div>
       </div>
       <div class="crossy-message" id="crossyMessage"></div>
     </div>
@@ -5753,12 +5793,12 @@
   // Nutzt dieselbe Guthaben-Anbindung (bjAdjustChips) wie die anderen Spiele.
   // ============================================================
   const CROSSY_LANES = 6;
-  const CROSSY_HOUSE_EDGE = 0.97; // ~3% Hausvorteil, wie bei Walzenglück-artigen Spielen üblich
+  const CROSSY_HOUSE_EDGE = 0.97; // Hausvorteil PRO SPUR — verzinst sich über die Runde (~17% über 6 Spuren), damit hohe Multiplikatoren selten und teuer sind
   const CROSSY_DIFFICULTIES = {
     easy:      { label:'Easy',      crash:[0.04,0.06,0.08,0.10,0.12,0.14] },
     medium:    { label:'Medium',    crash:[0.08,0.12,0.16,0.20,0.24,0.28] },
-    hard:      { label:'Hard',      crash:[0.15,0.20,0.26,0.32,0.38,0.44] },
-    daredevil: { label:'Daredevil', crash:[0.28,0.36,0.44,0.51,0.57,0.63] },
+    hard:      { label:'Hard',      crash:[0.18,0.24,0.31,0.38,0.45,0.52] },
+    daredevil: { label:'Daredevil', crash:[0.35,0.45,0.54,0.62,0.69,0.75] },
   };
   let crossySelectedDiff = 'daredevil';
   let crossyState = { running:false, busy:false, lane:0, bet:0, difficulty:'daredevil', multiplier:1 };
@@ -5766,7 +5806,7 @@
   function crossyMultiplierTable(diffKey){
     const arr = CROSSY_DIFFICULTIES[diffKey].crash;
     let survival = 1;
-    return arr.map(p => { survival *= (1 - p); return CROSSY_HOUSE_EDGE / survival; });
+    return arr.map((p, i) => { survival *= (1 - p); return Math.pow(CROSSY_HOUSE_EDGE, i + 1) / survival; });
   }
   function crossyCarSvg(color){
     // Draufsicht wie im Chicken-Road-Vorbild: Karosserie mit Dach,
@@ -5888,7 +5928,8 @@
   }
 
   function crossyResetUI(){
-    document.getElementById('crossyChicken').classList.remove('hit', 'hop');
+    document.getElementById('crossyChicken').classList.remove('hit', 'hop', 'flat');
+    document.getElementById('crossyFailOverlay').classList.remove('show');
     crossyState.lane = 0;
     crossyState.busy = false;
     crossyMoveChickenTo(0);
@@ -5977,10 +6018,15 @@
       }
     }
     crossySpawnFeathers(chickenRect.left - roadRect.left + 20, chickenRect.top - roadRect.top + 10);
-    chicken.classList.add('hit');
+    chicken.classList.add('flat');
     crossyPlayCrashSound();
     crossySetMessage(`Erwischt! −${crossyState.bet.toLocaleString('de-DE')} Chips verloren.`, 'lose');
-    setTimeout(crossyResetUI, 1400);
+    // erst platt fahren lassen, dann den Versagens-Screen einblenden
+    setTimeout(() => {
+      document.getElementById('crossyFailSub').textContent = `−${crossyState.bet.toLocaleString('de-DE')} Chips — das Huhn kam unter die Räder.`;
+      document.getElementById('crossyFailOverlay').classList.add('show');
+    }, 550);
+    setTimeout(crossyResetUI, 3000);
   }
 
   // Ein einzelner Schritt: wird durch den "Los"-Knopf ausgelöst (statt automatisch
