@@ -6,6 +6,15 @@ services:
     staticPublishPath: .
     pullRequestPreviewsEnabled: false
     headers:
+      # HTML nie im Browser-Cache "einfrieren" — sonst sieht man nach einem Deploy
+      # bis zu 1h die alte Version. no-cache = Browser muss vor Nutzung neu prüfen.
+      - path: /*.html
+        name: Cache-Control
+        value: no-cache, must-revalidate
+      - path: /
+        name: Cache-Control
+        value: no-cache, must-revalidate
+      # statische Assets (Audio etc.) dürfen weiter gecacht werden
       - path: /*
         name: Cache-Control
         value: public, max-age=3600

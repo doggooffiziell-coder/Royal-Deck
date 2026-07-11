@@ -7630,7 +7630,15 @@
   let mainAppShown = false;
 
   async function loadProfile(){
-    const { data: { user } } = await supabaseClient.auth.getUser();
+    let { data: { user } } = await supabaseClient.auth.getUser();
+    if(!user){
+      // getUser() macht einen Netzwerk-Call und liefert bei Races/kurzen Aussetzern
+      // (v.a. direkt nach dem Login) manchmal null, obwohl eine gültige Session da ist.
+      // Dann die lokal gespeicherte Session als Quelle nehmen, damit currentUserId nicht
+      // fälschlich auf null fällt (sonst denkt der Alpha-Button, man sei ausgeloggt).
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      user = session?.user || null;
+    }
     // Session-Globals SOFORT setzen — die Coming-Soon-/Wartungs-Zweige unten steigen früh
     // per return aus, bevor der Haupt-Pfad currentUserId setzt. Ohne das hält der
     // Coming-Soon-Screen currentUserId=null, obwohl man eingeloggt ist (der
