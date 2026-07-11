@@ -3041,7 +3041,14 @@
           <svg class="field-icon" viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5zm-7 19c0-3.9 3.1-7 7-7s7 3.1 7 7z"/></svg>
           <input id="regName" placeholder="z. B. HighRoller_88" maxlength="12">
         </div>
-        <div class="field-hint">Das ist einfach dein Spitzname (2–12 Zeichen), taucht z. B. in der Begrüßung auf. Deinen echten <strong>Benutzernamen</strong>, über den dich andere Spieler finden, wählst du gleich im nächsten Schritt.</div>
+        <div class="field-hint">Das ist einfach dein Spitzname (2–12 Zeichen), taucht z. B. in der Begrüßung auf.</div>
+
+        <label>Benutzername <span style="text-transform:none;font-weight:500;color:var(--faint);">(eindeutig, für die Freunde-Suche)</span></label>
+        <div class="field-icon-wrap">
+          <svg class="field-icon" viewBox="0 0 24 24"><path d="M16 11c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3 1.3 3 3 3zm-8 0c1.7 0 3-1.3 3-3S9.7 5 8 5 5 6.3 5 8s1.3 3 3 3z"/></svg>
+          <input id="regUsername" placeholder="z. B. HighRoller88" autocomplete="off" maxlength="20">
+        </div>
+        <div class="field-hint">3–20 Zeichen, mind. 1 Buchstabe. Nur Buchstaben, Zahlen und Unterstrich. Über den finden dich andere Spieler – später max. 1x im Monat änderbar.</div>
 
         <label>Geschlecht</label>
         <div class="gender-select" id="genderSelect">
@@ -7261,11 +7268,37 @@
         authError.textContent = 'Bitte ein Geschlecht auswählen.';
         return;
       }
+      const uname = document.getElementById('regUsername').value.trim();
+      if(!isValidUsername(uname)){
+        authError.textContent = 'Benutzername: 3–20 Zeichen, mind. 1 Buchstabe. Nur Buchstaben/Zahlen/Unterstrich, kein _ am Anfang/Ende oder doppelt.';
+        return;
+      }
+      if(containsBadWord(uname)){
+        authError.textContent = 'Dieser Benutzername ist nicht erlaubt.';
+        return;
+      }
       submitBtn.disabled = true;
       submitBtn.textContent = 'Prüfe E-Mail-Adresse...';
       const emailProblem = await validateEmailForSignup(email);
       if(emailProblem){
         authError.textContent = emailProblem;
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Konto erstellen';
+        return;
+      }
+      // Benutzername-Verfügbarkeit vorab prüfen (case-insensitive), damit wir eine
+      // klare Fehlermeldung geben, bevor das Konto überhaupt angelegt wird.
+      submitBtn.textContent = 'Prüfe Benutzername...';
+      const { data: unameTaken, error: unameErr } = await supabaseClient
+        .from('public_profiles').select('id').ilike('username', uname).maybeSingle();
+      if(unameErr && unameErr.code !== 'PGRST116'){
+        authError.textContent = unameErr.message;
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Konto erstellen';
+        return;
+      }
+      if(unameTaken){
+        authError.textContent = 'Dieser Benutzername ist bereits vergeben.';
         submitBtn.disabled = false;
         submitBtn.textContent = 'Konto erstellen';
         return;
@@ -7276,6 +7309,7 @@
     submitBtn.textContent = 'Bitte warten...';
 
     if(mode === 'register'){
+      const uname = document.getElementById('regUsername').value.trim();
       const name = document.getElementById('regName').value.trim() || email.split('@')[0].slice(0, DISPLAY_NAME_MAX);
       if(!isValidDisplayName(name)){
         authError.textContent = `Anzeigename muss ${DISPLAY_NAME_MIN}–${DISPLAY_NAME_MAX} Zeichen lang sein.`;
@@ -7291,7 +7325,7 @@
       }
       const { data, error } = await supabaseClient.auth.signUp({
         email, password: pass,
-        options: { data: { name, gender: selectedGenderAuth } }
+        options: { data: { name, username: uname, gender: selectedGenderAuth } }
       });
       submitBtn.disabled = false;
       submitBtn.textContent = 'Konto erstellen';
@@ -7300,9 +7334,10 @@
         return;
       }
       if(data.session){
-        // Falls der DB-Trigger "gender" nicht selbst setzt, hier sicherheitshalber nachziehen.
+        // Falls der DB-Trigger "gender"/"username" nicht selbst setzt, hier
+        // sicherheitshalber nachziehen (Benutzername ist Pflicht bei Registrierung).
         try {
-          await supabaseClient.from('profiles').update({ gender: selectedGenderAuth }).eq('id', data.user.id);
+          await supabaseClient.from('profiles').update({ gender: selectedGenderAuth, username: uname }).eq('id', data.user.id);
         } catch(e){ console.error(e); }
         // Hinweis: die Willkommens-Benachrichtigung wird per DB-Trigger auf auth.users angelegt,
         // nicht hier im Client — das funktioniert dann auch zuverlässig mit E-Mail-Bestätigung.
