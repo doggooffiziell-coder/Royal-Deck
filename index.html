@@ -1868,6 +1868,66 @@
   .fr-btn:disabled{opacity:.5;cursor:default;}
   .friend-empty{color:var(--faint);font-size:12.5px;padding:18px 4px;text-align:center;}
 
+  /* ---------- Chat mit Freunden ---------- */
+  .chat-wrap{display:flex;gap:16px;height:calc(100vh - 150px);min-height:420px;max-width:1000px;}
+  .chat-sidebar{
+    width:280px;flex-shrink:0;display:flex;flex-direction:column;
+    background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;
+  }
+  .chat-sidebar-head{padding:16px 16px 12px;border-bottom:1px solid var(--border);}
+  .chat-sidebar-head h1{font-family:var(--font-display);font-size:19px;font-weight:600;color:var(--text);}
+  .chat-sidebar-head p{color:var(--muted);font-size:12px;margin-top:2px;}
+  .chat-friend-list{flex:1;overflow-y:auto;padding:6px;}
+  .chat-friend-item{
+    display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;cursor:pointer;transition:.12s;
+  }
+  .chat-friend-item:hover{background:var(--surface-2);}
+  .chat-friend-item.active{background:var(--accent-soft);}
+  .chat-friend-item .avatar{width:36px;height:36px;font-size:13px;display:flex;align-items:center;justify-content:center;
+    border-radius:9px;font-weight:700;flex-shrink:0;}
+  .chat-friend-item .cfi-info{flex:1;min-width:0;}
+  .chat-friend-item .cfi-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .chat-friend-item .cfi-handle{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .chat-friend-item .cfi-unread{
+    background:var(--accent);color:var(--accent-ink);font-size:11px;font-weight:700;min-width:19px;height:19px;
+    border-radius:10px;display:flex;align-items:center;justify-content:center;padding:0 5px;flex-shrink:0;
+  }
+  .chat-main{
+    flex:1;min-width:0;display:flex;flex-direction:column;
+    background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;
+  }
+  .chat-main-head{display:flex;align-items:center;gap:11px;padding:13px 18px;border-bottom:1px solid var(--border);flex-shrink:0;}
+  .chat-main-head .avatar{width:38px;height:38px;font-size:14px;display:flex;align-items:center;justify-content:center;
+    border-radius:9px;font-weight:700;flex-shrink:0;}
+  .chat-main-head .cmh-name{font-size:14.5px;font-weight:600;color:var(--text);}
+  .chat-main-head .cmh-handle{font-size:11.5px;color:var(--accent-hi);font-weight:600;}
+  .chat-messages{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:8px;}
+  .chat-bubble{
+    max-width:72%;padding:9px 13px;border-radius:14px;font-size:13.5px;line-height:1.4;
+    word-wrap:break-word;overflow-wrap:anywhere;white-space:pre-wrap;
+  }
+  .chat-bubble.mine{align-self:flex-end;background:var(--accent);color:var(--accent-ink);border-bottom-right-radius:5px;}
+  .chat-bubble.theirs{align-self:flex-start;background:var(--surface-2);color:var(--text);border-bottom-left-radius:5px;}
+  .chat-bubble .cb-time{display:block;font-size:10px;opacity:.65;margin-top:3px;text-align:right;}
+  .chat-input-bar{display:flex;gap:9px;padding:13px 16px;border-top:1px solid var(--border);flex-shrink:0;}
+  .chat-input-bar input{
+    flex:1;height:42px;padding:0 15px;border-radius:10px;border:1px solid var(--border);
+    background:var(--surface-2);color:var(--text);font-size:13.5px;font-family:var(--font-body);outline:none;
+  }
+  .chat-input-bar input:focus{border-color:var(--accent-dim);box-shadow:0 0 0 3px var(--accent-soft);}
+  .chat-input-bar button{
+    height:42px;padding:0 20px;border-radius:10px;border:none;background:var(--accent);color:var(--accent-ink);
+    font-weight:600;font-size:13.5px;cursor:pointer;font-family:var(--font-body);transition:.15s;
+  }
+  .chat-input-bar button:hover{background:var(--accent-hi);}
+  .chat-input-bar button:disabled{opacity:.5;cursor:default;}
+  .chat-empty-state{flex:1;display:flex;align-items:center;justify-content:center;color:var(--faint);font-size:13px;padding:30px;text-align:center;}
+  @media(max-width:760px){
+    .chat-wrap{flex-direction:column;height:auto;}
+    .chat-sidebar{width:100%;max-height:230px;}
+    .chat-main{min-height:420px;}
+  }
+
   /* Pflicht-Username-Overlay: kann nicht weggeklickt werden */
   .modal.username-modal{width:400px;}
   .u-prefix{
@@ -3035,9 +3095,10 @@
     <span>Freunde</span>
     <div class="nav-badge" id="friendsNavBadge">0</div>
   </div>
-  <div class="nav-item">
+  <div class="nav-item" id="navChat">
     <svg viewBox="0 0 24 24"><path d="M4 4h16v12H5.2L4 17.2zm2 3v2h12V7zm0 4v2h8v-2z"/></svg>
     <span>Chat</span>
+    <div class="nav-badge" id="chatNavBadge">0</div>
   </div>
 
   <div class="nav-divider"></div>
@@ -3952,6 +4013,33 @@
     </div>
   </div>
 
+  <div class="content" id="chatView" style="display:none;">
+    <div class="chat-wrap">
+      <div class="chat-sidebar">
+        <div class="chat-sidebar-head">
+          <h1>Chat</h1>
+          <p>Schreibe mit deinen Freunden.</p>
+        </div>
+        <div class="chat-friend-list" id="chatFriendList"></div>
+      </div>
+      <div class="chat-main" id="chatMain">
+        <div class="chat-empty-state" id="chatEmptyState">Wähle links einen Freund aus, um zu chatten.</div>
+        <div class="chat-main-head" id="chatMainHead" style="display:none;">
+          <div id="chatHeadAvatar"></div>
+          <div>
+            <div class="cmh-name" id="chatHeadName"></div>
+            <div class="cmh-handle" id="chatHeadHandle"></div>
+          </div>
+        </div>
+        <div class="chat-messages" id="chatMessages" style="display:none;"></div>
+        <form class="chat-input-bar" id="chatInputBar" style="display:none;">
+          <input id="chatInput" placeholder="Nachricht schreiben …" autocomplete="off" maxlength="2000">
+          <button type="submit" id="chatSendBtn">Senden</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <div class="content" id="blackjackView" style="display:none;">
     <div class="bj-wrap">
       <div class="bj-head">
@@ -4557,11 +4645,14 @@
     const slot = document.getElementById('slotView');
     const rewards = document.getElementById('rewardsView');
     const crossy = document.getElementById('crossyView');
+    const chat = document.getElementById('chatView');
     blackjack.style.display = 'none';
     slot.style.display = 'none';
     crossy.style.display = 'none';
+    chat.style.display = 'none';
     if(view !== 'blackjack') bjStopMusic();
     if(view !== 'crossy') crossyStop();
+    if(view !== 'chat') closeChatView();
     if(view === 'discover'){
       home.style.display = 'none';
       friends.style.display = 'none';
@@ -4614,6 +4705,19 @@
         return;
       }
       refreshDailyBonusUI();
+    } else if(view === 'chat'){
+      home.style.display = 'none';
+      discover.style.display = 'none';
+      friends.style.display = 'none';
+      rewards.style.display = 'none';
+      chat.style.display = '';
+      chat.scrollTo({ top:0 });
+      if(!currentUserId){
+        showToast('Melde dich an, um zu chatten.');
+        openModal('login');
+        return;
+      }
+      openChatView();
     } else {
       discover.style.display = 'none';
       friends.style.display = 'none';
@@ -4636,6 +4740,8 @@
         switchMainView('friends');
       } else if(label === 'Belohnungen'){
         switchMainView('rewards');
+      } else if(label === 'Chat'){
+        switchMainView('chat');
       } else {
         showToast(`${label} folgt in Kürze.`);
       }
@@ -7192,6 +7298,9 @@
     makeRow('row1');
     document.getElementById('usernameOverlay').classList.remove('open');
     unsubscribeFriendRequests();
+    unsubscribeDirectMessages();
+    chatUnread = {}; activeChatFriend = null; chatFriendsCache = [];
+    refreshChatBadge();
     switchMainView('home');
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.querySelector('.nav-item span') && document.querySelectorAll('.nav-item')[0].classList.add('active');
@@ -7640,6 +7749,8 @@
     renderAuthArea(profile, user.email);
     enforceUsername(profile);
     subscribeFriendRequests();
+    subscribeDirectMessages();
+    loadChatUnreadCounts();
     refreshFriendsBadge();
   }
 
@@ -9165,16 +9276,24 @@
 
   function initials(name){ return (name || '?').charAt(0).toUpperCase(); }
 
-  function friendAvatarHTML(name){
-    return `<div class="avatar" style="background:linear-gradient(135deg,var(--accent-hi),var(--felt))">${initials(name)}</div>`;
+  // Rendert das echte Profilbild eines Spielers (Preset-Symbol + Farben aus dem Profil),
+  // fällt auf den Anfangsbuchstaben zurück, falls (noch) kein Avatar gesetzt ist.
+  function friendAvatarHTML(p){
+    const name = (p && (p.name || p.username)) || '';
+    const preset = getPreset(p && p.avatar_symbol);
+    const bg = (p && p.avatar_color) || 'linear-gradient(135deg,var(--accent-hi),var(--felt))';
+    const symColor = (p && p.avatar_symbol_color) ? `;color:${p.avatar_symbol_color}` : '';
+    const inner = preset ? preset.symbol : initials(name);
+    const cls = preset ? ' avatar-symbol' : '';
+    return `<div class="avatar${cls}" style="background:${bg}${symColor}">${inner}</div>`;
   }
 
-  // Holt öffentliche Profildaten (id, username, name) zu einer Liste von User-IDs.
+  // Holt öffentliche Profildaten (inkl. Avatar) zu einer Liste von User-IDs.
   async function fetchPublicProfiles(ids){
     if(!ids.length) return {};
     const { data, error } = await supabaseClient
       .from('public_profiles')
-      .select('id, username, name')
+      .select('id, username, name, avatar_symbol, avatar_color, avatar_symbol_color')
       .in('id', ids);
     if(error){ console.error(error); return {}; }
     const map = {};
@@ -9230,12 +9349,13 @@
     const listEl = document.getElementById('fpanelList');
     listEl.innerHTML = friendsCache.friends.length ? friendsCache.friends.map(f => `
       <div class="friend-row">
-        ${friendAvatarHTML(f.name || f.username)}
+        ${friendAvatarHTML(f)}
         <div class="fr-info">
           <div class="fr-username">@${f.username}</div>
           <div class="fr-name">${f.name || ''}</div>
         </div>
         <div class="fr-actions">
+          <button class="fr-btn primary" data-msg="${f.id}">Nachricht</button>
           <button class="fr-btn danger" data-remove="${f.requestId}">Entfernen</button>
         </div>
       </div>`).join('') : `<div class="friend-empty">Noch keine Freunde. Suche oben nach einem Benutzernamen.</div>`;
@@ -9243,7 +9363,7 @@
     const inEl = document.getElementById('fpanelIncoming');
     inEl.innerHTML = friendsCache.incoming.length ? friendsCache.incoming.map(f => `
       <div class="friend-row">
-        ${friendAvatarHTML(f.name || f.username)}
+        ${friendAvatarHTML(f)}
         <div class="fr-info">
           <div class="fr-username">@${f.username}</div>
           <div class="fr-name">${f.name || ''}</div>
@@ -9257,7 +9377,7 @@
     const outEl = document.getElementById('fpanelOutgoing');
     outEl.innerHTML = friendsCache.outgoing.length ? friendsCache.outgoing.map(f => `
       <div class="friend-row">
-        ${friendAvatarHTML(f.name || f.username)}
+        ${friendAvatarHTML(f)}
         <div class="fr-info">
           <div class="fr-username">@${f.username}</div>
           <div class="fr-name">Angefragt</div>
@@ -9267,6 +9387,7 @@
         </div>
       </div>`).join('') : `<div class="friend-empty">Keine gesendeten Anfragen.</div>`;
 
+    listEl.querySelectorAll('[data-msg]').forEach(b => b.addEventListener('click', () => openChatWith(b.dataset.msg)));
     listEl.querySelectorAll('[data-remove]').forEach(b => b.addEventListener('click', () => removeFriendRequest(b.dataset.remove)));
     inEl.querySelectorAll('[data-accept]').forEach(b => b.addEventListener('click', () => respondFriendRequest(b.dataset.accept, 'accepted')));
     inEl.querySelectorAll('[data-decline]').forEach(b => b.addEventListener('click', () => respondFriendRequest(b.dataset.decline, 'declined')));
@@ -9321,9 +9442,10 @@
   async function runFriendSearch(q){
     const resultsEl = document.getElementById('friendSearchResults');
     if(!currentUserId) return;
+    const searchCols = 'id, username, name, avatar_symbol, avatar_color, avatar_symbol_color';
     let { data, error } = await supabaseClient
       .from('public_profiles')
-      .select('id, username, name')
+      .select(searchCols)
       .ilike('username', `%${q}%`)
       .not('username', 'is', null)
       .limit(8);
@@ -9348,7 +9470,7 @@
     }
     resultsEl.innerHTML = results.map(p => `
       <div class="friend-row">
-        ${friendAvatarHTML(p.name || p.username)}
+        ${friendAvatarHTML(p)}
         <div class="fr-info">
           <div class="fr-username">@${p.username}</div>
           <div class="fr-name">${p.name || ''}</div>
@@ -9390,6 +9512,241 @@
   }
   function unsubscribeFriendRequests(){
     if(friendsChannel){ supabaseClient.removeChannel(friendsChannel); friendsChannel = null; }
+  }
+
+  // ============================================================
+  // --- Chat mit Freunden (Direktnachrichten, Realtime) ---
+  // Tabelle: public.direct_messages (siehe SQL). Realtime muss für die Tabelle
+  // in Supabase aktiv sein (Database -> Publications -> supabase_realtime).
+  // ============================================================
+  let chatFriendsCache = [];       // Freunde, mit denen man chatten kann (inkl. Avatar)
+  let activeChatFriend = null;     // aktuell geöffnete Konversation
+  let chatUnread = {};             // { friendId: Anzahl ungelesener Nachrichten }
+  let chatChannel = null;          // Realtime-Kanal
+  let renderedMsgIds = new Set();  // verhindert doppeltes Anhängen (eigenes Insert + Realtime-Echo)
+
+  function chatEscape(s){
+    return (s || '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  }
+  function chatTime(iso){
+    return new Date(iso).toLocaleTimeString('de-DE', { hour:'2-digit', minute:'2-digit' });
+  }
+  function totalChatUnread(){
+    return Object.values(chatUnread).reduce((a,b) => a + b, 0);
+  }
+  function refreshChatBadge(){
+    const badge = document.getElementById('chatNavBadge');
+    if(!badge) return;
+    const n = totalChatUnread();
+    if(currentUserId && n > 0){ badge.textContent = n > 99 ? '99+' : n; badge.style.display = 'flex'; }
+    else { badge.style.display = 'none'; }
+  }
+
+  // Zählt ungelesene eingehende Nachrichten pro Absender (für Badge + Sidebar).
+  async function loadChatUnreadCounts(){
+    chatUnread = {};
+    if(!currentUserId){ refreshChatBadge(); return; }
+    const { data, error } = await supabaseClient
+      .from('direct_messages')
+      .select('sender_id')
+      .eq('receiver_id', currentUserId)
+      .is('read_at', null);
+    if(!error){
+      (data || []).forEach(m => { chatUnread[m.sender_id] = (chatUnread[m.sender_id] || 0) + 1; });
+    }
+    refreshChatBadge();
+  }
+
+  // Wird beim Öffnen des Chat-Tabs aufgerufen.
+  async function openChatView(){
+    await loadFriendsData();                       // füllt friendsCache.friends inkl. Avatar
+    chatFriendsCache = friendsCache.friends.slice();
+    await loadChatUnreadCounts();
+    renderChatSidebar();
+    // Falls die zuvor offene Konversation kein Freund mehr ist -> Leerzustand.
+    if(activeChatFriend && !chatFriendsCache.some(f => f.id === activeChatFriend.id)){
+      activeChatFriend = null;
+      showChatEmptyState();
+    }
+  }
+  function closeChatView(){
+    // Realtime läuft global weiter, damit der Badge auch außerhalb des Chats aktuell bleibt.
+  }
+
+  function showChatEmptyState(){
+    document.getElementById('chatEmptyState').style.display = 'flex';
+    document.getElementById('chatMainHead').style.display = 'none';
+    document.getElementById('chatMessages').style.display = 'none';
+    document.getElementById('chatInputBar').style.display = 'none';
+  }
+
+  function renderChatSidebar(){
+    const listEl = document.getElementById('chatFriendList');
+    if(!listEl) return;
+    if(!chatFriendsCache.length){
+      listEl.innerHTML = `<div class="friend-empty">Noch keine Freunde zum Chatten. Füge zuerst welche unter „Freunde“ hinzu.</div>`;
+      return;
+    }
+    listEl.innerHTML = chatFriendsCache.map(f => {
+      const unread = chatUnread[f.id] || 0;
+      const active = activeChatFriend && activeChatFriend.id === f.id ? ' active' : '';
+      return `
+        <div class="chat-friend-item${active}" data-cf="${f.id}">
+          ${friendAvatarHTML(f)}
+          <div class="cfi-info">
+            <div class="cfi-name">${chatEscape(f.name || f.username)}</div>
+            <div class="cfi-handle">@${chatEscape(f.username)}</div>
+          </div>
+          ${unread ? `<div class="cfi-unread">${unread > 99 ? '99+' : unread}</div>` : ''}
+        </div>`;
+    }).join('');
+    listEl.querySelectorAll('[data-cf]').forEach(el => el.addEventListener('click', () => openChatWith(el.dataset.cf)));
+  }
+
+  // Öffnet die Konversation mit einem Freund. Kann auch aus der Freundesliste heraus
+  // aufgerufen werden ("Nachricht"-Button) und wechselt dann zuerst in den Chat-Tab.
+  async function openChatWith(friendId){
+    if(!currentUserId){ showToast('Melde dich an, um zu chatten.'); openModal('login'); return; }
+    if(document.getElementById('chatView').style.display === 'none'){
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      const navChat = document.getElementById('navChat');
+      if(navChat) navChat.classList.add('active');
+      switchMainView('chat');
+    }
+    let friend = chatFriendsCache.find(f => f.id === friendId)
+      || friendsCache.friends.find(f => f.id === friendId);
+    if(!friend){
+      await loadFriendsData();
+      chatFriendsCache = friendsCache.friends.slice();
+      friend = chatFriendsCache.find(f => f.id === friendId);
+    }
+    if(!friend){ showToast('Freund nicht gefunden.'); return; }
+
+    activeChatFriend = friend;
+    renderChatSidebar();
+
+    document.getElementById('chatEmptyState').style.display = 'none';
+    document.getElementById('chatMainHead').style.display = 'flex';
+    document.getElementById('chatHeadAvatar').innerHTML = friendAvatarHTML(friend);
+    document.getElementById('chatHeadName').textContent = friend.name || friend.username;
+    document.getElementById('chatHeadHandle').textContent = '@' + friend.username;
+    document.getElementById('chatMessages').style.display = 'flex';
+    document.getElementById('chatInputBar').style.display = 'flex';
+    document.getElementById('chatInput').value = '';
+
+    await loadConversation(friend.id);
+    await markConversationRead(friend.id);
+    setTimeout(() => document.getElementById('chatInput').focus(), 30);
+  }
+
+  async function loadConversation(friendId){
+    const box = document.getElementById('chatMessages');
+    box.innerHTML = `<div class="chat-empty-state">Lädt …</div>`;
+    const { data, error } = await supabaseClient
+      .from('direct_messages')
+      .select('id, sender_id, receiver_id, content, created_at')
+      .or(`and(sender_id.eq.${currentUserId},receiver_id.eq.${friendId}),and(sender_id.eq.${friendId},receiver_id.eq.${currentUserId})`)
+      .order('created_at', { ascending:true })
+      .limit(300);
+    if(error){
+      box.innerHTML = `<div class="chat-empty-state">Nachrichten konnten nicht geladen werden.</div>`;
+      console.error(error);
+      return;
+    }
+    // Konversation könnte in der Zwischenzeit gewechselt haben.
+    if(!activeChatFriend || activeChatFriend.id !== friendId) return;
+    renderConversation(data || []);
+  }
+
+  function renderConversation(rows){
+    const box = document.getElementById('chatMessages');
+    renderedMsgIds = new Set(rows.map(r => r.id));
+    if(!rows.length){
+      box.innerHTML = `<div class="chat-empty-state">Noch keine Nachrichten. Schreib die erste!</div>`;
+      return;
+    }
+    box.innerHTML = rows.map(m => {
+      const mine = m.sender_id === currentUserId;
+      return `<div class="chat-bubble ${mine ? 'mine' : 'theirs'}">${chatEscape(m.content)}<span class="cb-time">${chatTime(m.created_at)}</span></div>`;
+    }).join('');
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function appendMessage(m){
+    if(m.id && renderedMsgIds.has(m.id)) return;
+    if(m.id) renderedMsgIds.add(m.id);
+    const box = document.getElementById('chatMessages');
+    const empty = box.querySelector('.chat-empty-state');
+    if(empty) box.innerHTML = '';
+    const mine = m.sender_id === currentUserId;
+    const div = document.createElement('div');
+    div.className = 'chat-bubble ' + (mine ? 'mine' : 'theirs');
+    div.innerHTML = `${chatEscape(m.content)}<span class="cb-time">${chatTime(m.created_at)}</span>`;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  // Markiert alle eingehenden Nachrichten eines Freundes als gelesen.
+  async function markConversationRead(friendId){
+    if(!currentUserId) return;
+    if(chatUnread[friendId]){
+      delete chatUnread[friendId];
+      refreshChatBadge();
+      renderChatSidebar();
+    }
+    await supabaseClient
+      .from('direct_messages')
+      .update({ read_at: new Date().toISOString() })
+      .eq('receiver_id', currentUserId)
+      .eq('sender_id', friendId)
+      .is('read_at', null);
+  }
+
+  document.getElementById('chatInputBar').addEventListener('submit', async e => {
+    e.preventDefault();
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    if(!text || !activeChatFriend || !currentUserId) return;
+    const btn = document.getElementById('chatSendBtn');
+    const receiverId = activeChatFriend.id;
+    btn.disabled = true;
+    const { data, error } = await supabaseClient
+      .from('direct_messages')
+      .insert({ sender_id: currentUserId, receiver_id: receiverId, content: text })
+      .select('id, sender_id, receiver_id, content, created_at')
+      .single();
+    btn.disabled = false;
+    if(error){ showToast('Nachricht konnte nicht gesendet werden.'); console.error(error); return; }
+    input.value = '';
+    input.focus();
+    if(activeChatFriend && activeChatFriend.id === receiverId) appendMessage(data);
+  });
+
+  // Realtime: neue Direktnachrichten sofort einblenden bzw. Badge/Sidebar aktualisieren.
+  function subscribeDirectMessages(){
+    unsubscribeDirectMessages();
+    if(!currentUserId) return;
+    chatChannel = supabaseClient
+      .channel('direct_messages_' + currentUserId)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'direct_messages' }, payload => {
+        const m = payload.new;
+        if(!m || (m.sender_id !== currentUserId && m.receiver_id !== currentUserId)) return;
+        const otherId = m.sender_id === currentUserId ? m.receiver_id : m.sender_id;
+        const chatOpen = document.getElementById('chatView').style.display !== 'none';
+        const isActive = chatOpen && activeChatFriend && otherId === activeChatFriend.id;
+        if(isActive){
+          appendMessage(m);
+          if(m.receiver_id === currentUserId) markConversationRead(otherId);
+        } else if(m.receiver_id === currentUserId){
+          chatUnread[otherId] = (chatUnread[otherId] || 0) + 1;
+          refreshChatBadge();
+          renderChatSidebar();
+        }
+      })
+      .subscribe();
+  }
+  function unsubscribeDirectMessages(){
+    if(chatChannel){ supabaseClient.removeChannel(chatChannel); chatChannel = null; }
   }
 
   // Falls Supabase uns über einen Passwort-Reset-Link zurückschickt (PASSWORD_RECOVERY event),
