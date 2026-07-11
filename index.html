@@ -8329,6 +8329,9 @@
           <button type="button" class="wl-activate-btn ${row.activated ? 'is-active' : ''}" data-activate="${row.id}">
             ${row.activated ? 'Deaktivieren' : 'Aktivieren'}
           </button>
+          <div class="wl-remove" data-remove-req="${row.id}" title="Anfrage entfernen (Person kann danach neu anfragen)">
+            <svg viewBox="0 0 24 24"><path d="M18.3 5.7L12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7 2.9 18.3 9.2 12 2.9 5.7 4.3 4.3l6.3 6.3 6.3-6.3z"/></svg>
+          </div>
         </div>
       </div>`).join('');
     list.querySelectorAll('[data-activate]').forEach(btn => {
@@ -8370,6 +8373,22 @@
         } else {
           showToast('Alpha-Zugriff-Status zurückgesetzt.');
         }
+        await loadAlphaAccessRequests();
+      });
+    });
+    // Anfrage komplett löschen — gibt die E-Mail wieder frei (Unique-Constraint),
+    // sodass die Person danach erneut Alpha-Zugriff anfragen kann.
+    list.querySelectorAll('[data-remove-req]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.dataset.removeReq;
+        const email = btn.closest('.wl-item')?.dataset.email || '';
+        if(!confirm(`Anfrage von ${email} wirklich entfernen? Die Person kann danach neu anfragen.`)) return;
+        const { error: delError } = await supabaseClient
+          .from('alpha_access_requests')
+          .delete()
+          .eq('id', id);
+        if(delError){ showToast(delError.message); return; }
+        showToast('Anfrage entfernt.');
         await loadAlphaAccessRequests();
       });
     });
