@@ -529,7 +529,7 @@
     .hero h1{font-size:22px;}
     .hero{padding:28px 22px 40px;min-height:0;}
     .hero-stats{flex-wrap:wrap;}
-    .crossy-road{height:260px;}
+    .crossy-road{height:320px;}
   }
 
   /* ---------- Overlay/modal shared styles ---------- */
@@ -2290,67 +2290,83 @@
     display:flex;flex-direction:column;gap:14px;
   }
   .crossy-road{
-    position:relative;height:320px;display:flex;border-radius:16px;overflow:hidden;flex-shrink:0;
-    background:
-      linear-gradient(90deg,rgba(0,0,0,.25) 0%,transparent 6%,transparent 94%,rgba(0,0,0,.25) 100%),
-      linear-gradient(180deg,#2b2b33,#232329 55%,#1c1c22);
+    position:relative;height:400px;display:flex;border-radius:16px;overflow:hidden;flex-shrink:0;
+    background:linear-gradient(180deg,#474555,#403e4d 55%,#393745);
     box-shadow:inset 0 0 0 1px rgba(0,0,0,.3),0 8px 18px rgba(0,0,0,.35);
   }
-  .crossy-curb{
-    width:32px;flex-shrink:0;position:relative;z-index:2;
+  /* Randstreifen wie im Chicken-Road-Vorbild: Grasstreifen mit Büschen und
+     Steinen außen, grauer Gehweg innen — dort wartet das Huhn. */
+  .crossy-curb{width:54px;flex-shrink:0;position:relative;z-index:2;}
+  .crossy-curb-start{
     background:
-      repeating-linear-gradient(180deg,#3a5c40 0 14px,#2c4832 14px 28px),
-      linear-gradient(90deg,#254230,#1c3524);
-    box-shadow:inset 0 0 0 1px rgba(0,0,0,.25);
+      radial-gradient(circle 5.5px at 9px 46px, #2e8a46 97%, transparent),
+      radial-gradient(circle 7px at 13px 112px, #2e8a46 97%, transparent),
+      radial-gradient(circle 5px at 8px 178px, #35984f 97%, transparent),
+      radial-gradient(ellipse 7px 5px at 11px 250px, #a7ac97 97%, transparent),
+      radial-gradient(circle 6px at 10px 330px, #2e8a46 97%, transparent),
+      repeating-linear-gradient(180deg, transparent 0 46px, rgba(0,0,0,.14) 46px 48px) 18px 0/36px 100% no-repeat,
+      linear-gradient(90deg,#4aab61 0 18px,#c2c6b8 18px);
+    box-shadow:inset -3px 0 6px rgba(0,0,0,.25);
   }
-  .crossy-curb:before{
-    content:"";position:absolute;top:0;bottom:0;width:6px;
-    background:repeating-linear-gradient(180deg,#8a8f78 0 16px,#5f6350 16px 32px);
+  /* kleiner Hydrant auf dem Gehweg, wie im Vorbild */
+  .crossy-curb-start:after{
+    content:"";position:absolute;left:29px;bottom:56px;width:11px;height:15px;
+    background:linear-gradient(180deg,#e05a48,#c1443c);border-radius:5px 5px 2px 2px;
+    box-shadow:inset 0 2px 0 rgba(255,255,255,.3),0 2px 3px rgba(0,0,0,.3);
   }
-  .crossy-curb-start:before{right:0;box-shadow:2px 0 6px rgba(0,0,0,.35);}
-  .crossy-curb-end:before{left:0;box-shadow:-2px 0 6px rgba(0,0,0,.35);}
-  .crossy-lanes{flex:1;display:flex;position:relative;}
+  .crossy-curb-end{
+    background:
+      radial-gradient(circle 6px at 44px 70px, #2e8a46 97%, transparent),
+      radial-gradient(ellipse 7px 5px at 43px 160px, #a7ac97 97%, transparent),
+      radial-gradient(circle 5.5px at 45px 260px, #35984f 97%, transparent),
+      radial-gradient(circle 6.5px at 42px 350px, #2e8a46 97%, transparent),
+      repeating-linear-gradient(180deg, transparent 0 46px, rgba(0,0,0,.14) 46px 48px) 0 0/36px 100% no-repeat,
+      linear-gradient(90deg,#c2c6b8 0 36px,#4aab61 36px);
+    box-shadow:inset 3px 0 6px rgba(0,0,0,.25);
+  }
+  .crossy-lanes{flex:1;display:flex;position:relative;z-index:2;}
   .crossy-lane{
-    flex:1;position:relative;border-right:4px dashed rgba(255,255,255,.16);
+    flex:1;position:relative;border-right:4px dashed rgba(255,255,255,.45);
     overflow:hidden;
   }
   .crossy-lane:last-child{border-right:none;}
-  .crossy-lane.is-current{background:rgba(212,175,106,.07);}
-  .crossy-lane.is-cleared{background:rgba(76,191,131,.06);}
+  .crossy-lane.is-current{background:rgba(212,175,106,.08);}
+  .crossy-lane.is-cleared{background:rgba(76,191,131,.07);}
 
-  /* Multiplikator-Anzeige liegt jetzt in einer eigenen Zeile ÜBER der
-     Fahrbahn (statt in der Spur selbst), damit sich Pill und Auto nie mehr
-     überschneiden oder gegenseitig verdecken können. */
-  .crossy-multipliers{display:flex;padding:0 32px 10px;gap:0;}
+  /* Multiplikatoren liegen als Gullideckel mitten in den Spuren,
+     vertikal zentriert — wie im Chicken-Road-Vorbild. */
+  .crossy-multipliers{
+    position:absolute;top:50%;left:54px;right:54px;transform:translateY(-50%);
+    display:flex;z-index:1;pointer-events:none;
+  }
   .crossy-multiplier-cell{flex:1;display:flex;justify-content:center;}
 
-  /* Autos fahren jetzt IN ihrer Spur auf und ab (vertikal, längs zur
-     Fahrbahn) statt seitlich quer durch die Spur zu driften. Das Sprite ist
-     als liegendes Auto gezeichnet, wird deshalb um 90° gedreht, damit die
-     Motorhaube nach oben zeigt. */
+  /* Autos: große Cartoon-Autos in Draufsicht, fahren längs in ihrer Spur */
   .crossy-car{
-    position:absolute;left:50%;top:-26%;width:56px;height:28px;margin-left:-28px;
-    transform:rotate(90deg);transform-origin:50% 50%;
-    animation:crossyDrive linear infinite;will-change:top;
+    position:absolute;left:50%;top:-32%;width:66px;height:114px;margin-left:-33px;
+    animation:crossyDrive linear infinite;will-change:top;z-index:2;
   }
-  .crossy-car svg{width:100%;height:100%;filter:drop-shadow(0 4px 5px rgba(0,0,0,.45));}
+  .crossy-car svg{width:100%;height:100%;filter:drop-shadow(0 5px 6px rgba(0,0,0,.45));}
   @keyframes crossyDrive{
-    0%{top:-26%;}
-    48%{top:98%;}
-    50%{top:98%;}
-    98%{top:-26%;}
-    100%{top:-26%;}
+    0%{top:-32%;}
+    48%{top:102%;}
+    50%{top:102%;}
+    98%{top:-32%;}
+    100%{top:-32%;}
   }
   .crossy-car.speeding{animation:crossySpeedThrough .35s ease-in forwards !important;}
   @keyframes crossySpeedThrough{0%{top:var(--car-y,40%);}100%{top:-70%;}}
 
   .crossy-multiplier-pill{
-    position:relative;z-index:2;padding:6px 12px;border-radius:20px;font-family:var(--font-mono);font-weight:700;font-size:13px;
-    background:linear-gradient(180deg,rgba(20,26,20,.85),rgba(10,15,10,.9));border:1px solid var(--border);color:var(--accent-hi);
-    box-shadow:0 3px 10px rgba(0,0,0,.4);transition:.2s;
+    width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-mono);font-weight:700;font-size:12px;color:rgba(255,255,255,.7);
+    background:radial-gradient(circle at 50% 40%,#57556a,#403e4f 70%);
+    border:1px solid rgba(0,0,0,.4);
+    box-shadow:inset 0 0 0 4px rgba(0,0,0,.16),inset 0 0 0 5px rgba(255,255,255,.06),inset 0 3px 7px rgba(0,0,0,.35);
+    transition:.2s;
   }
-  .crossy-multiplier-cell.is-cleared .crossy-multiplier-pill{border-color:var(--success);color:var(--success);box-shadow:0 0 0 2px rgba(76,191,131,.3);opacity:.55;}
-  .crossy-multiplier-cell.is-current .crossy-multiplier-pill{box-shadow:0 0 0 2px var(--accent-soft),0 3px 10px rgba(0,0,0,.4);}
+  .crossy-multiplier-cell.is-cleared .crossy-multiplier-pill{color:var(--success);box-shadow:inset 0 0 0 4px rgba(0,0,0,.16),0 0 0 2px rgba(76,191,131,.45);opacity:.75;}
+  .crossy-multiplier-cell.is-current .crossy-multiplier-pill{color:var(--accent-hi);box-shadow:inset 0 0 0 4px rgba(0,0,0,.16),0 0 0 3px var(--accent-soft),0 0 18px rgba(240,207,142,.25);}
 
   /* Straßensperre: fällt von oben in die Spur, sobald sie sicher überquert wurde */
   .crossy-barrier{
@@ -2362,7 +2378,7 @@
   @keyframes crossyBarrierDrop{0%{transform:translateY(-140px);opacity:0;}70%{opacity:1;}100%{transform:translateY(22px);opacity:1;}}
 
   .crossy-chicken{
-    position:absolute;bottom:14px;left:0;width:44px;height:44px;z-index:3;
+    position:absolute;top:50%;margin-top:-28px;left:0;width:56px;height:56px;z-index:3;
     transition:left .5s cubic-bezier(.34,1.4,.64,1);filter:drop-shadow(0 4px 5px rgba(0,0,0,.45));
   }
   .crossy-chicken.hop{animation:crossyHop .4s ease-in-out;}
@@ -2383,15 +2399,15 @@
   .crossy-message.win{color:var(--success);text-shadow:0 0 14px rgba(76,191,131,.5);}
   .crossy-message.lose{color:var(--danger);}
 
-  /* Steuerleiste — eine durchgehende Leiste unterhalb des Spielfelds, genau
-     wie .bj-panel bei Blackjack: Label + Controls flach in einer Zeile,
-     darunter der Aktions-Button über die volle Breite. */
+  /* Steuerleiste — eine flache Zeile wie im Chicken-Road-Vorbild:
+     Einsatz links, Schwierigkeit in der Mitte, großer Start-Knopf rechts. */
   .crossy-panel{
-    margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 18px;
-    display:flex;flex-direction:column;gap:14px;
+    margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 18px;
+    display:flex;align-items:center;gap:26px;flex-wrap:wrap;
   }
-  .crossy-controls-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
-  .crossy-panel-label{font-size:12.5px;color:var(--muted);font-weight:600;flex-shrink:0;}
+  .crossy-panel-group{display:flex;flex-direction:column;gap:7px;}
+  .crossy-controls-row{display:flex;align-items:center;gap:10px;}
+  .crossy-panel-label{font-size:11px;color:var(--muted);font-weight:600;flex-shrink:0;letter-spacing:.5px;text-transform:uppercase;}
   .crossy-bet-input-row{display:flex;align-items:center;gap:8px;}
   .crossy-bet-prefix{font-size:12px;color:var(--muted);}
   .crossy-bet-input{
@@ -2414,9 +2430,9 @@
   .crossy-diff-btn.active{background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:var(--accent-ink);border-color:var(--accent-dim);}
   .crossy-diff-btn:disabled{opacity:.5;cursor:default;}
 
-  .crossy-action-row{display:flex;gap:12px;}
+  .crossy-action-row{flex:1;display:flex;gap:12px;min-width:240px;}
   .crossy-action-btn{
-    flex:1;height:46px;border:none;border-radius:10px;cursor:pointer;font-family:var(--font-body);
+    flex:1;height:54px;border:none;border-radius:10px;cursor:pointer;font-family:var(--font-body);
     font-weight:700;font-size:14.5px;letter-spacing:.2px;color:var(--accent-ink);
     background:linear-gradient(180deg,var(--accent-hi),var(--accent) 55%,var(--accent-dim));
     box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -2px 4px rgba(0,0,0,.2),0 6px 14px rgba(0,0,0,.35);
@@ -2425,7 +2441,7 @@
   .crossy-action-btn:hover:not(:disabled){transform:translateY(-1px);}
   .crossy-action-btn:disabled{opacity:.5;cursor:default;box-shadow:none;transform:none;}
   .crossy-go-btn{
-    flex:1;height:46px;border:none;border-radius:10px;cursor:pointer;font-family:var(--font-body);
+    flex:1;height:54px;border:none;border-radius:10px;cursor:pointer;font-family:var(--font-body);
     font-weight:700;font-size:14.5px;letter-spacing:.2px;color:#0d1f14;
     background:linear-gradient(180deg,#7fe3a8,var(--success) 60%,#2f8f5e);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 14px rgba(0,0,0,.3);
@@ -2434,7 +2450,7 @@
   .crossy-go-btn:hover:not(:disabled){transform:translateY(-1px);}
   .crossy-go-btn:disabled{opacity:.5;cursor:default;transform:none;}
   .crossy-giveup-btn{
-    flex:1;height:46px;border:none;border-radius:10px;cursor:pointer;font-family:var(--font-body);
+    flex:1;height:54px;border:none;border-radius:10px;cursor:pointer;font-family:var(--font-body);
     font-weight:700;font-size:14.5px;letter-spacing:.2px;color:#2a0d0d;
     background:linear-gradient(180deg,#e59a94,var(--danger) 60%,#8a2a26);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 6px 14px rgba(0,0,0,.3);
@@ -4050,33 +4066,35 @@
     </div>
 
     <div class="crossy-cabinet">
-      <div class="crossy-multipliers" id="crossyMultipliers"></div>
       <div class="crossy-road" id="crossyRoad">
         <div class="crossy-curb crossy-curb-start"></div>
         <div class="crossy-lanes" id="crossyLanes"></div>
         <div class="crossy-curb crossy-curb-end"></div>
+        <div class="crossy-multipliers" id="crossyMultipliers"></div>
         <div class="crossy-chicken" id="crossyChicken">
-          <svg viewBox="0 0 48 48"><defs><radialGradient id="gChick" cx="35%" cy="30%" r="75%"><stop offset="0%" stop-color="#fff6dd"/><stop offset="55%" stop-color="#f2c94c"/><stop offset="100%" stop-color="#c99a1f"/></radialGradient></defs><ellipse cx="22" cy="30" rx="14" ry="12" fill="url(#gChick)" stroke="#8a6a12" stroke-width="1"/><circle cx="30" cy="20" r="9" fill="url(#gChick)" stroke="#8a6a12" stroke-width="1"/><path d="M38 19l7 2-7 3z" fill="#d9642c" stroke="#8a4318" stroke-width="0.6"/><circle cx="33" cy="18" r="1.6" fill="#241a08"/><path d="M26 12c1-2.6 3-4 6-4.4-1 1.6-1.4 3-1.2 4.6" fill="#d1443c" stroke="#8a2a26" stroke-width="0.5"/><path d="M10 30c-3 1-5 3-5 6" stroke="#c99a1f" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>
+          <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path d="M19 39v5M27 39v5" stroke="#e8973f" stroke-width="2.6" stroke-linecap="round"/><path d="M19 44l-4 2M27 44l-4 2" stroke="#e8973f" stroke-width="2.2" stroke-linecap="round"/><path d="M12 25c-5-1-8-5-7-10 4 1 7 4 8 7z" fill="#f4efe2" stroke="#d9d2c0" stroke-width="1"/><ellipse cx="22" cy="29" rx="13" ry="11.5" fill="#fdfaf1" stroke="#d9d2c0" stroke-width="1"/><path d="M17 28c4-2.5 9-2 11 1.5-2.5 3.5-8 4-11 1.5z" fill="#efe8d6"/><circle cx="31" cy="16" r="8.5" fill="#fdfaf1" stroke="#d9d2c0" stroke-width="1"/><path d="M27 8.5c-.5-3 1-5.5 3.5-6 .2 1 .8 1.8 1.8 2 .8-.8 2.2-1 3.2-.4-.4 1 .1 2 1 2.4-.3 2.2-2.3 4-4.8 4z" fill="#e2503e"/><path d="M39 14.5l6.5 2.2-6.5 3z" fill="#f2a23c" stroke="#c67f26" stroke-width=".5"/><path d="M33.5 23c.2 2.4-.8 4-2.3 4s-2.6-1.4-2.5-3.4z" fill="#e2503e"/><circle cx="34" cy="14" r="1.7" fill="#232830"/></svg>
         </div>
       </div>
       <div class="crossy-message" id="crossyMessage"></div>
     </div>
 
     <div class="crossy-panel">
-      <div class="crossy-controls-row">
+      <div class="crossy-panel-group">
         <span class="crossy-panel-label">Einsatz</span>
-        <div class="crossy-bet-input-row">
-          <span class="crossy-bet-prefix">Chips</span>
-          <input type="number" class="crossy-bet-input" id="crossyBetInput" min="0" step="10" value="0">
-        </div>
-        <div class="crossy-bet-quick">
-          <button type="button" class="crossy-bet-quick-btn" id="crossyBetHalf">1/2</button>
-          <button type="button" class="crossy-bet-quick-btn" id="crossyBetDouble">2×</button>
-          <button type="button" class="crossy-bet-quick-btn" id="crossyBetMax">Max</button>
+        <div class="crossy-controls-row">
+          <div class="crossy-bet-input-row">
+            <span class="crossy-bet-prefix">Chips</span>
+            <input type="number" class="crossy-bet-input" id="crossyBetInput" min="0" step="10" value="0">
+          </div>
+          <div class="crossy-bet-quick">
+            <button type="button" class="crossy-bet-quick-btn" id="crossyBetHalf">1/2</button>
+            <button type="button" class="crossy-bet-quick-btn" id="crossyBetDouble">2×</button>
+            <button type="button" class="crossy-bet-quick-btn" id="crossyBetMax">Max</button>
+          </div>
         </div>
       </div>
 
-      <div class="crossy-controls-row">
+      <div class="crossy-panel-group">
         <span class="crossy-panel-label">Schwierigkeit</span>
         <div class="crossy-diff-row" id="crossyDiffRow">
           <button type="button" class="crossy-diff-btn" data-diff="easy">Easy</button>
@@ -5751,13 +5769,19 @@
     return arr.map(p => { survival *= (1 - p); return CROSSY_HOUSE_EDGE / survival; });
   }
   function crossyCarSvg(color){
-    return `<svg viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg">
-      <rect x="4" y="10" width="52" height="14" rx="6" fill="${color}" stroke="rgba(0,0,0,.35)" stroke-width="1"/>
-      <rect x="14" y="3" width="30" height="12" rx="5" fill="${color}" opacity="0.9" stroke="rgba(0,0,0,.3)" stroke-width="1"/>
-      <rect x="17" y="6" width="10" height="7" rx="1.5" fill="#bfe3ff" opacity="0.85"/>
-      <rect x="31" y="6" width="10" height="7" rx="1.5" fill="#bfe3ff" opacity="0.85"/>
-      <circle cx="15" cy="24" r="4.2" fill="#141414" stroke="#000" stroke-width="0.5"/>
-      <circle cx="45" cy="24" r="4.2" fill="#141414" stroke="#000" stroke-width="0.5"/>
+    // Draufsicht wie im Chicken-Road-Vorbild: Karosserie mit Dach,
+    // Front-/Heckscheibe und leuchtenden Scheinwerfern in Fahrtrichtung.
+    return `<svg viewBox="0 0 36 62" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0.5" y="10" width="5" height="11" rx="2.2" fill="#191921"/>
+      <rect x="30.5" y="10" width="5" height="11" rx="2.2" fill="#191921"/>
+      <rect x="0.5" y="42" width="5" height="11" rx="2.2" fill="#191921"/>
+      <rect x="30.5" y="42" width="5" height="11" rx="2.2" fill="#191921"/>
+      <rect x="3" y="2" width="30" height="58" rx="10" fill="${color}" stroke="rgba(0,0,0,.38)" stroke-width="1.6"/>
+      <rect x="7" y="10" width="22" height="8" rx="3.5" fill="#232b38"/>
+      <rect x="7.8" y="20" width="20.4" height="17" rx="4" fill="rgba(255,255,255,.16)"/>
+      <rect x="7" y="39" width="22" height="10" rx="3.5" fill="#232b38"/>
+      <circle cx="10.5" cy="56.5" r="2.6" fill="#fff3c4"/>
+      <circle cx="25.5" cy="56.5" r="2.6" fill="#fff3c4"/>
     </svg>`;
   }
   function crossyBuildRoad(){
@@ -5804,13 +5828,13 @@
     if(laneCount <= 0){
       const curb = road.querySelector('.crossy-curb-start');
       const r = curb.getBoundingClientRect();
-      targetX = (r.left - roadRect.left) + r.width / 2 - 22;
+      targetX = (r.left - roadRect.left) + r.width / 2 - 28;
     } else {
       const lanes = [...document.querySelectorAll('.crossy-lane')];
       const laneEl = lanes[Math.min(laneCount, lanes.length) - 1];
       if(!laneEl) return;
       const r = laneEl.getBoundingClientRect();
-      targetX = (r.left - roadRect.left) + r.width / 2 - 22;
+      targetX = (r.left - roadRect.left) + r.width / 2 - 28;
     }
     chicken.style.left = Math.max(0, targetX) + 'px';
   }
