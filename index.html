@@ -6015,6 +6015,15 @@
     if(laneEls[laneIdx]){
       laneEls[laneIdx].classList.remove('is-current');
       laneEls[laneIdx].classList.add('is-cleared');
+      // Spur ist ab jetzt gesperrt: das Auto rast ein letztes Mal durch
+      // und kommt nicht wieder (speeding-Animation endet außerhalb der Spur).
+      const clearedCar = laneEls[laneIdx].querySelector('.crossy-car');
+      if(clearedCar){
+        const carRect = clearedCar.getBoundingClientRect();
+        const laneRect = laneEls[laneIdx].getBoundingClientRect();
+        clearedCar.style.setProperty('--car-y', (carRect.top - laneRect.top) + 'px');
+        clearedCar.classList.add('speeding');
+      }
       const barrier = document.createElement('div');
       barrier.className = 'crossy-barrier';
       laneEls[laneIdx].appendChild(barrier);
