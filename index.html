@@ -529,6 +529,7 @@
     .hero h1{font-size:22px;}
     .hero{padding:28px 22px 40px;min-height:0;}
     .hero-stats{flex-wrap:wrap;}
+    .crossy-road{height:260px;}
   }
 
   /* ---------- Overlay/modal shared styles ---------- */
@@ -2210,6 +2211,44 @@
   .slot-bet-step:hover{border-color:var(--accent-dim);color:var(--accent-hi);transform:translateY(-1px);}
   .slot-bet-step:active{transform:translateY(0);}
   .slot-bet-val{font-family:var(--font-mono);font-weight:700;color:var(--accent-hi);min-width:60px;text-align:center;font-size:14.5px;}
+
+  /* ---- Münzwert-Auswahl + Münzschlitz: Einsatz wird jetzt durch tatsächliches
+     "Einwerfen" von Münzen mit wählbarem Wert gebildet, statt per reinem Stepper ---- */
+  .slot-coinslot-box{
+    display:flex;align-items:center;gap:12px;background:linear-gradient(180deg,var(--surface),var(--surface-2));
+    border:1px solid var(--border);border-radius:14px;padding:9px 16px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.03),0 4px 10px rgba(0,0,0,.25);
+  }
+  .slot-coinslot-box span{font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.5px;font-weight:600;}
+  .slot-coinslot{
+    position:relative;width:46px;height:34px;border-radius:7px;cursor:pointer;flex-shrink:0;
+    background:linear-gradient(180deg,#1a1108,#0c0703);border:1px solid var(--accent-dim);
+    box-shadow:inset 0 3px 6px rgba(0,0,0,.65),0 1px 0 rgba(255,255,255,.04);
+    display:flex;align-items:center;justify-content:center;transition:.15s;
+  }
+  .slot-coinslot:hover{border-color:var(--accent-hi);box-shadow:inset 0 3px 6px rgba(0,0,0,.65),0 0 0 3px var(--accent-soft);}
+  .slot-coinslot:active{transform:translateY(1px);}
+  .slot-coinslot:disabled, .slot-coinslot.disabled{cursor:default;opacity:.45;box-shadow:inset 0 3px 6px rgba(0,0,0,.65);}
+  .slot-coinslot:before{
+    content:"";width:22px;height:4px;border-radius:2px;background:#000;box-shadow:inset 0 1px 1px rgba(255,255,255,.06);
+  }
+  .slot-coin-drop{
+    position:absolute;left:50%;top:-26px;width:20px;height:20px;border-radius:50%;margin-left:-10px;
+    background:radial-gradient(circle at 34% 30%,var(--accent-hi),var(--accent) 65%,var(--accent-dim));
+    box-shadow:0 0 0 2px var(--accent-ink);pointer-events:none;
+    animation:slotCoinFall .42s cubic-bezier(.55,0,1,.45) forwards;
+  }
+  @keyframes slotCoinFall{
+    0%{top:-26px;opacity:1;}
+    80%{top:14px;opacity:1;}
+    100%{top:22px;opacity:0;}
+  }
+  .slot-inserted-val{font-family:var(--font-mono);font-weight:700;color:var(--accent-hi);min-width:70px;text-align:center;font-size:14.5px;}
+  .slot-coinslot-box.slot-needs-coin .slot-coinslot{
+    animation:slotCoinHint 1.4s ease-in-out infinite;
+  }
+  @keyframes slotCoinHint{0%,100%{box-shadow:inset 0 3px 6px rgba(0,0,0,.65),0 0 0 3px rgba(201,160,91,.12);}50%{box-shadow:inset 0 3px 6px rgba(0,0,0,.65),0 0 0 5px rgba(201,160,91,.3);}}
+
   .slot-spin-btn{
     position:relative;height:58px;padding:0 40px;border:none;border-radius:16px;cursor:pointer;font-family:var(--font-body);
     font-weight:800;font-size:16px;letter-spacing:.4px;text-transform:uppercase;color:var(--accent-ink);
@@ -2236,6 +2275,174 @@
   .slot-pay-row:hover{border-color:var(--accent-dim);transform:translateY(-1px);}
   .slot-pay-row svg{width:24px;height:24px;flex-shrink:0;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35));}
   .slot-pay-row b{color:var(--accent-hi);margin-left:auto;font-family:var(--font-mono);font-size:13px;}
+
+  /* ---------- Hühnerlauf (Crossy-Style Fahrbahn-Spiel) ---------- */
+  /* Läuft wie Blackjack als normale Karte im Content-Bereich: Sidebar bleibt
+     sichtbar, das Spielfeld ist eine kompakte, abgerundete Filz-Tischkarte
+     statt eines Vollbild-Screens ohne Ränder. */
+  .crossy-wrap{width:100%;}
+
+  .crossy-cabinet{
+    position:relative;border-radius:20px;padding:16px;
+    background:var(--panel);
+    border:1px solid var(--border-soft);
+    box-shadow:0 18px 40px rgba(0,0,0,.35);
+    display:flex;flex-direction:column;gap:14px;
+  }
+  .crossy-road{
+    position:relative;height:320px;display:flex;border-radius:16px;overflow:hidden;flex-shrink:0;
+    background:
+      linear-gradient(90deg,rgba(0,0,0,.25) 0%,transparent 6%,transparent 94%,rgba(0,0,0,.25) 100%),
+      linear-gradient(180deg,#2b2b33,#232329 55%,#1c1c22);
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,.3),0 8px 18px rgba(0,0,0,.35);
+  }
+  .crossy-curb{
+    width:32px;flex-shrink:0;position:relative;z-index:2;
+    background:
+      repeating-linear-gradient(180deg,#3a5c40 0 14px,#2c4832 14px 28px),
+      linear-gradient(90deg,#254230,#1c3524);
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,.25);
+  }
+  .crossy-curb:before{
+    content:"";position:absolute;top:0;bottom:0;width:6px;
+    background:repeating-linear-gradient(180deg,#8a8f78 0 16px,#5f6350 16px 32px);
+  }
+  .crossy-curb-start:before{right:0;box-shadow:2px 0 6px rgba(0,0,0,.35);}
+  .crossy-curb-end:before{left:0;box-shadow:-2px 0 6px rgba(0,0,0,.35);}
+  .crossy-lanes{flex:1;display:flex;position:relative;}
+  .crossy-lane{
+    flex:1;position:relative;border-right:4px dashed rgba(255,255,255,.16);
+    overflow:hidden;
+  }
+  .crossy-lane:last-child{border-right:none;}
+  .crossy-lane.is-current{background:rgba(212,175,106,.07);}
+  .crossy-lane.is-cleared{background:rgba(76,191,131,.06);}
+
+  /* Multiplikator-Anzeige liegt jetzt in einer eigenen Zeile ÜBER der
+     Fahrbahn (statt in der Spur selbst), damit sich Pill und Auto nie mehr
+     überschneiden oder gegenseitig verdecken können. */
+  .crossy-multipliers{display:flex;padding:0 32px 10px;gap:0;}
+  .crossy-multiplier-cell{flex:1;display:flex;justify-content:center;}
+
+  /* Autos fahren jetzt IN ihrer Spur auf und ab (vertikal, längs zur
+     Fahrbahn) statt seitlich quer durch die Spur zu driften. Das Sprite ist
+     als liegendes Auto gezeichnet, wird deshalb um 90° gedreht, damit die
+     Motorhaube nach oben zeigt. */
+  .crossy-car{
+    position:absolute;left:50%;top:-26%;width:56px;height:28px;margin-left:-28px;
+    transform:rotate(90deg);transform-origin:50% 50%;
+    animation:crossyDrive linear infinite;will-change:top;
+  }
+  .crossy-car svg{width:100%;height:100%;filter:drop-shadow(0 4px 5px rgba(0,0,0,.45));}
+  @keyframes crossyDrive{
+    0%{top:-26%;}
+    48%{top:98%;}
+    50%{top:98%;}
+    98%{top:-26%;}
+    100%{top:-26%;}
+  }
+  .crossy-car.speeding{animation:crossySpeedThrough .35s ease-in forwards !important;}
+  @keyframes crossySpeedThrough{0%{top:var(--car-y,40%);}100%{top:-70%;}}
+
+  .crossy-multiplier-pill{
+    position:relative;z-index:2;padding:6px 12px;border-radius:20px;font-family:var(--font-mono);font-weight:700;font-size:13px;
+    background:linear-gradient(180deg,rgba(20,26,20,.85),rgba(10,15,10,.9));border:1px solid var(--border);color:var(--accent-hi);
+    box-shadow:0 3px 10px rgba(0,0,0,.4);transition:.2s;
+  }
+  .crossy-multiplier-cell.is-cleared .crossy-multiplier-pill{border-color:var(--success);color:var(--success);box-shadow:0 0 0 2px rgba(76,191,131,.3);opacity:.55;}
+  .crossy-multiplier-cell.is-current .crossy-multiplier-pill{box-shadow:0 0 0 2px var(--accent-soft),0 3px 10px rgba(0,0,0,.4);}
+
+  /* Straßensperre: fällt von oben in die Spur, sobald sie sicher überquert wurde */
+  .crossy-barrier{
+    position:absolute;top:0;left:6%;right:6%;height:16px;z-index:2;border-radius:4px;
+    background:repeating-linear-gradient(90deg,#e8c168 0 16px,#1c1c22 16px 32px);
+    box-shadow:0 4px 10px rgba(0,0,0,.5),inset 0 0 0 1px rgba(0,0,0,.3);
+    animation:crossyBarrierDrop .45s cubic-bezier(.3,1.4,.5,1) forwards;
+  }
+  @keyframes crossyBarrierDrop{0%{transform:translateY(-140px);opacity:0;}70%{opacity:1;}100%{transform:translateY(22px);opacity:1;}}
+
+  .crossy-chicken{
+    position:absolute;bottom:14px;left:0;width:44px;height:44px;z-index:3;
+    transition:left .5s cubic-bezier(.34,1.4,.64,1);filter:drop-shadow(0 4px 5px rgba(0,0,0,.45));
+  }
+  .crossy-chicken.hop{animation:crossyHop .4s ease-in-out;}
+  @keyframes crossyHop{0%,100%{transform:translateY(0) rotate(0);}50%{transform:translateY(-20px) rotate(-6deg);}}
+  .crossy-chicken.hit{animation:crossyHit .6s ease-in forwards;}
+  @keyframes crossyHit{
+    0%{transform:rotate(0) translate(0,0);opacity:1;}
+    30%{transform:rotate(25deg) translate(6px,-6px);opacity:1;}
+    100%{transform:rotate(100deg) translate(120px,30px);opacity:0;}
+  }
+  .crossy-feather{position:absolute;width:8px;height:8px;border-radius:50% 0 50% 50%;background:#f2ecdd;opacity:.9;
+    animation:crossyFeather .7s ease-out forwards;}
+  @keyframes crossyFeather{0%{transform:translate(0,0) rotate(0);opacity:1;}100%{transform:translate(var(--fx,20px),var(--fy,-30px)) rotate(220deg);opacity:0;}}
+
+  .crossy-message{
+    text-align:center;font-size:15px;font-weight:700;min-height:22px;padding:10px 0 0;color:var(--accent-hi);letter-spacing:.2px;flex-shrink:0;
+  }
+  .crossy-message.win{color:var(--success);text-shadow:0 0 14px rgba(76,191,131,.5);}
+  .crossy-message.lose{color:var(--danger);}
+
+  /* Steuerleiste — eine durchgehende Leiste unterhalb des Spielfelds, genau
+     wie .bj-panel bei Blackjack: Label + Controls flach in einer Zeile,
+     darunter der Aktions-Button über die volle Breite. */
+  .crossy-panel{
+    margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 18px;
+    display:flex;flex-direction:column;gap:14px;
+  }
+  .crossy-controls-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+  .crossy-panel-label{font-size:12.5px;color:var(--muted);font-weight:600;flex-shrink:0;}
+  .crossy-bet-input-row{display:flex;align-items:center;gap:8px;}
+  .crossy-bet-prefix{font-size:12px;color:var(--muted);}
+  .crossy-bet-input{
+    width:100px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--accent-hi);
+    font-family:var(--font-mono);font-weight:700;font-size:14.5px;padding:6px 8px;outline:none;
+  }
+  .crossy-bet-input:focus{border-color:var(--accent-dim);box-shadow:0 0 0 3px var(--accent-soft);}
+  .crossy-bet-quick{display:flex;gap:6px;}
+  .crossy-bet-quick-btn{
+    padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:linear-gradient(180deg,var(--panel),var(--surface-2));
+    color:var(--text);font-size:12px;font-weight:700;cursor:pointer;transition:.15s;
+  }
+  .crossy-bet-quick-btn:hover{border-color:var(--accent-dim);color:var(--accent-hi);}
+  .crossy-diff-row{display:flex;gap:6px;}
+  .crossy-diff-btn{
+    padding:8px 12px;border-radius:9px;border:1px solid var(--border);background:linear-gradient(180deg,var(--panel),var(--surface-2));
+    color:var(--muted);font-size:12.5px;font-weight:700;cursor:pointer;transition:.15s;
+  }
+  .crossy-diff-btn:hover{border-color:var(--accent-dim);color:var(--text);}
+  .crossy-diff-btn.active{background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:var(--accent-ink);border-color:var(--accent-dim);}
+  .crossy-diff-btn:disabled{opacity:.5;cursor:default;}
+
+  .crossy-action-row{display:flex;gap:12px;}
+  .crossy-action-btn{
+    flex:1;height:46px;border:none;border-radius:10px;cursor:pointer;font-family:var(--font-body);
+    font-weight:700;font-size:14.5px;letter-spacing:.2px;color:var(--accent-ink);
+    background:linear-gradient(180deg,var(--accent-hi),var(--accent) 55%,var(--accent-dim));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -2px 4px rgba(0,0,0,.2),0 6px 14px rgba(0,0,0,.35);
+    transition:transform .12s, box-shadow .12s;
+  }
+  .crossy-action-btn:hover:not(:disabled){transform:translateY(-1px);}
+  .crossy-action-btn:disabled{opacity:.5;cursor:default;box-shadow:none;transform:none;}
+  .crossy-go-btn{
+    flex:1;height:46px;border:none;border-radius:10px;cursor:pointer;font-family:var(--font-body);
+    font-weight:700;font-size:14.5px;letter-spacing:.2px;color:#0d1f14;
+    background:linear-gradient(180deg,#7fe3a8,var(--success) 60%,#2f8f5e);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 14px rgba(0,0,0,.3);
+    display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .12s;
+  }
+  .crossy-go-btn:hover:not(:disabled){transform:translateY(-1px);}
+  .crossy-go-btn:disabled{opacity:.5;cursor:default;transform:none;}
+  .crossy-giveup-btn{
+    flex:1;height:46px;border:none;border-radius:10px;cursor:pointer;font-family:var(--font-body);
+    font-weight:700;font-size:14.5px;letter-spacing:.2px;color:#2a0d0d;
+    background:linear-gradient(180deg,#e59a94,var(--danger) 60%,#8a2a26);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 6px 14px rgba(0,0,0,.3);
+    display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .12s;
+  }
+  .crossy-giveup-btn:hover:not(:disabled){transform:translateY(-1px);}
+  .crossy-giveup-btn span{font-family:var(--font-mono);}
+
 
 
   /* ---------- Rewards / Belohnungen ---------- */
@@ -3809,14 +4016,80 @@
         <div class="slot-message" id="slotMessage"></div>
         <div class="slot-panel">
           <div class="slot-bet-box">
-            <span>Einsatz</span>
-            <button class="slot-bet-step" id="slotBetDown">−</button>
-            <span class="slot-bet-val" id="slotBetVal">10</span>
-            <button class="slot-bet-step" id="slotBetUp">+</button>
+            <span>Münzwert</span>
+            <button class="slot-bet-step" id="slotCoinValDown">−</button>
+            <span class="slot-bet-val" id="slotCoinValVal">10</span>
+            <button class="slot-bet-step" id="slotCoinValUp">+</button>
           </div>
-          <button class="slot-spin-btn" id="slotSpinBtn">Drehen</button>
+          <div class="slot-coinslot-box slot-needs-coin" id="slotCoinslotBox">
+            <span>Münze einwerfen</span>
+            <button class="slot-coinslot" id="slotCoinslot" title="Münze in den Schlitz werfen"></button>
+            <span class="slot-inserted-val" id="slotInsertedVal">0 eingesetzt</span>
+          </div>
+          <button class="slot-spin-btn" id="slotSpinBtn" disabled>Drehen</button>
         </div>
         <div class="slot-paytable" id="slotPaytable"></div>
+      </div>
+    </div>
+  </div>
+
+<div class="content" id="crossyView" style="display:none;">
+  <div class="crossy-wrap">
+    <div class="bj-head">
+      <button class="bj-back" id="crossyBackBtn" title="Zurück">
+        <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>
+      </button>
+      <div class="bj-head-text">
+        <h1>Hühnerlauf</h1>
+        <p>Überquer die Fahrbahn und nimm deinen Multiplikator mit, bevor's kracht.</p>
+      </div>
+      <div class="bj-balance">
+        <span class="bj-balance-label">Guthaben</span>
+        <span class="bj-balance-val" id="crossyBalance">0</span>
+      </div>
+    </div>
+
+    <div class="crossy-cabinet">
+      <div class="crossy-multipliers" id="crossyMultipliers"></div>
+      <div class="crossy-road" id="crossyRoad">
+        <div class="crossy-curb crossy-curb-start"></div>
+        <div class="crossy-lanes" id="crossyLanes"></div>
+        <div class="crossy-curb crossy-curb-end"></div>
+        <div class="crossy-chicken" id="crossyChicken">
+          <svg viewBox="0 0 48 48"><defs><radialGradient id="gChick" cx="35%" cy="30%" r="75%"><stop offset="0%" stop-color="#fff6dd"/><stop offset="55%" stop-color="#f2c94c"/><stop offset="100%" stop-color="#c99a1f"/></radialGradient></defs><ellipse cx="22" cy="30" rx="14" ry="12" fill="url(#gChick)" stroke="#8a6a12" stroke-width="1"/><circle cx="30" cy="20" r="9" fill="url(#gChick)" stroke="#8a6a12" stroke-width="1"/><path d="M38 19l7 2-7 3z" fill="#d9642c" stroke="#8a4318" stroke-width="0.6"/><circle cx="33" cy="18" r="1.6" fill="#241a08"/><path d="M26 12c1-2.6 3-4 6-4.4-1 1.6-1.4 3-1.2 4.6" fill="#d1443c" stroke="#8a2a26" stroke-width="0.5"/><path d="M10 30c-3 1-5 3-5 6" stroke="#c99a1f" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+      <div class="crossy-message" id="crossyMessage"></div>
+    </div>
+
+    <div class="crossy-panel">
+      <div class="crossy-controls-row">
+        <span class="crossy-panel-label">Einsatz</span>
+        <div class="crossy-bet-input-row">
+          <span class="crossy-bet-prefix">Chips</span>
+          <input type="number" class="crossy-bet-input" id="crossyBetInput" min="0" step="10" value="0">
+        </div>
+        <div class="crossy-bet-quick">
+          <button type="button" class="crossy-bet-quick-btn" id="crossyBetHalf">1/2</button>
+          <button type="button" class="crossy-bet-quick-btn" id="crossyBetDouble">2×</button>
+          <button type="button" class="crossy-bet-quick-btn" id="crossyBetMax">Max</button>
+        </div>
+      </div>
+
+      <div class="crossy-controls-row">
+        <span class="crossy-panel-label">Schwierigkeit</span>
+        <div class="crossy-diff-row" id="crossyDiffRow">
+          <button type="button" class="crossy-diff-btn" data-diff="easy">Easy</button>
+          <button type="button" class="crossy-diff-btn" data-diff="medium">Medium</button>
+          <button type="button" class="crossy-diff-btn" data-diff="hard">Hard</button>
+          <button type="button" class="crossy-diff-btn active" data-diff="daredevil">Daredevil</button>
+        </div>
+      </div>
+
+      <div class="crossy-action-row">
+        <button type="button" class="crossy-action-btn" id="crossyStartBtn">Start</button>
+        <button type="button" class="crossy-go-btn" id="crossyGoBtn" style="display:none;">Los <span id="crossyGoVal"></span></button>
+        <button type="button" class="crossy-giveup-btn" id="crossyGiveupBtn" style="display:none;">Aufgeben <span id="crossyGiveupVal"></span></button>
       </div>
     </div>
   </div>
@@ -3869,6 +4142,7 @@
       <div class="level-rewards-grid" id="levelRewardsGrid"></div>
     </div>
   </div>
+</div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -3931,14 +4205,16 @@
 </div>
 
 <script>
-  // Nur zwei echte Spiele — der Rest folgt später als "Bald verfügbar".
+  // Drei echte Spiele — der Rest folgt später als "Bald verfügbar".
   const games = [
     { name:"Blackjack", suit:"♣", c1:"#1c1408", c2:"#8a6a35", players:"—", desc:"Schlag den Dealer auf 21.",
       rules:"Ziel: näher an 21 als der Dealer, ohne drüber zu gehen. Bube/Dame/König zählen 10, Ass 1 oder 11. Nach dem Einsatz kannst du Karten ziehen (Hit), stehen bleiben (Stand), verdoppeln (Double) oder bei gleichem Kartenpaar splitten." },
     { name:"Walzenglück", suit:"★", c1:"#3a0d12", c2:"#c1443c", players:"—", desc:"Drei gleiche Zeichen bringen den Gewinn.",
       rules:"Setz deinen Einsatz und dreh die drei Walzen. Landen alle drei auf demselben Symbol, gewinnst du entsprechend der Symbol-Auszahlung deines Einsatzes." },
+    { name:"Hühnerlauf", suit:"♠", c1:"#141f0d", c2:"#6fae4a", players:"—", desc:"Über die Fahrbahn hüpfen und Multiplikatoren einsammeln.",
+      rules:"Setz deinen Einsatz und wähle eine Schwierigkeit. Das Huhn läuft automatisch über die Fahrbahn — jede überquerte Spur erhöht deinen Multiplikator. Nimm jederzeit deinen Gewinn mit (Auszahlen), oder riskier die nächste Spur für mehr. Erwischt dich ein Auto, ist der Einsatz verloren." },
   ];
-  const PLACEHOLDER_SLOTS = 2; // leere Plätze, bis mehr Spiele folgen
+  const PLACEHOLDER_SLOTS = 1; // leere Plätze, bis mehr Spiele folgen
 
   // Leicht variierender Text im Ruhezustand der Karte (statt festem Button-Label)
   const CTA_PHRASES = [
@@ -4115,7 +4391,7 @@
       openModal('login');
       return;
     }
-    if(name !== 'Blackjack' && name !== 'Walzenglück'){
+    if(name !== 'Blackjack' && name !== 'Walzenglück' && name !== 'Hühnerlauf'){
       showToast(`${name}-Tisch wird vorbereitet …`);
       return;
     }
@@ -4133,6 +4409,10 @@
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
       switchMainView('slot');
       slotInit();
+    } else if(name === 'Hühnerlauf'){
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      switchMainView('crossy');
+      crossyInit();
     }
   }
 
@@ -4218,9 +4498,12 @@
     const blackjack = document.getElementById('blackjackView');
     const slot = document.getElementById('slotView');
     const rewards = document.getElementById('rewardsView');
+    const crossy = document.getElementById('crossyView');
     blackjack.style.display = 'none';
     slot.style.display = 'none';
+    crossy.style.display = 'none';
     if(view !== 'blackjack') bjStopMusic();
+    if(view !== 'crossy') crossyStop();
     if(view === 'discover'){
       home.style.display = 'none';
       friends.style.display = 'none';
@@ -4254,6 +4537,13 @@
       rewards.style.display = 'none';
       slot.style.display = '';
       slot.scrollTo({ top:0 });
+    } else if(view === 'crossy'){
+      home.style.display = 'none';
+      discover.style.display = 'none';
+      friends.style.display = 'none';
+      rewards.style.display = 'none';
+      crossy.style.display = '';
+      crossy.scrollTo({ top:0 });
     } else if(view === 'rewards'){
       home.style.display = 'none';
       discover.style.display = 'none';
@@ -4370,6 +4660,13 @@
   });
 
   document.getElementById('slotBackBtn').addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const homeNav = document.querySelectorAll('.nav-item')[0];
+    if(homeNav) homeNav.classList.add('active');
+    switchMainView('home');
+  });
+
+  document.getElementById('crossyBackBtn').addEventListener('click', () => {
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     const homeNav = document.querySelectorAll('.nav-item')[0];
     if(homeNav) homeNav.classList.add('active');
@@ -4684,6 +4981,8 @@
     if(slotBalanceEl) slotBalanceEl.textContent = val;
     const rewardsBalanceEl = document.getElementById('rewardsBalance');
     if(rewardsBalanceEl) rewardsBalanceEl.textContent = val;
+    const crossyBalanceEl = document.getElementById('crossyBalance');
+    if(crossyBalanceEl) crossyBalanceEl.textContent = val;
     if(currentProfile){
       const unameRoleEl = document.querySelector('#userChip .uname-role');
       if(unameRoleEl && !isAdmin) unameRoleEl.textContent = 'Level ' + level;
@@ -5216,8 +5515,13 @@
   }
   const SLOT_CELL_H = 82;
   let slotSpinning = false;
-  let slotBet = 10;
-  const SLOT_BET_STEP = 10, SLOT_BET_MIN = 10, SLOT_BET_MAX = 500;
+  // Münzwert: was eine einzelne eingeworfene Münze wert ist.
+  let slotCoinValue = 10;
+  const SLOT_COIN_STEP = 5, SLOT_COIN_MIN = 5, SLOT_COIN_MAX = 100;
+  // Eingesetzter Betrag: baut sich erst durch tatsächliches Einwerfen von Münzen auf
+  // (Münzschlitz) und wird nach jedem Dreh wieder auf 0 zurückgesetzt.
+  let slotInserted = 0;
+  const SLOT_INSERTED_MAX = 500;
   function slotBuildReelsDOM(){
     const wrap = document.getElementById('slotReels');
     wrap.innerHTML = '';
@@ -5293,13 +5597,47 @@
     thump.connect(tg); tg.connect(bjAudioDest);
     thump.start(t); thump.stop(t + 0.1);
   }
-  function slotUpdateBetDisplay(){
-    document.getElementById('slotBetVal').textContent = slotBet.toLocaleString('de-DE');
+  function slotUpdateCoinValueDisplay(){
+    document.getElementById('slotCoinValVal').textContent = slotCoinValue.toLocaleString('de-DE');
+  }
+  function slotUpdateInsertedDisplay(){
+    document.getElementById('slotInsertedVal').textContent = slotInserted.toLocaleString('de-DE') + ' eingesetzt';
+    const box = document.getElementById('slotCoinslotBox');
+    const spinBtn = document.getElementById('slotSpinBtn');
+    box.classList.toggle('slot-needs-coin', slotInserted === 0 && !slotSpinning);
+    spinBtn.disabled = slotInserted === 0 || slotSpinning;
+  }
+  // Eine Münze im gewählten Münzwert in den Schlitz werfen: zieht sofort die Chips
+  // ab (wie bei einer echten Automaten-Münze) und erhöht den Einsatz für den nächsten Dreh.
+  async function slotInsertCoin(){
+    if(slotSpinning) return;
+    if(!currentProfile){
+      showToast('Melde dich an, um zu spielen.');
+      return;
+    }
+    if(slotInserted >= SLOT_INSERTED_MAX){
+      showToast('Maximaler Einsatz erreicht.');
+      return;
+    }
+    if((currentProfile.chips || 0) < slotCoinValue){
+      showToast('Nicht genug Guthaben für diese Münze.');
+      return;
+    }
+    await bjAdjustChips(-slotCoinValue);
+    slotInserted += slotCoinValue;
+    slotUpdateInsertedDisplay();
+    const slot = document.getElementById('slotCoinslot');
+    const drop = document.createElement('div');
+    drop.className = 'slot-coin-drop';
+    slot.appendChild(drop);
+    drop.addEventListener('animationend', () => drop.remove());
+    slotPlayReelStop();
   }
   function slotInit(){
     if(!document.getElementById('slotStrip0')) slotBuildReelsDOM();
     slotRenderPaytable();
-    slotUpdateBetDisplay();
+    slotUpdateCoinValueDisplay();
+    slotUpdateInsertedDisplay();
     const msg = document.getElementById('slotMessage');
     msg.textContent = ''; msg.className = 'slot-message';
     document.querySelectorAll('.slot-reel-window').forEach(w => w.classList.remove('slot-win-glow'));
@@ -5337,18 +5675,20 @@
       showToast('Melde dich an, um zu spielen.');
       return;
     }
-    if((currentProfile.chips || 0) < slotBet){
-      showToast('Nicht genug Guthaben für diesen Einsatz.');
+    if(slotInserted <= 0){
+      showToast('Wirf zuerst eine Münze in den Schlitz.');
       return;
     }
+    const betAmount = slotInserted; // Einsatz steht fest, sobald der Hebel gezogen wird
     slotSpinning = true;
     document.getElementById('slotSpinBtn').disabled = true;
+    document.getElementById('slotCoinslot').classList.add('disabled');
     const msg = document.getElementById('slotMessage');
     msg.textContent = ''; msg.className = 'slot-message';
     document.querySelectorAll('.slot-reel-window').forEach(w => w.classList.remove('slot-win-glow'));
     slotPlaySpinSound();
-    await bjAdjustChips(-slotBet);
-    gainXp(slotBet);
+    // Chips für die Münzen wurden bereits beim Einwerfen abgezogen — hier nur noch XP vergeben.
+    gainXp(betAmount);
 
     const finalSymbols = [slotPickSymbol(), slotPickSymbol(), slotPickSymbol()];
     await Promise.all([0, 1, 2].map(i => slotSpinReel(i, finalSymbols[i])));
@@ -5356,7 +5696,7 @@
     const win = finalSymbols[0] === finalSymbols[1] && finalSymbols[1] === finalSymbols[2];
     if(win){
       const symbolData = SLOT_SYMBOLS.find(s => s.id === finalSymbols[0]);
-      const payout = slotBet * symbolData.pay;
+      const payout = betAmount * symbolData.pay;
       await bjAdjustChips(payout);
       msg.textContent = `Gewinn! +${payout.toLocaleString('de-DE')} Chips`;
       msg.classList.add('win');
@@ -5365,20 +5705,388 @@
     } else {
       msg.textContent = 'Kein Treffer – viel Glück beim nächsten Dreh!';
     }
+    slotInserted = 0;
     slotSpinning = false;
-    document.getElementById('slotSpinBtn').disabled = false;
+    document.getElementById('slotCoinslot').classList.remove('disabled');
+    slotUpdateInsertedDisplay();
   }
-  document.getElementById('slotBetUp').addEventListener('click', () => {
+  document.getElementById('slotCoinValUp').addEventListener('click', () => {
     if(slotSpinning) return;
-    slotBet = Math.min(SLOT_BET_MAX, slotBet + SLOT_BET_STEP);
-    slotUpdateBetDisplay();
+    slotCoinValue = Math.min(SLOT_COIN_MAX, slotCoinValue + SLOT_COIN_STEP);
+    slotUpdateCoinValueDisplay();
   });
-  document.getElementById('slotBetDown').addEventListener('click', () => {
+  document.getElementById('slotCoinValDown').addEventListener('click', () => {
     if(slotSpinning) return;
-    slotBet = Math.max(SLOT_BET_MIN, slotBet - SLOT_BET_STEP);
-    slotUpdateBetDisplay();
+    slotCoinValue = Math.max(SLOT_COIN_MIN, slotCoinValue - SLOT_COIN_STEP);
+    slotUpdateCoinValueDisplay();
   });
+  document.getElementById('slotCoinslot').addEventListener('click', slotInsertCoin);
   document.getElementById('slotSpinBtn').addEventListener('click', slotSpin);
+
+
+  // ============================================================
+  // --- Hühnerlauf (Fahrbahn-Überquerungs-Spiel, Chicken-Road-Stil) ---
+  // Nach dem Start hüpft das Huhn NICHT mehr automatisch: der Spieler drückt
+  // pro Spur selbst auf "Los", um die nächste Fahrbahn zu riskieren. Jede
+  // überstandene Spur erhöht den Multiplikator UND lässt eine Straßensperre
+  // hinter dem Huhn herunterfallen (= sichere Zone). Jederzeit kann per
+  // "Aufgeben" der aktuelle Zwischenstand mitgenommen werden. Wird eine Spur
+  // nicht überstanden, ist der Einsatz verloren.
+  // Nutzt dieselbe Guthaben-Anbindung (bjAdjustChips) wie die anderen Spiele.
+  // ============================================================
+  const CROSSY_LANES = 6;
+  const CROSSY_HOUSE_EDGE = 0.97; // ~3% Hausvorteil, wie bei Walzenglück-artigen Spielen üblich
+  const CROSSY_DIFFICULTIES = {
+    easy:      { label:'Easy',      crash:[0.04,0.06,0.08,0.10,0.12,0.14] },
+    medium:    { label:'Medium',    crash:[0.08,0.12,0.16,0.20,0.24,0.28] },
+    hard:      { label:'Hard',      crash:[0.15,0.20,0.26,0.32,0.38,0.44] },
+    daredevil: { label:'Daredevil', crash:[0.28,0.36,0.44,0.51,0.57,0.63] },
+  };
+  let crossySelectedDiff = 'daredevil';
+  let crossyState = { running:false, busy:false, lane:0, bet:0, difficulty:'daredevil', multiplier:1 };
+
+  function crossyMultiplierTable(diffKey){
+    const arr = CROSSY_DIFFICULTIES[diffKey].crash;
+    let survival = 1;
+    return arr.map(p => { survival *= (1 - p); return CROSSY_HOUSE_EDGE / survival; });
+  }
+  function crossyCarSvg(color){
+    return `<svg viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg">
+      <rect x="4" y="10" width="52" height="14" rx="6" fill="${color}" stroke="rgba(0,0,0,.35)" stroke-width="1"/>
+      <rect x="14" y="3" width="30" height="12" rx="5" fill="${color}" opacity="0.9" stroke="rgba(0,0,0,.3)" stroke-width="1"/>
+      <rect x="17" y="6" width="10" height="7" rx="1.5" fill="#bfe3ff" opacity="0.85"/>
+      <rect x="31" y="6" width="10" height="7" rx="1.5" fill="#bfe3ff" opacity="0.85"/>
+      <circle cx="15" cy="24" r="4.2" fill="#141414" stroke="#000" stroke-width="0.5"/>
+      <circle cx="45" cy="24" r="4.2" fill="#141414" stroke="#000" stroke-width="0.5"/>
+    </svg>`;
+  }
+  function crossyBuildRoad(){
+    const lanesEl = document.getElementById('crossyLanes');
+    const multsEl = document.getElementById('crossyMultipliers');
+    lanesEl.innerHTML = '';
+    multsEl.innerHTML = '';
+    const mults = crossyMultiplierTable(crossySelectedDiff);
+    const carColors = ['#c9a05b','#4a89dd','#c1443c','#4cbf83','#e8c168','#8a6a35'];
+    for(let i = 0; i < CROSSY_LANES; i++){
+      const lane = document.createElement('div');
+      lane.className = 'crossy-lane';
+      lane.dataset.lane = i;
+      const car = document.createElement('div');
+      car.className = 'crossy-car';
+      car.dataset.lane = i;
+      // jedes Auto bekommt eine leicht andere Geschwindigkeit/Verzögerung,
+      // damit sich der Verkehr nicht synchron, sondern lebendig anfühlt
+      const dur = (2.4 + Math.random() * 1.8).toFixed(2);
+      const delay = (Math.random() * -dur).toFixed(2);
+      car.style.animationDuration = dur + 's';
+      car.style.animationDelay = delay + 's';
+      car.innerHTML = crossyCarSvg(carColors[i % carColors.length]);
+      lane.appendChild(car);
+      lanesEl.appendChild(lane);
+
+      const cell = document.createElement('div');
+      cell.className = 'crossy-multiplier-cell';
+      cell.dataset.lane = i;
+      const pill = document.createElement('div');
+      pill.className = 'crossy-multiplier-pill';
+      pill.textContent = mults[i].toFixed(2) + '×';
+      cell.appendChild(pill);
+      multsEl.appendChild(cell);
+    }
+    crossyMoveChickenTo(crossyState.lane || 0);
+  }
+  function crossyMoveChickenTo(laneCount){
+    const road = document.getElementById('crossyRoad');
+    const chicken = document.getElementById('crossyChicken');
+    const roadRect = road.getBoundingClientRect();
+    if(roadRect.width === 0) return; // View gerade nicht sichtbar
+    let targetX;
+    if(laneCount <= 0){
+      const curb = road.querySelector('.crossy-curb-start');
+      const r = curb.getBoundingClientRect();
+      targetX = (r.left - roadRect.left) + r.width / 2 - 22;
+    } else {
+      const lanes = [...document.querySelectorAll('.crossy-lane')];
+      const laneEl = lanes[Math.min(laneCount, lanes.length) - 1];
+      if(!laneEl) return;
+      const r = laneEl.getBoundingClientRect();
+      targetX = (r.left - roadRect.left) + r.width / 2 - 22;
+    }
+    chicken.style.left = Math.max(0, targetX) + 'px';
+  }
+  function crossyUpdateBetInput(val){
+    const input = document.getElementById('crossyBetInput');
+    input.value = Math.max(0, Math.round(val));
+  }
+  function crossyMaxBet(){
+    return (currentProfile && currentProfile.chips) || 0;
+  }
+  function crossySetMessage(text, cls){
+    const msg = document.getElementById('crossyMessage');
+    msg.textContent = text;
+    msg.className = 'crossy-message' + (cls ? ' ' + cls : '');
+  }
+  function crossyDelay(ms){ return new Promise(resolve => setTimeout(resolve, ms)); }
+
+  // Lässt ein paar Federn an der Huhn-Position aufwirbeln — kleiner visueller
+  // Treffer-Effekt, wenn ein Auto zuschlägt.
+  function crossySpawnFeathers(x, y){
+    const road = document.getElementById('crossyRoad');
+    for(let i = 0; i < 6; i++){
+      const f = document.createElement('div');
+      f.className = 'crossy-feather';
+      f.style.left = x + 'px';
+      f.style.top = y + 'px';
+      f.style.setProperty('--fx', (Math.random() * 80 - 20) + 'px');
+      f.style.setProperty('--fy', (-(20 + Math.random() * 40)) + 'px');
+      road.appendChild(f);
+      setTimeout(() => f.remove(), 750);
+    }
+  }
+
+  function crossyPlayCrashSound(){
+    if(!bjAudioCtx) return;
+    bjEnsureAudio();
+    const t = bjAudioCtx.currentTime;
+    const len = Math.floor(bjAudioCtx.sampleRate * 0.28);
+    const buffer = bjAudioCtx.createBuffer(1, len, bjAudioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for(let i = 0; i < len; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / len);
+    const noise = bjAudioCtx.createBufferSource();
+    noise.buffer = buffer;
+    const filt = bjAudioCtx.createBiquadFilter();
+    filt.type = 'lowpass'; filt.frequency.setValueAtTime(2200, t); filt.frequency.exponentialRampToValueAtTime(160, t + 0.28);
+    const g = bjAudioCtx.createGain();
+    g.gain.setValueAtTime(0.32, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
+    noise.connect(filt); filt.connect(g); g.connect(bjAudioDest);
+    noise.start(t);
+  }
+
+  function crossyResetUI(){
+    document.getElementById('crossyChicken').classList.remove('hit', 'hop');
+    crossyState.lane = 0;
+    crossyState.busy = false;
+    crossyMoveChickenTo(0);
+    document.querySelectorAll('.crossy-lane').forEach(l => {
+      l.classList.remove('is-cleared', 'is-current');
+      l.querySelectorAll('.crossy-barrier').forEach(b => b.remove());
+      const car = l.querySelector('.crossy-car');
+      if(car) car.classList.remove('speeding');
+    });
+    document.querySelectorAll('.crossy-multiplier-cell').forEach(c => c.classList.remove('is-cleared', 'is-current'));
+    document.getElementById('crossyStartBtn').style.display = '';
+    document.getElementById('crossyStartBtn').disabled = false;
+    document.getElementById('crossyGoBtn').style.display = 'none';
+    document.getElementById('crossyGiveupBtn').style.display = 'none';
+    document.getElementById('crossyBetInput').disabled = false;
+    document.getElementById('crossyBetHalf').disabled = false;
+    document.getElementById('crossyBetDouble').disabled = false;
+    document.getElementById('crossyBetMax').disabled = false;
+    document.querySelectorAll('.crossy-diff-btn').forEach(b => b.disabled = false);
+  }
+
+  // Bricht ein laufendes Spiel ab (z.B. beim Verlassen der Ansicht). Wurde schon
+  // mindestens eine Spur überstanden, wird der aktuelle Zwischenstand automatisch
+  // ausgezahlt; ansonsten bekommt der Spieler seinen Einsatz zurück.
+  function crossyStop(){
+    if(!crossyState.running) return;
+    crossyState.running = false;
+    if(crossyState.lane > 0){
+      const payout = Math.round(crossyState.bet * crossyState.multiplier);
+      bjAdjustChips(payout);
+    } else {
+      bjAdjustChips(crossyState.bet);
+    }
+    crossyResetUI();
+  }
+
+  // "Aufgeben" — nimmt den aktuellen Zwischenstand mit (oder den Einsatz zurück,
+  // solange noch keine Spur geschafft wurde).
+  function crossyGiveUp(){
+    if(!crossyState.running || crossyState.busy) return;
+    crossyState.running = false;
+    if(crossyState.lane > 0){
+      const payout = Math.round(crossyState.bet * crossyState.multiplier);
+      bjAdjustChips(payout);
+      gainXp(crossyState.bet);
+      bjPlayChipSound();
+      crossySetMessage(`Aufgegeben — ausgezahlt: +${payout.toLocaleString('de-DE')} Chips (${crossyState.multiplier.toFixed(2)}×)`, 'win');
+    } else {
+      bjAdjustChips(crossyState.bet);
+      crossySetMessage('Aufgegeben — Einsatz zurückerstattet.', '');
+    }
+    setTimeout(crossyResetUI, 900);
+  }
+
+  function crossyCashOut(auto){
+    if(!crossyState.running || crossyState.lane <= 0) return;
+    crossyState.running = false;
+    const payout = Math.round(crossyState.bet * crossyState.multiplier);
+    bjAdjustChips(payout);
+    gainXp(crossyState.bet);
+    bjPlayChipSound();
+    crossySetMessage(
+      (auto ? 'Fahrbahn geschafft! ' : '') + `Ausgezahlt: +${payout.toLocaleString('de-DE')} Chips (${crossyState.multiplier.toFixed(2)}×)`,
+      'win'
+    );
+    setTimeout(crossyResetUI, 1200);
+  }
+
+  function crossyCrash(){
+    crossyState.running = false;
+    const laneIdx = crossyState.lane;
+    const laneEls = document.querySelectorAll('.crossy-lane');
+    const chicken = document.getElementById('crossyChicken');
+    const road = document.getElementById('crossyRoad');
+    const chickenRect = chicken.getBoundingClientRect();
+    const roadRect = road.getBoundingClientRect();
+    // das Auto in der aktuellen Spur schießt durchs Bild, statt einfach weiterzutuckern
+    const laneEl = laneEls[laneIdx];
+    if(laneEl){
+      const car = laneEl.querySelector('.crossy-car');
+      if(car){
+        const carRect = car.getBoundingClientRect();
+        const laneRect = laneEl.getBoundingClientRect();
+        car.style.setProperty('--car-y', (carRect.top - laneRect.top) + 'px');
+        car.classList.add('speeding');
+      }
+    }
+    crossySpawnFeathers(chickenRect.left - roadRect.left + 20, chickenRect.top - roadRect.top + 10);
+    chicken.classList.add('hit');
+    crossyPlayCrashSound();
+    crossySetMessage(`Erwischt! −${crossyState.bet.toLocaleString('de-DE')} Chips verloren.`, 'lose');
+    setTimeout(crossyResetUI, 1400);
+  }
+
+  // Ein einzelner Schritt: wird durch den "Los"-Knopf ausgelöst (statt automatisch
+  // zu laufen), damit der Spieler jede Spur bewusst selbst riskiert.
+  async function crossyStepForward(){
+    if(!crossyState.running || crossyState.busy) return;
+    if(crossyState.lane >= CROSSY_LANES) return;
+    crossyState.busy = true;
+    document.getElementById('crossyGoBtn').disabled = true;
+    document.getElementById('crossyGiveupBtn').disabled = true;
+
+    const mults = crossyMultiplierTable(crossyState.difficulty);
+    const crashArr = CROSSY_DIFFICULTIES[crossyState.difficulty].crash;
+    const laneIdx = crossyState.lane;
+    const laneEls = document.querySelectorAll('.crossy-lane');
+    const cellEls = document.querySelectorAll('.crossy-multiplier-cell');
+    if(laneEls[laneIdx]) laneEls[laneIdx].classList.add('is-current');
+    if(cellEls[laneIdx]) cellEls[laneIdx].classList.add('is-current');
+
+    const chicken = document.getElementById('crossyChicken');
+    chicken.classList.add('hop');
+    slotPlayReelStop();
+    await crossyDelay(420);
+    chicken.classList.remove('hop');
+    if(!crossyState.running){ crossyState.busy = false; return; }
+
+    const crashed = Math.random() < crashArr[laneIdx];
+    if(crashed){ crossyCrash(); return; }
+
+    crossyState.lane++;
+    crossyState.multiplier = mults[laneIdx];
+    if(laneEls[laneIdx]){
+      laneEls[laneIdx].classList.remove('is-current');
+      laneEls[laneIdx].classList.add('is-cleared');
+      const barrier = document.createElement('div');
+      barrier.className = 'crossy-barrier';
+      laneEls[laneIdx].appendChild(barrier);
+    }
+    if(cellEls[laneIdx]){
+      cellEls[laneIdx].classList.remove('is-current');
+      cellEls[laneIdx].classList.add('is-cleared');
+    }
+    crossyMoveChickenTo(crossyState.lane);
+
+    const payoutNow = Math.round(crossyState.bet * crossyState.multiplier);
+    document.getElementById('crossyGoVal').textContent = crossyState.lane < CROSSY_LANES ? `(${mults[crossyState.lane].toFixed(2)}×)` : '';
+    document.getElementById('crossyGiveupVal').textContent = `(${crossyState.multiplier.toFixed(2)}× · ${payoutNow.toLocaleString('de-DE')} Chips)`;
+
+    crossyState.busy = false;
+    if(crossyState.lane >= CROSSY_LANES){
+      document.getElementById('crossyGoBtn').style.display = 'none';
+      await crossyDelay(300);
+      crossyCashOut(true);
+      return;
+    }
+    document.getElementById('crossyGoBtn').disabled = false;
+    document.getElementById('crossyGiveupBtn').disabled = false;
+  }
+
+  function crossyStart(){
+    if(crossyState.running) return;
+    if(!currentUserId){
+      showToast('Melde dich an, um zu spielen.');
+      openModal('login');
+      return;
+    }
+    const bet = Math.round(parseFloat(document.getElementById('crossyBetInput').value) || 0);
+    if(bet <= 0){
+      showToast('Setz zuerst einen Einsatz.');
+      return;
+    }
+    if(bet > crossyMaxBet()){
+      showToast('Nicht genug Guthaben für diesen Einsatz.');
+      return;
+    }
+    crossySetMessage('', '');
+    const mults = crossyMultiplierTable(crossySelectedDiff);
+    crossyState = { running:true, busy:false, lane:0, bet, difficulty:crossySelectedDiff, multiplier:1 };
+    bjAdjustChips(-bet);
+    document.getElementById('crossyStartBtn').style.display = 'none';
+    document.getElementById('crossyGoBtn').style.display = '';
+    document.getElementById('crossyGoBtn').disabled = false;
+    document.getElementById('crossyGoVal').textContent = `(${mults[0].toFixed(2)}×)`;
+    document.getElementById('crossyGiveupBtn').style.display = '';
+    document.getElementById('crossyGiveupBtn').disabled = false;
+    document.getElementById('crossyGiveupVal').textContent = '';
+    document.getElementById('crossyBetInput').disabled = true;
+    document.getElementById('crossyBetHalf').disabled = true;
+    document.getElementById('crossyBetDouble').disabled = true;
+    document.getElementById('crossyBetMax').disabled = true;
+    document.querySelectorAll('.crossy-diff-btn').forEach(b => b.disabled = true);
+    crossyBuildRoad();
+  }
+
+  function crossyInit(){
+    if(!crossyState.running) crossyBuildRoad();
+    bjSyncBalanceDisplay();
+    if(!crossyState.running) crossySetMessage('', '');
+  }
+
+  document.getElementById('crossyBetHalf').addEventListener('click', () => {
+    if(crossyState.running) return;
+    const cur = parseFloat(document.getElementById('crossyBetInput').value) || 0;
+    crossyUpdateBetInput(cur / 2);
+  });
+  document.getElementById('crossyBetDouble').addEventListener('click', () => {
+    if(crossyState.running) return;
+    const cur = parseFloat(document.getElementById('crossyBetInput').value) || 0;
+    crossyUpdateBetInput(Math.min(crossyMaxBet(), cur === 0 ? 10 : cur * 2));
+  });
+  document.getElementById('crossyBetMax').addEventListener('click', () => {
+    if(crossyState.running) return;
+    crossyUpdateBetInput(crossyMaxBet());
+  });
+  document.getElementById('crossyBetInput').addEventListener('change', () => {
+    const cur = parseFloat(document.getElementById('crossyBetInput').value) || 0;
+    crossyUpdateBetInput(Math.min(crossyMaxBet(), Math.max(0, cur)));
+  });
+  document.querySelectorAll('.crossy-diff-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if(crossyState.running) return;
+      crossySelectedDiff = btn.dataset.diff;
+      document.querySelectorAll('.crossy-diff-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      crossyBuildRoad();
+    });
+  });
+  document.getElementById('crossyStartBtn').addEventListener('click', crossyStart);
+  document.getElementById('crossyGoBtn').addEventListener('click', crossyStepForward);
+  document.getElementById('crossyGiveupBtn').addEventListener('click', crossyGiveUp);
 
 
   // --- Supabase Setup ---
@@ -6683,11 +7391,19 @@
     }
     submitBtn.disabled = true;
     submitBtn.textContent = 'Sende...';
-    const { error } = await supabaseClient.from('alpha_access_requests').insert({ name, email: email.toLowerCase() });
+    let error = null;
+    try {
+      const res = await supabaseClient.from('alpha_access_requests').insert({ name, email: email.toLowerCase() });
+      error = res.error;
+    } catch(e){
+      error = e;
+      console.error('Alpha-Zugriff-Anfrage fehlgeschlagen (Exception):', e);
+    }
     submitBtn.disabled = false;
     submitBtn.textContent = 'Anfrage senden';
     if(error){
-      hint.textContent = error.message.includes('duplicate') ? 'Für diese E-Mail liegt bereits eine Anfrage vor.' : error.message;
+      const msg = error.message || 'Unbekannter Fehler beim Senden.';
+      hint.textContent = msg.includes('duplicate') ? 'Für diese E-Mail liegt bereits eine Anfrage vor.' : msg;
       hint.classList.add('error');
       return;
     }
@@ -7381,12 +8097,19 @@
   async function loadAlphaAccessRequests(){
     const list = document.getElementById('alphaReqList');
     if(!isAdmin){ list.innerHTML = ''; return; }
-    const { data, error } = await supabaseClient
-      .from('alpha_access_requests')
-      .select('id, name, email, activated, created_at')
-      .order('created_at', { ascending: true });
+    let data, error;
+    try {
+      const res = await supabaseClient
+        .from('alpha_access_requests')
+        .select('id, name, email, activated, created_at')
+        .order('created_at', { ascending: true });
+      data = res.data; error = res.error;
+    } catch(e){
+      error = e;
+      console.error('Alpha-Zugriff-Anfragen laden fehlgeschlagen (Exception):', e);
+    }
     if(error){
-      list.innerHTML = `<div class="wl-empty">Fehler beim Laden: ${error.message}</div>`;
+      list.innerHTML = `<div class="wl-empty">Fehler beim Laden: ${error.message || error}</div>`;
       return;
     }
     if(!data || data.length === 0){
