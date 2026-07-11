@@ -6587,9 +6587,21 @@
   function collapseRepeats(str){
     return str.replace(/(.)\1+/g, '$1');
   }
+  // Phonetischer Fang speziell fürs N-Wort: erwischt alles, das sich beim
+  // Aussprechen gleich anhört (nigga, nigger, niga, nayga, neyga, naygha, nikka,
+  // niqqa, nicca, nygga …), auch wenn es so nicht in der Wortliste steht.
+  //   n  +  vorderer Vokal-Cluster (a/e/i/y)  +  harter Laut  +  End-Vokal
+  // Harter Laut: g (auch einfach) ODER doppeltes k/q/c (einfaches k/c bleibt frei,
+  // damit gängige Namen wie Monika, Annika, Nika, Nico, Nick nicht blockiert werden).
+  // Bewusst streng — im Zweifel lieber blocken, wie gewünscht.
+  const NWORD_PHONETIC_RE = /n[aeiy]{1,3}(g+|k{2,}|c{2,}|q{2,})h?(a|ah|er|uh|ur)/;
+  function soundsLikeNWord(norm, collapsed){
+    return NWORD_PHONETIC_RE.test(norm) || NWORD_PHONETIC_RE.test(collapsed);
+  }
   function containsBadWord(str){
     const norm = normalizeForFilter(str);
     const collapsed = collapseRepeats(norm);
+    if(soundsLikeNWord(norm, collapsed)) return true;
     return BAD_WORDS.some(w => norm.includes(w) || collapsed.includes(collapseRepeats(w)));
   }
   function isValidUsername(uname){
