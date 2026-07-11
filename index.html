@@ -6522,7 +6522,13 @@
 
   // Gibt null zurück wenn ok, sonst eine Fehlermeldung zum Anzeigen.
   async function validateEmailForSignup(email){
+    const localPart = email.split('@')[0] || '';
     const domain = email.split('@')[1] || '';
+    // 0) Wortfilter auch auf E-Mails anwenden — der Teil vor dem @ (z. B. "nigga123")
+    //    wird genau wie ein Benutzername/Anzeigename gegen die Denylist geprüft.
+    if(containsBadWord(localPart)){
+      return 'Diese E-Mail-Adresse enthält unangemessene Wörter und ist nicht erlaubt.';
+    }
     if(isDisposableEmailDomain(domain)){
       return 'Bitte eine echte E-Mail-Adresse verwenden (keine Wegwerf-Adressen).';
     }
@@ -6544,19 +6550,36 @@
   // Kleiner Denylist-Filter gegen offensichtlich unangemessene Namen. Prüft normalisiert
   // (klein geschrieben, Zahlen-als-Buchstaben-Ersatz entfernt) auf Teilstrings.
   const BAD_WORDS = [
-    'fuck','shit','bitch','asshole','cunt','nigger','nigga','fag','whore','slut',
-    'hurensohn','wichser','arschloch','fotze','schlampe','hure','nazi','hitler',
-    'kanake','spast','mongo','neger',
-    // Anatomisch/vulgär
+    // Slurs (inkl. gängiger Verschleierungen/Phonetik, die die Normalisierung
+    // allein nicht abfängt)
+    'nigger','nigga','neyga','neiga','nayga','nyga','nygga','niga','nigar','nigr',
+    'negro','neger','coon','chink','gook','kike','wetback','beaner',
+    'tranny','faggot','fag','dyke','retard','retarded',
+    'kanake','spast','spasti','mongo','untermensch','missgeburt',
+    // Beleidigungen / vulgär
+    'fuck','shit','bitch','asshole','cunt','whore','slut','bastard',
+    'hurensohn','huso','wichser','arschloch','fotze','schlampe','hure','nutte',
+    'schwuchtel',
+    // Hass / Extremismus
+    'nazi','hitler','judensau','siegheil','heilhitler',
+    // Anatomisch/sexuell
     'penis','vagina','pussy','dick','cock','boobs','tits','titten','muschi',
     'schwanz','pimmel','sperma','anal','porn','porno','sex','nackt','nude',
-    'blowjob','handjob','wank','masturbat'
+    'blowjob','handjob','wank','masturbat','dildo','fick','ficken','arsch',
+    'pedo','rapist'
   ];
   function normalizeForFilter(str){
     return str.toLowerCase()
-      .replace(/0/g,'o').replace(/1/g,'i').replace(/3/g,'e').replace(/4/g,'a')
-      .replace(/5/g,'s').replace(/7/g,'t').replace(/@/g,'a').replace(/\$/g,'s')
-      .replace(/[^a-z0-9]/g,'');
+      // gängige Buchstaben-Digraphen zusammenziehen (ph -> f)
+      .replace(/ph/g,'f')
+      // Leetspeak & Symbol-Ersatz -> Buchstaben (deckt n1gg4, n!gga, niqqa, … ab)
+      .replace(/0/g,'o').replace(/1/g,'i').replace(/2/g,'z').replace(/3/g,'e')
+      .replace(/4/g,'a').replace(/5/g,'s').replace(/6/g,'g').replace(/7/g,'t')
+      .replace(/8/g,'b').replace(/9/g,'g')
+      .replace(/@/g,'a').replace(/\$/g,'s').replace(/!/g,'i').replace(/\|/g,'i')
+      .replace(/\+/g,'t').replace(/q/g,'g')
+      // alles außer Buchstaben entfernen (Punkte, Unterstriche, Leerzeichen …)
+      .replace(/[^a-z]/g,'');
   }
   // Reduziert wiederholte Buchstaben auf einen ("niiggeer" -> "niger", "fuuuck" -> "fuck").
   // Fängt damit auch Varianten wie "Niger" (single-g) gegen "Nigger" (double-g) ab,
