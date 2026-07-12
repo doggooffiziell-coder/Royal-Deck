@@ -1227,6 +1227,24 @@
   }
   .sbt-dot{width:5px;height:5px;border-radius:50%;background:var(--accent-dim);flex-shrink:0;}
 
+  /* ---- permanent admin nav item — pinned above the alpha tag, visible whenever
+     the account has admin rights, regardless of which view is open ---- */
+  .nav-item-admin{
+    display:none;color:var(--danger);
+    background:rgba(239,107,107,.1);border:1px solid rgba(239,107,107,.22);
+    margin-bottom:8px;
+  }
+  .nav-item-admin.show{display:flex;}
+  .nav-item-admin svg{fill:var(--danger);}
+  .nav-item-admin:hover{background:rgba(239,107,107,.18);color:#ffdada;}
+  .nav-item-admin.active{
+    background:rgba(239,107,107,.24);border-color:rgba(239,107,107,.45);color:#ffdada;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+  }
+  .nav-item-admin.active:before{
+    background:linear-gradient(180deg,var(--danger),#8a2c26);box-shadow:0 0 10px rgba(239,107,107,.5);
+  }
+
   /* --------- maintenance screen --------- */
   #maintenanceScreen{
     display:none;position:fixed;inset:0;z-index:999;
@@ -3271,6 +3289,10 @@
   </div>
 
   <div class="sidebar-bottom">
+    <div class="nav-item nav-item-admin" id="navAdmin">
+      <svg viewBox="0 0 24 24"><path d="M19.4 13a7.9 7.9 0 000-2l2.1-1.6-2-3.4-2.5 1a8 8 0 00-1.7-1L14.9 3H9.1l-.4 2.9a8 8 0 00-1.7 1l-2.5-1-2 3.4L4.6 11a7.9 7.9 0 000 2l-2.1 1.6 2 3.4 2.5-1a8 8 0 001.7 1l.4 2.9h5.8l.4-2.9a8 8 0 001.7-1l2.5 1 2-3.4zM12 15.5a3.5 3.5 0 110-7 3.5 3.5 0 010 7z"/></svg>
+      <span>Admin</span>
+    </div>
     <div class="sidebar-build-tag" title="Royal Deck befindet sich in der Alpha-Phase">
       <span class="sbt-dot"></span>ALPHA · v0.1
     </div>
@@ -4871,6 +4893,11 @@
   document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', () => {
       const clickedLabel = item.querySelector('span')?.textContent;
+      if(clickedLabel === 'Admin'){
+        if(currentProfile && isAdmin){ openSettings(currentUserEmail); switchPane('admin'); }
+        else if(!currentProfile){ openModal('login'); }
+        return;
+      }
       if(clickedLabel === 'Einstellungen'){
         if(currentProfile){ openSettings(currentUserEmail); }
         else { openModal('login'); }
@@ -7518,6 +7545,7 @@
   async function logout(){
     await supabaseClient.auth.signOut();
     currentUserId = null; currentUserEmail = null; isAdmin = false; notifications = [];
+    document.getElementById('navAdmin')?.classList.remove('show');
     makeRow('row1');
     unsubscribeFriendRequests();
     unsubscribeDirectMessages();
@@ -7854,6 +7882,7 @@
 
     const admin = await checkIsAdmin(user?.email);
     isAdmin = admin;
+    document.getElementById('navAdmin')?.classList.toggle('show', !!admin);
     const whitelisted = admin ? true : await isWhitelistedEmail(user?.email);
 
     if(maintenanceMode && !whitelisted){
@@ -7921,6 +7950,7 @@
 
     if(!user){
       currentUserId = null; currentUserEmail = null; isAdmin = false;
+      document.getElementById('navAdmin')?.classList.remove('show');
       makeRow('row1');
       renderAuthArea(null);
       return;
@@ -8949,6 +8979,9 @@
     const label = document.getElementById('settingsPaneLabel');
     if(label) label.textContent = spaneLabels[name] || name;
     positionStabHighlight(activeTab);
+    // Sidebar: Admin-Pane hebt den permanenten Admin-Knopf hervor statt "Einstellungen".
+    document.getElementById('navSettings')?.classList.toggle('active', name !== 'admin');
+    document.getElementById('navAdmin')?.classList.toggle('active', name === 'admin');
   }
   document.querySelectorAll('.settings-tabnav .stab[data-spane], .settings-admin-footer .stab[data-spane]').forEach(t => {
     t.addEventListener('click', () => switchPane(t.dataset.spane));
