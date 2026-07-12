@@ -2578,7 +2578,7 @@
   .slot-pay-row svg{width:24px;height:24px;flex-shrink:0;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35));}
   .slot-pay-row b{color:var(--accent-hi);margin-left:auto;font-family:var(--font-mono);font-size:13px;}
 
-  /* ---------- Hühnerlauf (Crossy-Style Fahrbahn-Spiel) ---------- */
+  /* ---------- Chicken Road (Crossy-Style Fahrbahn-Spiel) ---------- */
   /* Läuft wie Blackjack als normale Karte im Content-Bereich: Sidebar bleibt
      sichtbar, das Spielfeld ist eine kompakte, abgerundete Filz-Tischkarte
      statt eines Vollbild-Screens ohne Ränder. */
@@ -2648,7 +2648,7 @@
     position:absolute;left:50%;top:-32%;width:66px;height:114px;margin-left:-33px;
     animation:crossyDrive linear infinite;will-change:top;z-index:2;
   }
-  .crossy-car svg{width:100%;height:100%;filter:drop-shadow(0 5px 6px rgba(0,0,0,.45));}
+  .crossy-car svg{width:100%;height:100%;filter:drop-shadow(0 5px 6px rgba(0,0,0,.45)) drop-shadow(0 0 6px rgba(255,243,196,.25));}
   @keyframes crossyDrive{
     0%{top:-32%;}
     48%{top:102%;}
@@ -2682,6 +2682,10 @@
   .crossy-chicken{
     position:absolute;top:50%;margin-top:-28px;left:0;width:56px;height:56px;z-index:3;
     transition:left .5s cubic-bezier(.34,1.4,.64,1);filter:drop-shadow(0 4px 5px rgba(0,0,0,.45));
+  }
+  .crossy-chicken:after{
+    content:"";position:absolute;left:50%;bottom:-4px;width:34px;height:9px;transform:translateX(-50%);
+    background:radial-gradient(ellipse, rgba(0,0,0,.4), transparent 70%);z-index:-1;
   }
   .crossy-chicken.hop{animation:crossyHop .4s ease-in-out;}
   @keyframes crossyHop{0%,100%{transform:translateY(0) rotate(0);}50%{transform:translateY(-20px) rotate(-6deg);}}
@@ -4456,7 +4460,7 @@
         <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>
       </button>
       <div class="bj-head-text">
-        <h1>Hühnerlauf</h1>
+        <h1>Chicken Road</h1>
         <p>Überquer die Fahrbahn und nimm deinen Multiplikator mit, bevor's kracht.</p>
       </div>
       <div class="bj-balance">
@@ -4525,6 +4529,14 @@
           <button type="button" class="crossy-diff-btn" data-diff="medium">Medium</button>
           <button type="button" class="crossy-diff-btn" data-diff="hard">Hard</button>
           <button type="button" class="crossy-diff-btn active" data-diff="daredevil">Daredevil</button>
+        </div>
+      </div>
+
+      <div class="crossy-panel-group">
+        <span class="crossy-panel-label">Auto-Auszahlung <span style="opacity:.6;font-weight:500;">(optional)</span></span>
+        <div class="crossy-bet-input-row">
+          <input type="number" class="crossy-bet-input" id="crossyAutoInput" min="0" step="0.1" placeholder="z.B. 2.5" style="width:110px;">
+          <span class="crossy-bet-prefix">×</span>
         </div>
       </div>
 
@@ -4653,7 +4665,7 @@
       rules:"Ziel: näher an 21 als der Dealer, ohne drüber zu gehen. Bube/Dame/König zählen 10, Ass 1 oder 11. Nach dem Einsatz kannst du Karten ziehen (Hit), stehen bleiben (Stand), verdoppeln (Double) oder bei gleichem Kartenpaar splitten." },
     { name:"Walzenglück", suit:"★", c1:"#3a0d12", c2:"#c1443c", players:"—", desc:"Drei gleiche Zeichen bringen den Gewinn.",
       rules:"Setz deinen Einsatz und dreh die drei Walzen. Landen alle drei auf demselben Symbol, gewinnst du entsprechend der Symbol-Auszahlung deines Einsatzes." },
-    { name:"Hühnerlauf", suit:"♠", c1:"#141f0d", c2:"#6fae4a", players:"—", desc:"Über die Fahrbahn hüpfen und Multiplikatoren einsammeln.",
+    { name:"Chicken Road", suit:"♠", c1:"#141f0d", c2:"#6fae4a", players:"—", desc:"Über die Fahrbahn hüpfen und Multiplikatoren einsammeln.",
       rules:"Setz deinen Einsatz und wähle eine Schwierigkeit. Das Huhn läuft automatisch über die Fahrbahn — jede überquerte Spur erhöht deinen Multiplikator. Nimm jederzeit deinen Gewinn mit (Auszahlen), oder riskier die nächste Spur für mehr. Erwischt dich ein Auto, ist der Einsatz verloren." },
   ];
   const PLACEHOLDER_SLOTS = 1; // leere Plätze, bis mehr Spiele folgen
@@ -4833,7 +4845,7 @@
       openModal('login');
       return;
     }
-    if(name !== 'Blackjack' && name !== 'Walzenglück' && name !== 'Hühnerlauf'){
+    if(name !== 'Blackjack' && name !== 'Walzenglück' && name !== 'Chicken Road'){
       showToast(`${name}-Tisch wird vorbereitet …`);
       return;
     }
@@ -4851,7 +4863,7 @@
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
       switchMainView('slot');
       slotInit();
-    } else if(name === 'Hühnerlauf'){
+    } else if(name === 'Chicken Road'){
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
       switchMainView('crossy');
       crossyInit();
@@ -6175,7 +6187,7 @@
 
 
   // ============================================================
-  // --- Hühnerlauf (Fahrbahn-Überquerungs-Spiel, Chicken-Road-Stil) ---
+  // --- Chicken Road (Fahrbahn-Überquerungs-Spiel, Chicken-Road-Stil) ---
   // Nach dem Start hüpft das Huhn NICHT mehr automatisch: der Spieler drückt
   // pro Spur selbst auf "Los", um die nächste Fahrbahn zu riskieren. Jede
   // überstandene Spur erhöht den Multiplikator UND lässt eine Straßensperre
@@ -6193,27 +6205,58 @@
     daredevil: { label:'Daredevil', crash:[0.35,0.45,0.54,0.62,0.69,0.75] },
   };
   let crossySelectedDiff = 'daredevil';
-  let crossyState = { running:false, busy:false, lane:0, bet:0, difficulty:'daredevil', multiplier:1 };
+  let crossyState = { running:false, busy:false, lane:0, bet:0, difficulty:'daredevil', multiplier:1, autoCashout:0, pending:null };
+
+  // Fairness: echte Zufallsquelle statt Math.random(), wo verfügbar. Math.random()
+  // ist nicht kryptographisch sicher und theoretisch vorhersagbar — für den
+  // Ausgang einer Wette sollte das nicht der Fall sein.
+  function crossyRandom(){
+    if(window.crypto && crypto.getRandomValues){
+      const buf = new Uint32Array(1);
+      crypto.getRandomValues(buf);
+      return buf[0] / 4294967296;
+    }
+    return Math.random();
+  }
 
   function crossyMultiplierTable(diffKey){
     const arr = CROSSY_DIFFICULTIES[diffKey].crash;
     let survival = 1;
     return arr.map((p, i) => { survival *= (1 - p); return Math.pow(CROSSY_HOUSE_EDGE, i + 1) / survival; });
   }
-  function crossyCarSvg(color){
-    // Draufsicht wie im Chicken-Road-Vorbild: Karosserie mit Dach,
-    // Front-/Heckscheibe und leuchtenden Scheinwerfern in Fahrtrichtung.
+  // Drei Karosserie-Silhouetten (Limousine, Van, Kompakt) statt einer einzigen
+  // Form in nur unterschiedlichen Farben — macht den Verkehr auf Anhieb
+  // lebendiger, ohne die Draufsicht-Logik der Fahrbahn zu verändern.
+  function crossyCarSvg(color, type){
+    const headlights = `<circle cx="10.5" cy="56.5" r="2.6" fill="#fff3c4"/><circle cx="25.5" cy="56.5" r="2.6" fill="#fff3c4"/>`;
+    const wheels = `<rect x="0.5" y="10" width="5" height="11" rx="2.2" fill="#191921"/><rect x="30.5" y="10" width="5" height="11" rx="2.2" fill="#191921"/><rect x="0.5" y="42" width="5" height="11" rx="2.2" fill="#191921"/><rect x="30.5" y="42" width="5" height="11" rx="2.2" fill="#191921"/>`;
+    if(type === 'van'){
+      return `<svg viewBox="0 0 36 62" xmlns="http://www.w3.org/2000/svg">
+        ${wheels}
+        <rect x="2.5" y="1.5" width="31" height="59" rx="6" fill="${color}" stroke="rgba(0,0,0,.38)" stroke-width="1.6"/>
+        <rect x="6.5" y="8" width="23" height="9" rx="2.5" fill="#232b38"/>
+        <rect x="6.5" y="19" width="23" height="27" rx="2.5" fill="rgba(255,255,255,.14)"/>
+        <line x1="18" y1="19" x2="18" y2="46" stroke="rgba(0,0,0,.25)" stroke-width="1"/>
+        ${headlights}
+      </svg>`;
+    }
+    if(type === 'sport'){
+      return `<svg viewBox="0 0 36 62" xmlns="http://www.w3.org/2000/svg">
+        ${wheels}
+        <path d="M18 1c9 0 13 5 14 15v34c0 6-6 10-14 10S4 56 4 50V16C5 6 9 1 18 1z" fill="${color}" stroke="rgba(0,0,0,.38)" stroke-width="1.6"/>
+        <path d="M10 13c1.5-4 4.5-6 8-6s6.5 2 8 6l-1.5 8h-13z" fill="#232b38"/>
+        <rect x="8.5" y="22" width="19" height="16" rx="5" fill="rgba(255,255,255,.16)"/>
+        ${headlights}
+      </svg>`;
+    }
+    // sedan (Standard)
     return `<svg viewBox="0 0 36 62" xmlns="http://www.w3.org/2000/svg">
-      <rect x="0.5" y="10" width="5" height="11" rx="2.2" fill="#191921"/>
-      <rect x="30.5" y="10" width="5" height="11" rx="2.2" fill="#191921"/>
-      <rect x="0.5" y="42" width="5" height="11" rx="2.2" fill="#191921"/>
-      <rect x="30.5" y="42" width="5" height="11" rx="2.2" fill="#191921"/>
+      ${wheels}
       <rect x="3" y="2" width="30" height="58" rx="10" fill="${color}" stroke="rgba(0,0,0,.38)" stroke-width="1.6"/>
       <rect x="7" y="10" width="22" height="8" rx="3.5" fill="#232b38"/>
       <rect x="7.8" y="20" width="20.4" height="17" rx="4" fill="rgba(255,255,255,.16)"/>
       <rect x="7" y="39" width="22" height="10" rx="3.5" fill="#232b38"/>
-      <circle cx="10.5" cy="56.5" r="2.6" fill="#fff3c4"/>
-      <circle cx="25.5" cy="56.5" r="2.6" fill="#fff3c4"/>
+      ${headlights}
     </svg>`;
   }
   function crossyBuildRoad(){
@@ -6223,6 +6266,7 @@
     multsEl.innerHTML = '';
     const mults = crossyMultiplierTable(crossySelectedDiff);
     const carColors = ['#c9a05b','#4a89dd','#c1443c','#4cbf83','#e8c168','#8a6a35'];
+    const carTypes = ['sedan','van','sport'];
     for(let i = 0; i < CROSSY_LANES; i++){
       const lane = document.createElement('div');
       lane.className = 'crossy-lane';
@@ -6236,7 +6280,7 @@
       const delay = (Math.random() * -dur).toFixed(2);
       car.style.animationDuration = dur + 's';
       car.style.animationDelay = delay + 's';
-      car.innerHTML = crossyCarSvg(carColors[i % carColors.length]);
+      car.innerHTML = crossyCarSvg(carColors[i % carColors.length], carTypes[i % carTypes.length]);
       lane.appendChild(car);
       lanesEl.appendChild(lane);
 
@@ -6341,6 +6385,8 @@
     document.getElementById('crossyBetDouble').disabled = false;
     document.getElementById('crossyBetMax').disabled = false;
     document.querySelectorAll('.crossy-diff-btn').forEach(b => b.disabled = false);
+    const autoInput = document.getElementById('crossyAutoInput');
+    if(autoInput) autoInput.disabled = false;
   }
 
   // Bricht ein laufendes Spiel ab (z.B. beim Verlassen der Ansicht). Wurde schon
@@ -6349,6 +6395,24 @@
   function crossyStop(){
     if(!crossyState.running) return;
     crossyState.running = false;
+    // War gerade eine Spur "in der Luft" (Los-Animation lief noch), wurde deren
+    // Ausgang bereits VOR der Animation festgelegt (siehe crossyStepForward) —
+    // der wird hier angewendet, statt die laufende Runde einfach zum alten,
+    // sicheren Multiplikator auszuzahlen. Sonst könnte man einem Crash durch
+    // Wegnavigieren im richtigen Moment einfach entkommen.
+    if(crossyState.pending){
+      const p = crossyState.pending;
+      crossyState.pending = null;
+      if(p.crashed){
+        // Crash war bereits festgelegt: kompletter Einsatz verloren, exakt wie
+        // ein normaler Crash mitten im Spiel — kein Trick-Ausweg per Navigation.
+        crossyState.lane = 0;
+        crossyState.multiplier = 1;
+      } else {
+        crossyState.lane = p.laneIdx + 1;
+        crossyState.multiplier = p.mult;
+      }
+    }
     if(crossyState.lane > 0){
       const payout = Math.round(crossyState.bet * crossyState.multiplier);
       bjAdjustChips(payout);
@@ -6439,6 +6503,13 @@
     if(laneEls[laneIdx]) laneEls[laneIdx].classList.add('is-current');
     if(cellEls[laneIdx]) cellEls[laneIdx].classList.add('is-current');
 
+    // Fairness-Fix: das Ergebnis steht schon JETZT fest, bevor die Hop-Animation
+    // überhaupt läuft — und wird in crossyState.pending gemerkt. So kann niemand
+    // dem Ergebnis entkommen, indem er mitten in der Animation die Ansicht
+    // verlässt (crossyStop() löst crossyState.pending dann genauso auf).
+    const crashed = crossyRandom() < crashArr[laneIdx];
+    crossyState.pending = { laneIdx, crashed, mult: mults[laneIdx] };
+
     const chicken = document.getElementById('crossyChicken');
     chicken.classList.add('hop');
     slotPlayReelStop();
@@ -6446,7 +6517,7 @@
     chicken.classList.remove('hop');
     if(!crossyState.running){ crossyState.busy = false; return; }
 
-    const crashed = Math.random() < crashArr[laneIdx];
+    crossyState.pending = null;
     if(crashed){ crossyCrash(); return; }
 
     crossyState.lane++;
@@ -6484,6 +6555,14 @@
       crossyCashOut(true);
       return;
     }
+    // Auto-Auszahlung: sobald der eingestellte Zielmultiplikator erreicht ist,
+    // wird automatisch ausgezahlt, ohne dass der Spieler noch selbst klicken muss.
+    if(crossyState.autoCashout > 0 && crossyState.multiplier >= crossyState.autoCashout){
+      document.getElementById('crossyGoBtn').style.display = 'none';
+      await crossyDelay(300);
+      crossyCashOut(false);
+      return;
+    }
     document.getElementById('crossyGoBtn').disabled = false;
     document.getElementById('crossyGiveupBtn').disabled = false;
   }
@@ -6506,7 +6585,9 @@
     }
     crossySetMessage('', '');
     const mults = crossyMultiplierTable(crossySelectedDiff);
-    crossyState = { running:true, busy:false, lane:0, bet, difficulty:crossySelectedDiff, multiplier:1 };
+    const autoCashoutInput = document.getElementById('crossyAutoInput');
+    const autoCashout = autoCashoutInput ? (parseFloat(autoCashoutInput.value) || 0) : 0;
+    crossyState = { running:true, busy:false, lane:0, bet, difficulty:crossySelectedDiff, multiplier:1, autoCashout, pending:null };
     bjAdjustChips(-bet);
     document.getElementById('crossyStartBtn').style.display = 'none';
     document.getElementById('crossyGoBtn').style.display = '';
@@ -6520,6 +6601,7 @@
     document.getElementById('crossyBetDouble').disabled = true;
     document.getElementById('crossyBetMax').disabled = true;
     document.querySelectorAll('.crossy-diff-btn').forEach(b => b.disabled = true);
+    if(autoCashoutInput) autoCashoutInput.disabled = true;
     crossyBuildRoad();
   }
 
