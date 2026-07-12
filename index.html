@@ -3446,7 +3446,7 @@
           </div>
           <div>
             <div class="settings-topbar-heading">Konto & Einstellungen</div>
-            <div class="settings-topbar-sub" id="settingsPaneLabel">Profil</div>
+            <div class="settings-topbar-sub" id="settingsPaneLabel">Benachrichtigungen</div>
           </div>
         </div>
       </div>
@@ -3470,11 +3470,7 @@
 
           <div class="settings-tabnav" id="settingsTabnav">
             <div class="stab-highlight" id="stabHighlight"></div>
-            <div class="stab active" data-spane="profile">
-              <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5zm-7 19c0-3.9 3.1-7 7-7s7 3.1 7 7z"/></svg>
-              Profil
-            </div>
-            <div class="stab" data-spane="notifications">
+            <div class="stab active" data-spane="notifications">
               <svg viewBox="0 0 24 24"><path d="M12 22a2.2 2.2 0 002.2-2.2h-4.4A2.2 2.2 0 0012 22zm7-6.2V11a7 7 0 00-5.5-6.8V3.5a1.5 1.5 0 00-3 0v.7A7 7 0 005 11v4.8L3 17.8V19h18v-1.2z"/></svg>
               Benachrichtigungen
             </div>
@@ -3500,7 +3496,7 @@
         <div class="settings-main">
           <div class="settings-body">
           <!-- Profil pane -->
-          <div class="settings-pane active" id="pane-profile">
+          <div class="settings-pane" id="pane-profile">
             <div class="pane-heading">Profil</div>
 
             <div class="adm-console" id="profileConsole" style="grid-column:1/-1;">
@@ -3718,7 +3714,7 @@
           </div>
 
           <!-- Benachrichtigungen pane -->
-          <div class="settings-pane" id="pane-notifications">
+          <div class="settings-pane active" id="pane-notifications">
             <div class="pane-heading">Benachrichtigungen</div>
 
             <div class="adm-shell" style="grid-column:1/-1;">
@@ -8408,13 +8404,13 @@
       e.stopPropagation();
       document.getElementById('dropdown')?.classList.remove('open');
       document.getElementById('userChip')?.classList.remove('active');
-      openSettings(currentUserEmail);
+      openSettings(currentUserEmail, 'appearance');
     });
     document.getElementById('ddEditProfileBtn')?.addEventListener('click', (e) => {
       e.stopPropagation();
       document.getElementById('dropdown')?.classList.remove('open');
       document.getElementById('userChip')?.classList.remove('active');
-      openSettings(currentUserEmail);
+      openSettings(currentUserEmail, 'profile');
     });
     document.addEventListener('click', function outside(e){
       if(!document.getElementById('userChip')?.contains(e.target)){
@@ -9174,7 +9170,7 @@
     results.querySelectorAll('.chipadm-row').forEach(chipadmWireRow);
   });
 
-  function openSettings(email){
+  function openSettings(email, pane){
     document.getElementById('profileError').textContent = '';
     document.getElementById('profileHint').textContent = '';
     document.getElementById('pwError').textContent = '';
@@ -9204,7 +9200,10 @@
     switchMainView('settings');
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.getElementById('navSettings')?.classList.add('active');
-    switchPane('profile');
+    // "Profil" ist kein eigener Tab mehr in der Einstellungen-Navigation — der
+    // Pane bleibt aber erreichbar, gezielt über "Profil bearbeiten" im Dropdown.
+    // Ohne expliziten Zielort landet man auf dem ersten sichtbaren Tab.
+    switchPane(pane || 'notifications');
   }
 
   // --- Profilbild aus vorgefertigten Presets wählen (in eigenem Auswahlfenster) ---
@@ -9294,7 +9293,8 @@
   const spaneLabels = { profile: 'Profil', notifications: 'Benachrichtigungen', privacy: 'Privatsphäre', appearance: 'Darstellung', volume: 'Lautstärke', security: 'Sicherheit' };
   function positionStabHighlight(activeEl){
     const hl = document.getElementById('stabHighlight');
-    if(!hl || !activeEl) return;
+    if(!hl) return;
+    if(!activeEl){ hl.style.opacity = '0'; return; }
     hl.style.opacity = '1';
     hl.style.width = activeEl.offsetWidth + 'px';
     hl.style.transform = `translateX(${activeEl.offsetLeft}px)`;
