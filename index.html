@@ -93,45 +93,58 @@
   }
 
   /* Sidebar — a strip of felt trimmed in foil, like the rail of a table */
-  .sidebar{
-    width:76px;
-    background:
-      linear-gradient(180deg, rgba(212,175,106,.05), transparent 120px),
-      var(--sidebar);
-    border-right:1px solid var(--border-soft);
-    box-shadow:inset -1px 0 0 rgba(212,175,106,.04);
-    display:flex;flex-direction:column;align-items:center;padding:18px 0;gap:4px;
-    flex-shrink:0;position:relative;
+  /* Die alte Icon-Sidebar entfällt – Navigation läuft jetzt horizontal in der
+     Top-Leiste. Das Element bleibt (leer + ausgeblendet) im DOM, weil das JS es
+     beim Umschalten zwischen App- und Wartungsansicht per style.display anspricht. */
+  .sidebar{display:none;}
+
+  /* ===== Brand-Mark in der Top-Leiste ===== */
+  .brand-mark{display:flex;align-items:center;gap:11px;flex-shrink:0;padding-right:4px;cursor:default;}
+  .brand-emblem{
+    width:40px;height:40px;border-radius:12px;flex-shrink:0;position:relative;
+    background:radial-gradient(circle at 32% 28%,var(--felt-hi),var(--felt) 65%,#081911);
+    border:1px solid var(--accent-dim);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 0 0 1px rgba(212,175,106,.22), 0 4px 12px rgba(0,0,0,.4);
   }
-  .logo{
-    width:38px;height:38px;background:var(--surface);border:1px solid var(--border);border-radius:9px;margin-bottom:20px;
-    display:flex;align-items:center;justify-content:center;color:var(--accent-hi);font-weight:600;font-size:17px;
-    font-family:var(--font-display);position:relative;
-  }
-  .logo:after{
-    content:"";position:absolute;inset:0;border-radius:9px;box-shadow:inset 0 0 0 1px rgba(212,175,106,.22);
-  }
+  .brand-emblem svg{width:21px;height:21px;position:relative;z-index:1;}
+  .brand-word{display:flex;flex-direction:column;line-height:1.12;}
+  .brand-name{font-family:var(--font-display);font-style:italic;font-weight:600;font-size:16.5px;color:var(--text);letter-spacing:.2px;}
+  .brand-alpha{font-family:var(--font-mono);font-size:8px;font-weight:600;letter-spacing:1.5px;color:var(--accent);opacity:.85;}
+
+  /* ===== Horizontale Top-Navigation ===== */
+  .topnav{display:flex;align-items:center;gap:3px;flex-shrink:0;}
   .nav-item{
-    width:60px;height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:6px;border-radius:10px;cursor:pointer;color:var(--faint);transition:.15s;position:relative;
+    display:flex;flex-direction:row;align-items:center;gap:8px;
+    height:38px;padding:0 14px;border-radius:11px;cursor:pointer;
+    color:var(--muted);transition:.16s;position:relative;
+    border:1px solid transparent;white-space:nowrap;
   }
-  .nav-item svg{width:22px;height:22px;fill:currentColor;}
-  .nav-item span{font-size:10.5px;letter-spacing:.3px;font-weight:500;}
-  .nav-item.active{color:var(--accent-hi);background:var(--accent-soft);box-shadow:inset 0 0 0 1px rgba(212,175,106,.22);}
+  .nav-item svg{width:17px;height:17px;fill:currentColor;flex-shrink:0;}
+  .nav-item span{font-size:13px;letter-spacing:.1px;font-weight:600;font-family:var(--font-body);}
+  .nav-item:hover{background:rgba(212,175,106,.06);color:var(--text);}
+  .nav-item.active{
+    color:var(--accent-hi);background:var(--accent-soft);
+    border-color:rgba(212,175,106,.26);
+    box-shadow:inset 0 1px 0 rgba(240,207,142,.08), 0 3px 12px -6px rgba(212,175,106,.5);
+  }
   .nav-item.active:before{
-    content:"";position:absolute;left:-1px;top:10px;bottom:10px;width:2px;border-radius:2px;
-    background:linear-gradient(180deg,transparent,var(--accent-hi),transparent);
+    content:"";position:absolute;left:13px;right:13px;bottom:-1px;height:2px;border-radius:2px;
+    background:linear-gradient(90deg,transparent,var(--accent-hi),transparent);
   }
-  .nav-item:hover{background:rgba(212,175,106,.045);color:var(--text);}
 
   /* Main layout */
   .main{flex:1;display:flex;flex-direction:column;min-width:0;}
 
   .topbar{
-    height:60px;display:flex;align-items:center;gap:16px;padding:0 24px;
-    background:var(--panel);border-bottom:1px solid var(--border-soft);flex-shrink:0;
+    height:64px;display:flex;align-items:center;gap:14px;padding:0 20px;flex-shrink:0;position:relative;z-index:20;
+    background:linear-gradient(180deg, rgba(212,175,106,.05), transparent 70%), var(--panel);
+    border-bottom:1px solid var(--border-soft);
+    box-shadow:0 1px 0 rgba(212,175,106,.06), 0 14px 30px -22px rgba(0,0,0,.8);
   }
-  .search{flex:1;max-width:480px;position:relative;}
+  /* feine Gold-Trennung zwischen Brand+Nav und dem rechten Bereich */
+  .topbar .search{margin-left:8px;}
+  .search{flex:1;min-width:140px;max-width:400px;position:relative;}
   .search input{
     width:100%;height:37px;border-radius:8px;border:1px solid var(--border);
     background:var(--surface);color:var(--text);padding:0 16px 0 38px;font-size:13.5px;outline:none;transition:.15s;
@@ -523,6 +536,19 @@
   }
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
+  /* Top-Nav: bei knappem Platz erst die Suche, dann die Labels, dann Wordmark ausdünnen */
+  @media (max-width:1180px){
+    .search{max-width:280px;}
+  }
+  @media (max-width:1040px){
+    .nav-item span{display:none;}
+    .nav-item{padding:0 11px;gap:0;}
+    .topbar{gap:10px;}
+  }
+  @media (max-width:880px){
+    .brand-word{display:none;}
+    .search{display:none;}
+  }
   @media (max-width:700px){
     .sidebar{width:0;overflow:hidden;border:none;}
     .content{padding:16px;}
@@ -530,6 +556,8 @@
     .hero{padding:28px 22px 40px;min-height:0;}
     .hero-stats{flex-wrap:wrap;}
     .crossy-road{height:320px;}
+    .topbar{padding:0 12px;gap:6px;overflow-x:auto;}
+    .topnav{gap:1px;}
   }
 
   /* ---------- Overlay/modal shared styles ---------- */
@@ -1872,11 +1900,10 @@
 
   /* ---------- Freunde-System ---------- */
   .nav-badge{
-    position:absolute;top:2px;right:6px;background:var(--danger);color:#1a0808;font-size:9px;
+    position:absolute;top:-5px;right:-3px;background:var(--danger);color:#1a0808;font-size:9px;
     min-width:15px;height:15px;padding:0 3px;border-radius:8px;display:none;align-items:center;justify-content:center;
-    font-weight:700;border:2px solid var(--sidebar);
+    font-weight:700;border:2px solid var(--panel);z-index:1;
   }
-  .nav-item{position:relative;}
   .friends-wrap{max-width:760px;}
   .friends-head{margin-bottom:20px;}
   .friends-head h1{font-family:var(--font-display);font-size:24px;font-weight:600;color:var(--text);margin-bottom:4px;}
@@ -3133,57 +3160,56 @@
   </div>
 </div>
 
-<div class="sidebar">
-  <div class="brand" title="Royal Table – Alpha Build" style="position:relative;">
-    <svg viewBox="0 0 24 24"><path fill="var(--accent-hi)" d="M12 2l2.6 5.9 6.4.6-4.8 4.3 1.5 6.3L12 15.8 6.3 19.1l1.5-6.3-4.8-4.3 6.4-.6z" opacity="0.9"/></svg>
-    <div class="brand-alpha-badge">ALPHA</div>
-  </div>
-  <div class="nav-item active">
-    <svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9h-5v-6H11v6H6v-9H3z"/></svg>
-    <span>Home</span>
-  </div>
-  <div class="nav-item">
-    <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-6h2zm0-8h-2V7h2z"/></svg>
-    <span>Entdecken</span>
-  </div>
-  <div class="nav-item" id="navFriends">
-    <svg viewBox="0 0 24 24"><path d="M16 11c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3 1.3 3 3 3zm-8 0c1.7 0 3-1.3 3-3S9.7 5 8 5 5 6.3 5 8s1.3 3 3 3zm0 2c-2.3 0-7 1.2-7 3.5V19h9v-2.5c0-.9.4-1.9 1.2-2.7C10 13.4 8.7 13 8 13zm8 0c-.3 0-.6 0-1 .1 1 .8 1.7 1.9 1.7 3.4V19h6v-2.5c0-2.3-4.7-3.5-6.7-3.5z"/></svg>
-    <span>Freunde</span>
-    <div class="nav-badge" id="friendsNavBadge">0</div>
-  </div>
-  <div class="nav-item" id="navChat">
-    <svg viewBox="0 0 24 24"><path d="M4 4h16v12H5.2L4 17.2zm2 3v2h12V7zm0 4v2h8v-2z"/></svg>
-    <span>Chat</span>
-    <div class="nav-badge" id="chatNavBadge">0</div>
-  </div>
-
-  <div class="nav-divider"></div>
-  <div class="nav-group-label">Konto</div>
-
-  <div class="nav-item">
-    <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>
-    <span>Rangliste</span>
-  </div>
-  <div class="nav-item" id="navRewards">
-    <svg viewBox="0 0 24 24"><path d="M20 6h-2.2l-1.5-2H7.7L6.2 6H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm-8 12a5 5 0 110-10 5 5 0 010 10z"/></svg>
-    <span>Belohnungen</span>
-  </div>
-
-  <div class="sidebar-bottom">
-    <div class="nav-item">
-      <svg viewBox="0 0 24 24"><path d="M19.4 13a7.9 7.9 0 000-2l2.1-1.6-2-3.4-2.5 1a8 8 0 00-1.7-1L14.9 3H9.1l-.4 2.9a8 8 0 00-1.7 1l-2.5-1-2 3.4L4.6 11a7.9 7.9 0 000 2l-2.1 1.6 2 3.4 2.5-1a8 8 0 001.7 1l.4 2.9h5.8l.4-2.9a8 8 0 001.7-1l2.5 1 2-3.4z"/></svg>
-      <span>Mehr</span>
-    </div>
-  </div>
-</div>
+<!-- Sidebar bleibt als leeres Element erhalten, weil das JS sie beim Umschalten
+     zwischen App- und Wartungs-/Coming-Soon-Ansicht per style.display anspricht.
+     Die Navigation ist jetzt horizontal in der Top-Leiste (siehe .topnav). -->
+<div class="sidebar" aria-hidden="true"></div>
 
 <div class="main">
   <div class="topbar">
+    <div class="brand-mark" title="Royal Deck – Alpha Build">
+      <div class="brand-emblem">
+        <svg viewBox="0 0 24 24"><path fill="var(--accent-hi)" d="M12 2l2.6 5.9 6.4.6-4.8 4.3 1.5 6.3L12 15.8 6.3 19.1l1.5-6.3-4.8-4.3 6.4-.6z"/></svg>
+      </div>
+      <div class="brand-word">
+        <span class="brand-name">Royal Deck</span>
+        <span class="brand-alpha" title="Royal Deck befindet sich noch in der Alpha-Phase – es kann zu Bugs, Datenverlust oder Änderungen ohne Vorwarnung kommen.">ALPHA BUILD</span>
+      </div>
+    </div>
+
+    <nav class="topnav">
+      <div class="nav-item active">
+        <svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9h-5v-6H11v6H6v-9H3z"/></svg>
+        <span>Home</span>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-6h2zm0-8h-2V7h2z"/></svg>
+        <span>Entdecken</span>
+      </div>
+      <div class="nav-item" id="navFriends">
+        <svg viewBox="0 0 24 24"><path d="M16 11c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3 1.3 3 3 3zm-8 0c1.7 0 3-1.3 3-3S9.7 5 8 5 5 6.3 5 8s1.3 3 3 3zm0 2c-2.3 0-7 1.2-7 3.5V19h9v-2.5c0-.9.4-1.9 1.2-2.7C10 13.4 8.7 13 8 13zm8 0c-.3 0-.6 0-1 .1 1 .8 1.7 1.9 1.7 3.4V19h6v-2.5c0-2.3-4.7-3.5-6.7-3.5z"/></svg>
+        <span>Freunde</span>
+        <div class="nav-badge" id="friendsNavBadge">0</div>
+      </div>
+      <div class="nav-item" id="navChat">
+        <svg viewBox="0 0 24 24"><path d="M4 4h16v12H5.2L4 17.2zm2 3v2h12V7zm0 4v2h8v-2z"/></svg>
+        <span>Chat</span>
+        <div class="nav-badge" id="chatNavBadge">0</div>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>
+        <span>Rangliste</span>
+      </div>
+      <div class="nav-item" id="navRewards">
+        <svg viewBox="0 0 24 24"><path d="M20 6h-2.2l-1.5-2H7.7L6.2 6H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm-8 12a5 5 0 110-10 5 5 0 010 10z"/></svg>
+        <span>Belohnungen</span>
+      </div>
+    </nav>
+
     <div class="search">
       <svg viewBox="0 0 24 24"><path d="M15.5 14h-.8l-.3-.3a6.5 6.5 0 10-.7.7l.3.3v.8l5 5L20.5 19zm-6 0a4.5 4.5 0 110-9 4.5 4.5 0 010 9z"/></svg>
-      <input placeholder="Spiele, Erlebnisse suchen">
+      <input placeholder="Tische &amp; Spiele durchsuchen">
     </div>
-    <div class="alpha-tag" title="Royal Deck befindet sich noch in der Alpha-Phase – es kann zu Bugs, Datenverlust oder Änderungen ohne Vorwarnung kommen.">ALPHA BUILD</div>
     <div class="top-right">
       <div class="hud-rail">
         <div class="points-chip" id="pointsDisplay" title="Dein Level basiert auf deinen Einsätzen, nicht auf deinem Kontostand" style="--ring-pct:8">
