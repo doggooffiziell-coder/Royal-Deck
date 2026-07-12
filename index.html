@@ -5180,6 +5180,8 @@
   // gespielte Runden. Bei Bedarf hier einfach den Wert anpassen.
   const XP_PER_LEVEL = 2000;
   function getLevel(){ return Math.max(1, Math.floor(getXp() / XP_PER_LEVEL)); }
+  // Level aus einem beliebigen XP-Wert (z.B. für andere Spieler in der Rangliste).
+  function levelFromXp(xp){ return Math.max(1, Math.floor((xp || 0) / XP_PER_LEVEL)); }
   // Nach einem Einsatz: XP sofort lokal gutschreiben (UI reagiert ohne Wartezeit),
   // danach im Hintergrund in Supabase persistieren, damit es im Table Editor unter
   // profiles.xp auftaucht und geräteübergreifend erhalten bleibt.
@@ -9976,6 +9978,79 @@
   }
   function unsubscribeDirectMessages(){
     if(chatChannel){ supabaseClient.removeChannel(chatChannel); chatChannel = null; }
+  }
+
+  // ============================================================
+  // --- Rangliste (Leaderboard) ---
+  // Rangfolge nach XP (= Level). Braucht die Spalte "xp" in der View
+  // public_profiles (siehe SQL-Hinweis). Öffentlich sichtbar; der eigene
+  // Rang wird zusätzlich unten angeheftet, falls man nicht in den Top 50 ist.
+  // ============================================================
+  function lbRowHTML(p, rank){
+    const xp = Math.max(0, p.xp || 0);
+    const level = levelFromXp(xp);
+    const isMe = currentUserId && p.id === currentUserId;
+    const topClass = rank <= 3 ? ` top${rank}` : '';
+    return `
+      <div class="lb-row${topClass}${isMe ? ' is-me' : ''}">
+        <div class="lb-rank">${rank}</div>
+        ${friendAvatarHTML(p)}
+        <div class="lb-info">
+          <div class="lb-name">${chatEscape(p.name || p.username || 'Spieler')}</div>
+          <div class="lb-handle">${p.username ? '@' + chatEscape(p.username) : ''}</div>
+        </div>
+        <div class="lb-stats">
+          <div class="lb-level">Level ${level}</div>
+          <div class="lb-xp">${xp.toLocaleString('de-DE')} XP</div>
+        </div>
+      </div>`;
+  }
+
+  async function loadLeaderboard(){
+    const listEl = document.getElementById('leaderboardList');
+    const ownEl = document.getElementById('leaderboardOwnRank');
+    listEl.innerHTML = `<div class="lb-empty">Lädt …</div>`;
+    ownEl.style.display = 'none';
+
+    const cols = 'id, username, name, avatar_symbol, avatar_color, avatar_symbol_color, xp';
+    const { data, error } = await supabaseClient
+      .from('public_profiles')
+      .select(cols)
+      .not('username', 'is', null)
+      .order('xp', { ascending: false, nullsFirst: false })
+      .limit(50);
+    if(error){
+      // Häufigste Ursache: die Spalte "xp" fehlt noch in der View public_profiles.
+      listEl.innerHTML = `<div class="lb-empty">Rangliste konnte nicht geladen werden.<br>${chatEscape(error.message || '')}</div>`;
+      console.error('Leaderboard-Fehler:', error);
+      return;
+    }
+    const rows = data || [];
+    if(!rows.length){
+      listEl.innerHTML = `<div class="lb-empty">Noch keine Spieler in der Rangliste.</div>`;
+      return;
+    }
+    listEl.innerHTML = rows.map((p, i) => lbRowHTML(p, i + 1)).join('');
+
+    // Eigenen Rang unten anheften, falls eingeloggt und nicht in den Top 50.
+    if(currentUserId && !rows.some(p => p.id === currentUserId)){
+      const myXp = getXp();
+      const { count } = await supabaseClient
+        .from('public_profiles')
+        .select('id', { count: 'exact', head: true })
+        .gt('xp', myXp);
+      const me = {
+        id: currentUserId,
+        username: currentProfile?.username || '',
+        name: currentProfile?.name || '',
+        avatar_symbol: currentProfile?.avatar_symbol,
+        avatar_color: currentProfile?.avatar_color,
+        avatar_symbol_color: currentProfile?.avatar_symbol_color,
+        xp: myXp
+      };
+      ownEl.innerHTML = lbRowHTML(me, (count || 0) + 1);
+      ownEl.style.display = 'block';
+    }
   }
 
   // Falls Supabase uns über einen Passwort-Reset-Link zurückschickt (PASSWORD_RECOVERY event),
