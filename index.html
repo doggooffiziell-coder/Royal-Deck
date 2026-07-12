@@ -5022,12 +5022,12 @@
     } catch(e){ return null; }
   }
   function getXp(){
+    // XP ist ein EIGENER Wert, komplett unabhängig von den Chips. Level wird NICHT
+    // mehr aus dem Chip-Stand abgeleitet — nur aus tatsächlich erspielten Gewinn-XP.
     if(currentProfile && typeof currentProfile.xp === 'number') return currentProfile.xp;
     const local = getLocalXp();
     if(local !== null) return local;
-    const seed = Math.max(0, (currentProfile && currentProfile.chips) || 0);
-    try { localStorage.setItem(xpKey(), String(seed)); } catch(e){}
-    return seed;
+    return 0;
   }
   // XP-Bedarf pro Level. Vorher war das quasi 100 (1 Level pro 100 gesetzten Chips) —
   // bei Einsätzen von 100-500 Chips pro Runde ging das viel zu schnell (mehrere Level
@@ -5049,6 +5049,14 @@
       supabaseClient.from('profiles').update({ xp: newXp }).eq('id', currentUserId)
         .then(({ error }) => { if(error) console.error('XP-Update fehlgeschlagen:', error); });
     }
+  }
+
+  // XP kommt ausschließlich aus GEWINNEN, nicht aus Einsätzen: 25% des Netto-Gewinns
+  // (Auszahlung minus Einsatz) fließen als XP ins Level. Bei Verlust/Push = 0 XP.
+  const XP_WIN_RATE = 0.25;
+  function gainXpFromWin(netWin){
+    if(!netWin || netWin <= 0) return;
+    gainXp(Math.floor(netWin * XP_WIN_RATE));
   }
 
   function lvlRewardsKey(){ return 'rt_level_rewards_' + (currentUserId || 'guest'); }
@@ -5390,7 +5398,6 @@
     bjPendingBet = 0;
     bjPlayChipSound();
     await bjAdjustChips(-bet);
-    gainXp(bet);
 
     bjState = {
       hands: [{ cards: [bjDrawCard(), bjDrawCard()], bet, status: 'playing', splitFromAce:false }],
@@ -5476,7 +5483,6 @@
     if(balance < hand.bet) { showToast('Nicht genug Chips zum Verdoppeln.'); return; }
     bjPlayChipSound();
     await bjAdjustChips(-hand.bet);
-    gainXp(hand.bet);
     hand.bet *= 2;
     hand.cards.push(bjDrawCard());
     hand.status = bjHandValue(hand.cards) > 21 ? 'bust' : 'stand';
@@ -5491,7 +5497,6 @@
     if(balance < hand.bet) { showToast('Nicht genug Chips zum Splitten.'); return; }
     bjPlayChipSound();
     await bjAdjustChips(-hand.bet);
-    gainXp(hand.bet);
     const isAceSplit = hand.cards[0].rank === 'A';
     const secondCard = hand.cards.pop();
     hand.cards.push(bjDrawCard());
@@ -5525,8 +5530,10 @@
     const dealerBust = dealerTotal > 21;
 
     let totalReturn = 0;
+    let totalBet = 0;
     const results = [];
     bjState.hands.forEach(hand => {
+      totalBet += hand.bet;
       const playerTotal = bjHandValue(hand.cards);
       let outcome;
       if(hand.status === 'bust'){
@@ -5549,6 +5556,8 @@
     });
 
     if(totalReturn > 0) await bjAdjustChips(totalReturn);
+    // XP nur aus dem Netto-Gewinn (Auszahlung minus Einsatz). Push/Verlust = 0 XP.
+    gainXpFromWin(totalReturn - totalBet);
 
     bjRenderTable();
     const winCount = results.filter(r => r === 'win' || r === 'win-bj').length;
@@ -5851,8 +5860,6 @@
     msg.textContent = ''; msg.className = 'slot-message';
     document.querySelectorAll('.slot-reel-window').forEach(w => w.classList.remove('slot-win-glow'));
     slotPlaySpinSound();
-    // Chips für die Münzen wurden bereits beim Einwerfen abgezogen — hier nur noch XP vergeben.
-    gainXp(betAmount);
 
     const finalSymbols = [slotPickSymbol(), slotPickSymbol(), slotPickSymbol()];
     await Promise.all([0, 1, 2].map(i => slotSpinReel(i, finalSymbols[i])));
@@ -5862,6 +5869,7 @@
       const symbolData = SLOT_SYMBOLS.find(s => s.id === finalSymbols[0]);
       const payout = betAmount * symbolData.pay;
       await bjAdjustChips(payout);
+      gainXpFromWin(payout - betAmount);
       msg.textContent = `Gewinn! +${payout.toLocaleString('de-DE')} Chips`;
       msg.classList.add('win');
       document.querySelectorAll('.slot-reel-window').forEach(w => w.classList.add('slot-win-glow'));
@@ -6066,6 +6074,7 @@
     if(crossyState.lane > 0){
       const payout = Math.round(crossyState.bet * crossyState.multiplier);
       bjAdjustChips(payout);
+      gainXpFromWin(payout - crossyState.bet);
     } else {
       bjAdjustChips(crossyState.bet);
     }
@@ -6080,7 +6089,7 @@
     if(crossyState.lane > 0){
       const payout = Math.round(crossyState.bet * crossyState.multiplier);
       bjAdjustChips(payout);
-      gainXp(crossyState.bet);
+      gainXpFromWin(payout - crossyState.bet);
       bjPlayChipSound();
       crossySetMessage(`Aufgegeben — ausgezahlt: +${payout.toLocaleString('de-DE')} Chips (${crossyState.multiplier.toFixed(2)}×)`, 'win');
     } else {
@@ -6095,7 +6104,7 @@
     crossyState.running = false;
     const payout = Math.round(crossyState.bet * crossyState.multiplier);
     bjAdjustChips(payout);
-    gainXp(crossyState.bet);
+    gainXpFromWin(payout - crossyState.bet);
     bjPlayChipSound();
     crossySetMessage(
       (auto ? 'Fahrbahn geschafft! ' : '') + `Ausgezahlt: +${payout.toLocaleString('de-DE')} Chips (${crossyState.multiplier.toFixed(2)}×)`,
