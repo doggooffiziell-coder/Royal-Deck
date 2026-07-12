@@ -2721,6 +2721,17 @@
   .crossy-message.win{color:var(--success);text-shadow:0 0 14px rgba(76,191,131,.5);}
   .crossy-message.lose{color:var(--danger);}
 
+  /* Risiko-Anzeige: macht die tatsächliche Absturzchance vor jedem Klick sichtbar,
+     statt dass der Spieler ins Blaue klickt. Direkt zur Entscheidung platziert. */
+  .crossy-risk{
+    display:flex;justify-content:center;align-items:center;gap:18px;flex-wrap:wrap;
+    padding:9px 14px 2px;font-family:var(--font-mono);font-size:12px;letter-spacing:.2px;
+  }
+  .crossy-risk-item{display:flex;align-items:center;gap:6px;color:var(--muted);}
+  .crossy-risk-item b{color:var(--text);font-weight:700;}
+  .crossy-risk-item.danger b{color:var(--danger);}
+  .crossy-risk-item.success b{color:var(--success);}
+
   /* Steuerleiste — eine flache Zeile wie im Chicken-Road-Vorbild:
      Einsatz links, Schwierigkeit in der Mitte, großer Start-Knopf rechts. */
   .crossy-panel{
@@ -4476,34 +4487,48 @@
         <div class="crossy-curb crossy-curb-end"></div>
         <div class="crossy-multipliers" id="crossyMultipliers"></div>
         <div class="crossy-chicken" id="crossyChicken">
-          <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path d="M19 39v5M27 39v5" stroke="#e8973f" stroke-width="2.6" stroke-linecap="round"/><path d="M19 44l-4 2M27 44l-4 2" stroke="#e8973f" stroke-width="2.2" stroke-linecap="round"/><path d="M12 25c-5-1-8-5-7-10 4 1 7 4 8 7z" fill="#f4efe2" stroke="#d9d2c0" stroke-width="1"/><ellipse cx="22" cy="29" rx="13" ry="11.5" fill="#fdfaf1" stroke="#d9d2c0" stroke-width="1"/><path d="M17 28c4-2.5 9-2 11 1.5-2.5 3.5-8 4-11 1.5z" fill="#efe8d6"/><circle cx="31" cy="16" r="8.5" fill="#fdfaf1" stroke="#d9d2c0" stroke-width="1"/><path d="M27 8.5c-.5-3 1-5.5 3.5-6 .2 1 .8 1.8 1.8 2 .8-.8 2.2-1 3.2-.4-.4 1 .1 2 1 2.4-.3 2.2-2.3 4-4.8 4z" fill="#e2503e"/><path d="M39 14.5l6.5 2.2-6.5 3z" fill="#f2a23c" stroke="#c67f26" stroke-width=".5"/><path d="M33.5 23c.2 2.4-.8 4-2.3 4s-2.6-1.4-2.5-3.4z" fill="#e2503e"/><circle cx="34" cy="14" r="1.7" fill="#232830"/></svg>
+          <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="crossyChickenBody" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#fdfaf1"/>
+                <stop offset="100%" stop-color="#e2d8bd"/>
+              </linearGradient>
+            </defs>
+            <path d="M19 39.5v5M28 39.5v5" stroke="var(--accent-dim)" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M19 44.5l-3.5 1.8M28 44.5l3.5 1.8" stroke="var(--accent-dim)" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M10 25c-4-1.2-6-4.6-5-8.6 3.2.6 5.8 3.2 6.8 6.4z" fill="url(#crossyChickenBody)" stroke="var(--border)" stroke-width=".6"/>
+            <path d="M11 30.5c0-9.3 6-15.5 14-15.5s13 7.3 12 16.5c-.7 6.7-6.1 10.7-13 10.7S11 37.8 11 30.5z" fill="url(#crossyChickenBody)" stroke="var(--border)" stroke-width=".8"/>
+            <path d="M16 27.5c4-2 8-1.5 10 1-2 3-7 3.5-10 1.3z" fill="rgba(20,15,5,.07)"/>
+            <circle cx="32" cy="17" r="8" fill="url(#crossyChickenBody)" stroke="var(--border)" stroke-width=".8"/>
+            <path d="M28.3 9c0-2.7 1.6-4.7 3.6-4.9-.1 1 .3 1.9 1 2.3.9-.5 2-.4 2.6.3-.4.9-.1 1.9.6 2.4-.9 1.6-3.1 2.4-5.1 1.9z" fill="var(--danger)"/>
+            <path d="M39.5 15.3l6.3 2-6.3 2.7z" fill="var(--accent)"/>
+            <circle cx="34.5" cy="15.3" r="1.4" fill="#221f18"/>
+          </svg>
         </div>
         <div class="crossy-fail-overlay" id="crossyFailOverlay">
           <svg class="crossy-fail-chicken" viewBox="0 0 150 90" xmlns="http://www.w3.org/2000/svg">
-            <ellipse cx="72" cy="58" rx="54" ry="20" fill="#fdfaf1" stroke="#d9d2c0" stroke-width="1.5"/>
-            <ellipse cx="40" cy="52" rx="18" ry="9" fill="#efe8d6"/>
-            <ellipse cx="95" cy="66" rx="16" ry="8" fill="#efe8d6"/>
-            <ellipse cx="123" cy="50" rx="15" ry="11" fill="#fdfaf1" stroke="#d9d2c0" stroke-width="1.5"/>
-            <path d="M116 38c1-4 4-6 7-6 0 2 1 3 2 3 2-1 4 0 5 1-1 1-1 3 0 4-2 2-5 3-8 2z" fill="#e2503e"/>
-            <path d="M138 48l9 3-9 4z" fill="#f2a23c"/>
-            <path d="M118 46l6 6M124 46l-6 6" stroke="#232830" stroke-width="1.8" stroke-linecap="round"/>
-            <g fill="rgba(35,33,43,.5)">
-              <rect x="56" y="6" width="20" height="7" rx="2.5"/>
-              <rect x="56" y="19" width="20" height="7" rx="2.5"/>
-              <rect x="56" y="32" width="20" height="7" rx="2.5"/>
-              <rect x="56" y="45" width="20" height="7" rx="2.5"/>
-              <rect x="56" y="58" width="20" height="7" rx="2.5"/>
-              <rect x="56" y="71" width="20" height="7" rx="2.5"/>
-            </g>
-            <path d="M20 30q4-6 10-6-2 5-7 8z" fill="#f4efe2"/>
-            <path d="M120 78q5-3 10-1-3 4-8 5z" fill="#f4efe2"/>
-            <path d="M30 75q2-6 8-7-1 5-5 8z" fill="#f4efe2"/>
+            <defs>
+              <linearGradient id="crossyFailBody" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#fdfaf1"/>
+                <stop offset="100%" stop-color="#dcd1b3"/>
+              </linearGradient>
+            </defs>
+            <ellipse cx="72" cy="60" rx="56" ry="17" fill="url(#crossyFailBody)" stroke="var(--border)" stroke-width="1.4"/>
+            <ellipse cx="40" cy="55" rx="17" ry="7.5" fill="rgba(20,15,5,.07)"/>
+            <ellipse cx="123" cy="52" rx="15" ry="10" fill="url(#crossyFailBody)" stroke="var(--border)" stroke-width="1.4"/>
+            <path d="M116 40c1-3.6 3.6-5.4 6.4-5.6.1 1 .8 1.7 1.8 1.9.9-.5 2-.3 2.6.3-.4.9-.1 1.8.6 2.3-.8 1.6-2.8 2.4-4.8 2z" fill="var(--danger)"/>
+            <path d="M138 49l9 2.8-9 3.6z" fill="var(--accent)"/>
+            <path d="M118 47l6 5.4M124 47l-6 5.4" stroke="#221f18" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M20 33q4-5.5 10-5.6-2 4.6-7 7.4z" fill="url(#crossyFailBody)"/>
+            <path d="M120 78q5-2.8 10-1-3 3.8-8 4.6z" fill="url(#crossyFailBody)"/>
+            <path d="M30 76q2-5.6 8-6.4-1 4.6-5 7.2z" fill="url(#crossyFailBody)"/>
           </svg>
           <div class="crossy-fail-title">Gescheitert!</div>
           <div class="crossy-fail-sub" id="crossyFailSub"></div>
         </div>
       </div>
       <div class="crossy-message" id="crossyMessage"></div>
+      <div class="crossy-risk" id="crossyRisk" style="display:none;"></div>
     </div>
 
     <div class="crossy-panel">
@@ -6326,6 +6351,26 @@
     msg.textContent = text;
     msg.className = 'crossy-message' + (cls ? ' ' + cls : '');
   }
+
+  // Zeigt die tatsächliche Absturzchance der kommenden Spur + den Multiplikator
+  // bei Erfolg an — damit "Los" eine informierte Entscheidung ist, kein Blindklick.
+  function crossyUpdateRisk(){
+    const riskEl = document.getElementById('crossyRisk');
+    if(!riskEl) return;
+    if(!crossyState.running || crossyState.lane >= CROSSY_LANES){
+      riskEl.style.display = 'none';
+      return;
+    }
+    const crashArr = CROSSY_DIFFICULTIES[crossyState.difficulty].crash;
+    const mults = crossyMultiplierTable(crossyState.difficulty);
+    const chance = Math.round(crashArr[crossyState.lane] * 100);
+    const nextMult = mults[crossyState.lane];
+    riskEl.style.display = 'flex';
+    riskEl.innerHTML = `
+      <span class="crossy-risk-item danger">Absturzchance <b>${chance}%</b></span>
+      <span class="crossy-risk-item success">Bei Erfolg <b>${nextMult.toFixed(2)}×</b></span>
+    `;
+  }
   function crossyDelay(ms){ return new Promise(resolve => setTimeout(resolve, ms)); }
 
   // Lässt ein paar Federn an der Huhn-Position aufwirbeln — kleiner visueller
@@ -6366,6 +6411,8 @@
   function crossyResetUI(){
     document.getElementById('crossyChicken').classList.remove('hit', 'hop', 'flat');
     document.getElementById('crossyFailOverlay').classList.remove('show');
+    const riskEl = document.getElementById('crossyRisk');
+    if(riskEl) riskEl.style.display = 'none';
     crossyState.lane = 0;
     crossyState.busy = false;
     crossyMoveChickenTo(0);
@@ -6547,6 +6594,7 @@
     const payoutNow = Math.round(crossyState.bet * crossyState.multiplier);
     document.getElementById('crossyGoVal').textContent = crossyState.lane < CROSSY_LANES ? `(${mults[crossyState.lane].toFixed(2)}×)` : '';
     document.getElementById('crossyGiveupVal').textContent = `(${crossyState.multiplier.toFixed(2)}× · ${payoutNow.toLocaleString('de-DE')} Chips)`;
+    crossyUpdateRisk();
 
     crossyState.busy = false;
     if(crossyState.lane >= CROSSY_LANES){
@@ -6596,6 +6644,7 @@
     document.getElementById('crossyGiveupBtn').style.display = '';
     document.getElementById('crossyGiveupBtn').disabled = false;
     document.getElementById('crossyGiveupVal').textContent = '';
+    crossyUpdateRisk();
     document.getElementById('crossyBetInput').disabled = true;
     document.getElementById('crossyBetHalf').disabled = true;
     document.getElementById('crossyBetDouble').disabled = true;
