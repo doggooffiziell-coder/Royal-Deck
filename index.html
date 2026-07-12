@@ -1130,11 +1130,22 @@
     justify-content:center;flex-shrink:0;transition:.15s;
   }
   .dropdown .dd-menu div:hover .dd-icon-circle{background:var(--accent-soft);}
-  .dropdown .dd-menu div svg{width:13px;height:13px;}
+  .dropdown .dd-menu div svg{width:13px;height:13px;fill:var(--muted);transition:.15s;}
   .dropdown .dd-menu-divider{height:1px;background:var(--border);margin:5px 8px;}
+  .dropdown .dd-menu .dd-logout{color:var(--muted);font-weight:600;}
   .dropdown .dd-menu #logoutBtn:hover{color:var(--danger);}
   .dropdown .dd-menu #logoutBtn:hover .dd-icon-circle{background:rgba(193,68,60,.15);}
   .dropdown .dd-menu #logoutBtn:hover .dd-icon-circle svg{fill:var(--danger);}
+
+  /* Quick-Stats im User-Dropdown: Level + Chips auf einen Blick, ohne extra Klick */
+  .dropdown .dd-stats{
+    display:flex;align-items:center;margin:0 12px 8px;padding:10px 14px;border-radius:10px;
+    background:var(--surface-2);box-shadow:inset 0 0 0 1px rgba(212,175,106,.1);
+  }
+  .dropdown .dd-stat{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;}
+  .dropdown .dd-stat-val{font-family:var(--font-display);font-size:15px;font-weight:600;color:var(--accent-hi);line-height:1;}
+  .dropdown .dd-stat-label{font-size:9.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--faint);}
+  .dropdown .dd-stat-sep{width:1px;align-self:stretch;background:var(--border);margin:0 4px;}
 
   /* signed-out state inside notification / mail panels */
   .panel-loggedout{
@@ -1185,6 +1196,12 @@
   .sidebar-bottom:before{
     content:"";height:1px;background:var(--border-soft);margin:0 8px 8px;
   }
+  .sidebar-build-tag{
+    display:flex;align-items:center;gap:6px;padding:0 12px;height:26px;
+    font-family:var(--font-mono);font-size:9px;font-weight:600;letter-spacing:1px;
+    color:var(--faint);cursor:default;
+  }
+  .sbt-dot{width:5px;height:5px;border-radius:50%;background:var(--accent-dim);flex-shrink:0;}
 
   /* --------- maintenance screen --------- */
   #maintenanceScreen{
@@ -3234,11 +3251,14 @@
     <svg viewBox="0 0 24 24"><path d="M20 6h-2.2l-1.5-2H7.7L6.2 6H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm-8 12a5 5 0 110-10 5 5 0 010 10z"/></svg>
     <span>Belohnungen</span>
   </div>
+  <div class="nav-item" id="navSettings">
+    <svg viewBox="0 0 24 24"><path d="M19.4 13a7.9 7.9 0 000-2l2.1-1.6-2-3.4-2.5 1a8 8 0 00-1.7-1L14.9 3H9.1l-.4 2.9a8 8 0 00-1.7 1l-2.5-1-2 3.4L4.6 11a7.9 7.9 0 000 2l-2.1 1.6 2 3.4 2.5-1a8 8 0 001.7 1l.4 2.9h5.8l.4-2.9a8 8 0 001.7-1l2.5 1 2-3.4z"/></svg>
+    <span>Einstellungen</span>
+  </div>
 
   <div class="sidebar-bottom">
-    <div class="nav-item">
-      <svg viewBox="0 0 24 24"><path d="M19.4 13a7.9 7.9 0 000-2l2.1-1.6-2-3.4-2.5 1a8 8 0 00-1.7-1L14.9 3H9.1l-.4 2.9a8 8 0 00-1.7 1l-2.5-1-2 3.4L4.6 11a7.9 7.9 0 000 2l-2.1 1.6 2 3.4 2.5-1a8 8 0 001.7 1l.4 2.9h5.8l.4-2.9a8 8 0 001.7-1l2.5 1 2-3.4z"/></svg>
-      <span>Mehr</span>
+    <div class="sidebar-build-tag" title="Royal Deck befindet sich in der Alpha-Phase">
+      <span class="sbt-dot"></span>ALPHA · v0.1
     </div>
   </div>
 </div>
@@ -4872,6 +4892,12 @@
 
   document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', () => {
+      const clickedLabel = item.querySelector('span')?.textContent;
+      if(clickedLabel === 'Einstellungen'){
+        if(currentProfile){ openSettings(currentUserEmail); }
+        else { openModal('login'); }
+        return;
+      }
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
       item.classList.add('active');
       const label = item.querySelector('span')?.textContent;
@@ -8069,13 +8095,20 @@
               <div class="dd-handle" style="color:var(--accent-hi);font-size:11px;font-weight:600;">${profile.username ? '@' + profile.username : ''}</div>
             </div>
           </div>
-          <div class="dd-menu">
-            <div id="openSettingsBtn">
-              <div class="dd-icon-circle"><svg viewBox="0 0 24 24"><path d="M19.4 13a7.9 7.9 0 000-2l2.1-1.6-2-3.4-2.5 1a8 8 0 00-1.7-1L14.9 3H9.1l-.4 2.9a8 8 0 00-1.7 1l-2.5-1-2 3.4L4.6 11a7.9 7.9 0 000 2l-2.1 1.6 2 3.4 2.5-1a8 8 0 001.7 1l.4 2.9h5.8l.4-2.9a8 8 0 001.7-1l2.5 1 2-3.4z" fill="var(--accent-hi)"/></svg></div>
-              Einstellungen
+          <div class="dd-stats">
+            <div class="dd-stat">
+              <span class="dd-stat-val">${level}</span>
+              <span class="dd-stat-label">Level</span>
             </div>
-            <div id="logoutBtn">
-              <div class="dd-icon-circle"><svg viewBox="0 0 24 24"><path d="M16 13v-2H7V8l-5 4 5 4v-3zM20 3H10v2h10v14H10v2h10a2 2 0 002-2V5a2 2 0 00-2-2z" fill="var(--muted)"/></svg></div>
+            <div class="dd-stat-sep"></div>
+            <div class="dd-stat">
+              <span class="dd-stat-val">${chips.toLocaleString('de-DE')}</span>
+              <span class="dd-stat-label">Chips</span>
+            </div>
+          </div>
+          <div class="dd-menu">
+            <div id="logoutBtn" class="dd-logout">
+              <div class="dd-icon-circle"><svg viewBox="0 0 24 24"><path d="M16 13v-2H7V8l-5 4 5 4v-3zM20 3H10v2h10v14H10v2h10a2 2 0 002-2V5a2 2 0 00-2-2z"/></svg></div>
               Abmelden
             </div>
           </div>
@@ -8092,12 +8125,6 @@
     document.getElementById('logoutBtn').addEventListener('click', (e) => {
       e.stopPropagation();
       logout();
-    });
-    document.getElementById('openSettingsBtn').addEventListener('click', (e) => {
-      e.stopPropagation();
-      document.getElementById('dropdown').classList.remove('open');
-      document.getElementById('userChip').classList.remove('active');
-      openSettings(email);
     });
     document.addEventListener('click', function outside(e){
       if(!document.getElementById('userChip')?.contains(e.target)){
