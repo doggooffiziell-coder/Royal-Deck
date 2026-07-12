@@ -787,13 +787,27 @@
   .settings-tabnav .stab.active{color:var(--accent-hi);}
   .settings-tabnav .stab:hover{color:var(--text);}
 
-  .settings-tabnav .stab[data-spane="admin"]{
-    margin-left:auto;color:var(--danger);
-    background:rgba(239,107,107,.12);border:1px solid rgba(239,107,107,.22);
+  .settings-tabnav .stab[data-spane="admin"]{display:none;}
+
+  /* ---- fixed footer at the very bottom of settings, admin-only ---- */
+  .settings-admin-footer{
+    display:none;flex-shrink:0;padding:14px 32px;
+    border-top:1px solid rgba(239,107,107,.22);
+    background:linear-gradient(0deg, rgba(239,107,107,.07), transparent);
   }
-  .settings-tabnav .stab[data-spane="admin"] svg{fill:var(--danger);}
-  .settings-tabnav .stab[data-spane="admin"]:hover{background:rgba(239,107,107,.18);color:var(--danger);}
-  .settings-tabnav .stab[data-spane="admin"].active{background:rgba(239,107,107,.22);border-color:rgba(239,107,107,.4);color:#ffdada;}
+  .settings-admin-footer.show{display:flex;}
+  .settings-admin-footer .stab{
+    flex:1;justify-content:center;gap:9px;padding:12px 16px;border-radius:10px;
+    font-size:12.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;
+    color:var(--danger);background:rgba(239,107,107,.12);border:1px solid rgba(239,107,107,.22);
+    cursor:pointer;transition:.15s;
+  }
+  .settings-admin-footer .stab svg{width:14px;height:14px;fill:currentColor;}
+  .settings-admin-footer .stab:hover{background:rgba(239,107,107,.18);}
+  .settings-admin-footer .stab.active{
+    background:rgba(239,107,107,.24);border-color:rgba(239,107,107,.45);color:#ffdada;
+    box-shadow:0 0 0 1px rgba(239,107,107,.25),0 4px 16px -6px rgba(239,68,68,.55);
+  }
 
   /* ---- below: dashboard grid ---- */
   .settings-main{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;
@@ -4041,6 +4055,13 @@
 
             </div>
           </div>
+        </div>
+      </div>
+
+      <div class="settings-admin-footer" id="settingsAdminFooter">
+        <div class="stab" data-spane="admin">
+          <svg viewBox="0 0 24 24"><path d="M19.4 13a7.9 7.9 0 000-2l2.1-1.6-2-3.4-2.5 1a8 8 0 00-1.7-1L14.9 3H9.1l-.4 2.9a8 8 0 00-1.7 1l-2.5-1-2 3.4L4.6 11a7.9 7.9 0 000 2l-2.1 1.6 2 3.4 2.5-1a8 8 0 001.7 1l.4 2.9h5.8l.4-2.9a8 8 0 001.7-1l2.5 1 2-3.4z"/></svg>
+          Admin
         </div>
       </div>
       </div>
@@ -8785,21 +8806,9 @@
     updateProfileConsole();
     if(typeof renderSessionsList === 'function') renderSessionsList();
 
-    // Admin-Tab nur für Admin-Konten im Sicherheits-/Navigationsbereich einblenden
-    const adminTab = document.querySelector('.stab[data-spane="admin"]');
-    if(!adminTab && isAdmin){
-      const nav = document.querySelector('.settings-tabnav');
-      const tab = document.createElement('div');
-      tab.className = 'stab';
-      tab.dataset.spane = 'admin';
-      tab.innerHTML = `
-        <svg viewBox="0 0 24 24"><path d="M19.4 13a7.9 7.9 0 000-2l2.1-1.6-2-3.4-2.5 1a8 8 0 00-1.7-1L14.9 3H9.1l-.4 2.9a8 8 0 00-1.7 1l-2.5-1-2 3.4L4.6 11a7.9 7.9 0 000 2l-2.1 1.6 2 3.4 2.5-1a8 8 0 001.7 1l.4 2.9h5.8l.4-2.9a8 8 0 001.7-1l2.5 1 2-3.4z"/></svg>
-        Admin`;
-      tab.addEventListener('click', () => switchPane('admin'));
-      nav.appendChild(tab);
-    } else if(adminTab && !isAdmin){
-      adminTab.remove();
-    }
+    // Admin-Knopf nur für Admin-Konten einblenden — fest am unteren Rand der Einstellungen,
+    // getrennt von den horizontalen Kategorien oben.
+    document.getElementById('settingsAdminFooter')?.classList.toggle('show', !!isAdmin);
 
     if(isAdmin){
       maintenanceToggle.checked = maintenanceMode;
@@ -8931,7 +8940,7 @@
   }
   function switchPane(name){
     let activeTab = null;
-    document.querySelectorAll('.settings-tabnav .stab').forEach(t => {
+    document.querySelectorAll('.settings-tabnav .stab, .settings-admin-footer .stab').forEach(t => {
       const isActive = t.dataset.spane === name;
       t.classList.toggle('active', isActive);
       if(isActive) activeTab = t;
@@ -8941,7 +8950,7 @@
     if(label) label.textContent = spaneLabels[name] || name;
     positionStabHighlight(activeTab);
   }
-  document.querySelectorAll('.settings-tabnav .stab[data-spane]').forEach(t => {
+  document.querySelectorAll('.settings-tabnav .stab[data-spane], .settings-admin-footer .stab[data-spane]').forEach(t => {
     t.addEventListener('click', () => switchPane(t.dataset.spane));
   });
 
