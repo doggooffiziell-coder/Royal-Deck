@@ -787,26 +787,10 @@
   .settings-tabnav .stab.active{color:var(--accent-hi);}
   .settings-tabnav .stab:hover{color:var(--text);}
 
-  .settings-tabnav .stab[data-spane="admin"]{display:none;}
-
-  /* ---- fixed footer at the very bottom of settings, admin-only ---- */
-  .settings-admin-footer{
-    display:none;flex-shrink:0;padding:14px 32px;
-    border-top:1px solid rgba(239,107,107,.22);
-    background:linear-gradient(0deg, rgba(239,107,107,.07), transparent);
-  }
-  .settings-admin-footer.show{display:flex;}
-  .settings-admin-footer .stab{
-    flex:1;justify-content:center;gap:9px;padding:12px 16px;border-radius:10px;
-    font-size:12.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;
-    color:var(--danger);background:rgba(239,107,107,.12);border:1px solid rgba(239,107,107,.22);
-    cursor:pointer;transition:.15s;
-  }
-  .settings-admin-footer .stab svg{width:14px;height:14px;fill:currentColor;}
-  .settings-admin-footer .stab:hover{background:rgba(239,107,107,.18);}
-  .settings-admin-footer .stab.active{
-    background:rgba(239,107,107,.24);border-color:rgba(239,107,107,.45);color:#ffdada;
-    box-shadow:0 0 0 1px rgba(239,107,107,.25),0 4px 16px -6px rgba(239,68,68,.55);
+  /* ---- admin view: red-accented topbar icon (separate top-level view now) ---- */
+  .settings-topbar-icon.admin-accent{
+    color:var(--danger);border-color:rgba(239,107,107,.4);
+    box-shadow:0 0 0 2px rgba(239,107,107,.18);
   }
 
   /* ---- below: dashboard grid ---- */
@@ -1899,8 +1883,8 @@
   }
   body.settings-vol-muted .vol-mute-icon{fill:var(--danger);}
 
-  #pane-admin .wl-list{margin-top:12px;}
-  #pane-admin .wl-item{background:var(--surface-2);}
+  #adminView .wl-list{margin-top:12px;}
+  #adminView .wl-item{background:var(--surface-2);}
 
   @media (max-width:760px){
     .adm-grid-2{grid-template-columns:1fr;}
@@ -3904,188 +3888,198 @@
             </div>
           </div>
 
-          <!-- Admin pane (nur für Admin-Konten sichtbar) -->
-          <div class="settings-pane" id="pane-admin">
-            <div class="pane-heading">Admin</div>
-
-            <div class="adm-shell">
-
-              <!-- Live-Status-Konsole: zeigt auf einen Blick, was Spieler gerade sehen -->
-              <div class="adm-console" id="admStatusBar" data-mode="normal">
-                <div class="adm-console-grid"></div>
-                <div class="adm-console-dot"></div>
-                <div class="adm-console-text">
-                  <div class="adm-console-eyebrow">Live-Status</div>
-                  <div class="adm-console-label" id="admStatusLabel">Normaler Betrieb</div>
-                  <div class="adm-console-desc" id="admStatusDesc">Alle Spieler haben vollen Zugriff.</div>
-                </div>
-              </div>
-
-              <div class="adm-tabs" id="admTabs">
-                <div class="adm-tab active" data-adm-tab="status">Status</div>
-                <div class="adm-tab" data-adm-tab="chips">Chips</div>
-                <div class="adm-tab" data-adm-tab="whitelists">Whitelists</div>
-                <div class="adm-tab" data-adm-tab="alpha">Alpha Access</div>
-                <div class="adm-tab" data-adm-tab="admins">Adminzugriff</div>
-              </div>
-
-              <!-- ===== Reiter: Status ===== -->
-              <div class="adm-panel active" id="adm-panel-status">
-                <div class="adm-grid-2">
-                  <div class="adm-card" data-accent="gold">
-                    <div class="adm-card-head">
-                      <div class="adm-card-icon">
-                        <svg viewBox="0 0 24 24"><path d="M12 2l7 3v6c0 5-3.4 8.7-7 10-3.6-1.3-7-5-7-10V5z"/></svg>
-                      </div>
-                      <div class="adm-card-title">Wartungsmodus</div>
-                      <label class="switch">
-                        <input type="checkbox" id="maintenanceToggle">
-                        <span class="slider"></span>
-                      </label>
-                    </div>
-                    <p class="adm-card-note">Spieler ohne Whitelist-Berechtigung sehen den Wartungsbildschirm.</p>
-                    <div class="adm-card-foot">
-                      <button type="button" class="adm-ghost-btn" id="previewMaintenanceBtn">Vorschau ansehen</button>
-                      <div class="hint" id="maintenanceToggleHint"></div>
-                    </div>
-                  </div>
-
-                  <div class="adm-card" data-accent="gold">
-                    <div class="adm-card-head">
-                      <div class="adm-card-icon">
-                        <svg viewBox="0 0 24 24"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5m0 2h14v2H5v-2z"/></svg>
-                      </div>
-                      <div class="adm-card-title">Coming-Soon-Modus</div>
-                      <label class="switch">
-                        <input type="checkbox" id="comingSoonToggle">
-                        <span class="slider"></span>
-                      </label>
-                    </div>
-                    <p class="adm-card-note">Alle außer Admins sehen den "Royal Deck launcht bald…"-Bildschirm.</p>
-                    <div class="adm-card-foot">
-                      <button type="button" class="adm-ghost-btn" id="previewComingSoonBtn">Vorschau ansehen</button>
-                      <div class="hint" id="comingSoonToggleHint"></div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="adm-card wide" data-accent="gold" style="margin-top:14px;">
-                  <div class="adm-card-head">
-                    <div class="adm-card-icon">
-                      <svg viewBox="0 0 24 24"><path d="M12 4l1.4 1.4L8.8 10H20v2H8.8l4.6 4.6L12 18l-8-8z"/></svg>
-                    </div>
-                    <div class="adm-card-title">Update-Screen erzwingen</div>
-                  </div>
-                  <p class="adm-card-note">Zeigt allen gerade verbundenen Nutzern außer Admins sofort den "Neue Version verfügbar"-Screen an — unabhängig vom automatischen Deploy-Check.</p>
-                  <div class="adm-card-foot">
-                    <button type="button" class="adm-ghost-btn" id="forceUpdateBtn">Jetzt an alle senden</button>
-                    <div class="hint" id="forceUpdateHint"></div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- ===== Reiter: Whitelists ===== -->
-              <div class="adm-panel" id="adm-panel-whitelists">
-                <div class="adm-grid-2">
-                  <div class="adm-card" data-accent="muted">
-                    <div class="adm-card-head">
-                      <div class="adm-card-icon">
-                        <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5zm-7 19c0-3.9 3.1-7 7-7s7 3.1 7 7z"/></svg>
-                      </div>
-                      <div class="adm-card-title">Whitelist – Wartung</div>
-                    </div>
-                    <p class="adm-card-note">Kommen während des Wartungsmodus trotzdem rein.</p>
-                    <div class="wl-add-row">
-                      <input id="wlEmailInput" type="email" placeholder="z. B. name@mail.com">
-                      <button type="button" id="wlAddBtn">Hinzufügen</button>
-                    </div>
-                    <div class="hint" id="wlHint"></div>
-                    <div class="wl-list" id="wlList"></div>
-                  </div>
-
-                  <div class="adm-card" data-accent="muted">
-                    <div class="adm-card-head">
-                      <div class="adm-card-icon">
-                        <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5zm-7 19c0-3.9 3.1-7 7-7s7 3.1 7 7z"/></svg>
-                      </div>
-                      <div class="adm-card-title">Whitelist – Coming Soon</div>
-                    </div>
-                    <p class="adm-card-note">Kommen während des Coming-Soon-Modus trotzdem rein.</p>
-                    <div class="wl-add-row">
-                      <input id="wlEmailInputSoon" type="email" placeholder="z. B. name@mail.com">
-                      <button type="button" id="wlAddBtnSoon">Hinzufügen</button>
-                    </div>
-                    <div class="hint" id="wlHintSoon"></div>
-                    <div class="wl-list" id="wlListSoon"></div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- ===== Reiter: Alpha Access ===== -->
-              <div class="adm-panel" id="adm-panel-alpha">
-                <div class="adm-card wide" data-accent="gold">
-                  <div class="adm-card-head">
-                    <div class="adm-card-icon">
-                      <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>
-                    </div>
-                    <div class="adm-card-title">Alpha-Zugriff – Anfragen</div>
-                  </div>
-                  <p class="adm-card-note">Spieler, die auf dem Coming-Soon-Bildschirm Alpha-Zugriff angefordert haben. „Aktivieren“ schaltet die E-Mail-Adresse automatisch für den Coming-Soon-Modus frei (Eintrag in der Coming-Soon-Whitelist).</p>
-                  <div class="hint" id="alphaReqHint"></div>
-                  <div class="wl-list" id="alphaReqList"></div>
-                </div>
-              </div>
-
-              <!-- ===== Reiter: Chips ===== -->
-              <div class="adm-panel" id="adm-panel-chips">
-                <div class="adm-card wide" data-accent="gold">
-                  <div class="adm-card-head">
-                    <div class="adm-card-icon">
-                      <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>
-                    </div>
-                    <div class="adm-card-title">Chips verwalten</div>
-                  </div>
-                  <p class="adm-card-note">Suche einen Spieler über den Benutzernamen und passe seinen Chip-Stand an. Funktioniert auch für dein eigenes Konto — Änderungen wirken sofort.</p>
-                  <div class="wl-add-row">
-                    <input id="chipSearchInput" type="text" placeholder="Benutzername suchen…">
-                    <button type="button" id="chipSearchBtn">Suchen</button>
-                  </div>
-                  <div class="hint" id="chipSearchHint"></div>
-                  <button type="button" class="adm-ghost-btn" id="chipSelfBtn" style="margin-top:10px;">Meinen eigenen Account bearbeiten</button>
-                  <div id="chipSearchResults" class="chipadm-list"></div>
-                </div>
-              </div>
-
-              <!-- ===== Reiter: Adminzugriff ===== -->
-              <div class="adm-panel" id="adm-panel-admins">
-                <div class="adm-card wide" data-accent="danger">
-                  <div class="adm-card-head">
-                    <div class="adm-card-icon danger">
-                      <svg viewBox="0 0 24 24"><path d="M19.4 13a7.9 7.9 0 000-2l2.1-1.6-2-3.4-2.5 1a8 8 0 00-1.7-1L14.9 3H9.1l-.4 2.9a8 8 0 00-1.7 1l-2.5-1-2 3.4L4.6 11a7.9 7.9 0 000 2l-2.1 1.6 2 3.4 2.5-1a8 8 0 001.7 1l.4 2.9h5.8l.4-2.9a8 8 0 001.7-1l2.5 1 2-3.4z"/></svg>
-                    </div>
-                    <div class="adm-card-title">Admin-Zugriff verwalten</div>
-                  </div>
-                  <p class="adm-card-note">Nutzername oder E-Mail eingeben, um Admin-Rechte zu vergeben. Der Haupt-Admin kann nicht entfernt werden.</p>
-                  <div class="wl-add-row">
-                    <input id="adminIdentifierInput" type="text" placeholder="Benutzername oder E-Mail">
-                    <button type="button" id="adminAddBtn">Hinzufügen</button>
-                  </div>
-                  <div class="hint" id="adminHint"></div>
-                  <div class="wl-list" id="adminList"></div>
-                </div>
-              </div>
-
-            </div>
+          <!-- Admin-Bereich ist jetzt eine eigene Ansicht, siehe #adminView weiter unten -->
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+  <div class="content" id="adminView" style="display:none;">
+    <div class="settings-page">
+      <div class="settings-topbar">
+        <div class="settings-topbar-title">
+          <div class="settings-topbar-icon admin-accent">
+            <svg viewBox="0 0 24 24"><path d="M19.4 13a7.9 7.9 0 000-2l2.1-1.6-2-3.4-2.5 1a8 8 0 00-1.7-1L14.9 3H9.1l-.4 2.9a8 8 0 00-1.7 1l-2.5-1-2 3.4L4.6 11a7.9 7.9 0 000 2l-2.1 1.6 2 3.4 2.5-1a8 8 0 001.7 1l.4 2.9h5.8l.4-2.9a8 8 0 001.7-1l2.5 1 2-3.4z"/></svg>
+          </div>
+          <div>
+            <div class="settings-topbar-heading">Admin-Bereich</div>
+            <div class="settings-topbar-sub">Verwaltung &amp; Kontrolle</div>
           </div>
         </div>
       </div>
-
-      <div class="settings-admin-footer" id="settingsAdminFooter">
-        <div class="stab" data-spane="admin">
-          <svg viewBox="0 0 24 24"><path d="M19.4 13a7.9 7.9 0 000-2l2.1-1.6-2-3.4-2.5 1a8 8 0 00-1.7-1L14.9 3H9.1l-.4 2.9a8 8 0 00-1.7 1l-2.5-1-2 3.4L4.6 11a7.9 7.9 0 000 2l-2.1 1.6 2 3.4 2.5-1a8 8 0 001.7 1l.4 2.9h5.8l.4-2.9a8 8 0 001.7-1l2.5 1 2-3.4z"/></svg>
-          Admin
+      <div class="settings-body-wrap">
+        <div class="settings-main" style="width:100%;">
+          <div class="settings-body">
+              <div class="adm-shell">
+  
+                <!-- Live-Status-Konsole: zeigt auf einen Blick, was Spieler gerade sehen -->
+                <div class="adm-console" id="admStatusBar" data-mode="normal">
+                  <div class="adm-console-grid"></div>
+                  <div class="adm-console-dot"></div>
+                  <div class="adm-console-text">
+                    <div class="adm-console-eyebrow">Live-Status</div>
+                    <div class="adm-console-label" id="admStatusLabel">Normaler Betrieb</div>
+                    <div class="adm-console-desc" id="admStatusDesc">Alle Spieler haben vollen Zugriff.</div>
+                  </div>
+                </div>
+  
+                <div class="adm-tabs" id="admTabs">
+                  <div class="adm-tab active" data-adm-tab="status">Status</div>
+                  <div class="adm-tab" data-adm-tab="chips">Chips</div>
+                  <div class="adm-tab" data-adm-tab="whitelists">Whitelists</div>
+                  <div class="adm-tab" data-adm-tab="alpha">Alpha Access</div>
+                  <div class="adm-tab" data-adm-tab="admins">Adminzugriff</div>
+                </div>
+  
+                <!-- ===== Reiter: Status ===== -->
+                <div class="adm-panel active" id="adm-panel-status">
+                  <div class="adm-grid-2">
+                    <div class="adm-card" data-accent="gold">
+                      <div class="adm-card-head">
+                        <div class="adm-card-icon">
+                          <svg viewBox="0 0 24 24"><path d="M12 2l7 3v6c0 5-3.4 8.7-7 10-3.6-1.3-7-5-7-10V5z"/></svg>
+                        </div>
+                        <div class="adm-card-title">Wartungsmodus</div>
+                        <label class="switch">
+                          <input type="checkbox" id="maintenanceToggle">
+                          <span class="slider"></span>
+                        </label>
+                      </div>
+                      <p class="adm-card-note">Spieler ohne Whitelist-Berechtigung sehen den Wartungsbildschirm.</p>
+                      <div class="adm-card-foot">
+                        <button type="button" class="adm-ghost-btn" id="previewMaintenanceBtn">Vorschau ansehen</button>
+                        <div class="hint" id="maintenanceToggleHint"></div>
+                      </div>
+                    </div>
+  
+                    <div class="adm-card" data-accent="gold">
+                      <div class="adm-card-head">
+                        <div class="adm-card-icon">
+                          <svg viewBox="0 0 24 24"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5m0 2h14v2H5v-2z"/></svg>
+                        </div>
+                        <div class="adm-card-title">Coming-Soon-Modus</div>
+                        <label class="switch">
+                          <input type="checkbox" id="comingSoonToggle">
+                          <span class="slider"></span>
+                        </label>
+                      </div>
+                      <p class="adm-card-note">Alle außer Admins sehen den "Royal Deck launcht bald…"-Bildschirm.</p>
+                      <div class="adm-card-foot">
+                        <button type="button" class="adm-ghost-btn" id="previewComingSoonBtn">Vorschau ansehen</button>
+                        <div class="hint" id="comingSoonToggleHint"></div>
+                      </div>
+                    </div>
+                  </div>
+  
+                  <div class="adm-card wide" data-accent="gold" style="margin-top:14px;">
+                    <div class="adm-card-head">
+                      <div class="adm-card-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 4l1.4 1.4L8.8 10H20v2H8.8l4.6 4.6L12 18l-8-8z"/></svg>
+                      </div>
+                      <div class="adm-card-title">Update-Screen erzwingen</div>
+                    </div>
+                    <p class="adm-card-note">Zeigt allen gerade verbundenen Nutzern außer Admins sofort den "Neue Version verfügbar"-Screen an — unabhängig vom automatischen Deploy-Check.</p>
+                    <div class="adm-card-foot">
+                      <button type="button" class="adm-ghost-btn" id="forceUpdateBtn">Jetzt an alle senden</button>
+                      <div class="hint" id="forceUpdateHint"></div>
+                    </div>
+                  </div>
+                </div>
+  
+                <!-- ===== Reiter: Whitelists ===== -->
+                <div class="adm-panel" id="adm-panel-whitelists">
+                  <div class="adm-grid-2">
+                    <div class="adm-card" data-accent="muted">
+                      <div class="adm-card-head">
+                        <div class="adm-card-icon">
+                          <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5zm-7 19c0-3.9 3.1-7 7-7s7 3.1 7 7z"/></svg>
+                        </div>
+                        <div class="adm-card-title">Whitelist – Wartung</div>
+                      </div>
+                      <p class="adm-card-note">Kommen während des Wartungsmodus trotzdem rein.</p>
+                      <div class="wl-add-row">
+                        <input id="wlEmailInput" type="email" placeholder="z. B. name@mail.com">
+                        <button type="button" id="wlAddBtn">Hinzufügen</button>
+                      </div>
+                      <div class="hint" id="wlHint"></div>
+                      <div class="wl-list" id="wlList"></div>
+                    </div>
+  
+                    <div class="adm-card" data-accent="muted">
+                      <div class="adm-card-head">
+                        <div class="adm-card-icon">
+                          <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5zm-7 19c0-3.9 3.1-7 7-7s7 3.1 7 7z"/></svg>
+                        </div>
+                        <div class="adm-card-title">Whitelist – Coming Soon</div>
+                      </div>
+                      <p class="adm-card-note">Kommen während des Coming-Soon-Modus trotzdem rein.</p>
+                      <div class="wl-add-row">
+                        <input id="wlEmailInputSoon" type="email" placeholder="z. B. name@mail.com">
+                        <button type="button" id="wlAddBtnSoon">Hinzufügen</button>
+                      </div>
+                      <div class="hint" id="wlHintSoon"></div>
+                      <div class="wl-list" id="wlListSoon"></div>
+                    </div>
+                  </div>
+                </div>
+  
+                <!-- ===== Reiter: Alpha Access ===== -->
+                <div class="adm-panel" id="adm-panel-alpha">
+                  <div class="adm-card wide" data-accent="gold">
+                    <div class="adm-card-head">
+                      <div class="adm-card-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>
+                      </div>
+                      <div class="adm-card-title">Alpha-Zugriff – Anfragen</div>
+                    </div>
+                    <p class="adm-card-note">Spieler, die auf dem Coming-Soon-Bildschirm Alpha-Zugriff angefordert haben. „Aktivieren“ schaltet die E-Mail-Adresse automatisch für den Coming-Soon-Modus frei (Eintrag in der Coming-Soon-Whitelist).</p>
+                    <div class="hint" id="alphaReqHint"></div>
+                    <div class="wl-list" id="alphaReqList"></div>
+                  </div>
+                </div>
+  
+                <!-- ===== Reiter: Chips ===== -->
+                <div class="adm-panel" id="adm-panel-chips">
+                  <div class="adm-card wide" data-accent="gold">
+                    <div class="adm-card-head">
+                      <div class="adm-card-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>
+                      </div>
+                      <div class="adm-card-title">Chips verwalten</div>
+                    </div>
+                    <p class="adm-card-note">Suche einen Spieler über den Benutzernamen und passe seinen Chip-Stand an. Funktioniert auch für dein eigenes Konto — Änderungen wirken sofort.</p>
+                    <div class="wl-add-row">
+                      <input id="chipSearchInput" type="text" placeholder="Benutzername suchen…">
+                      <button type="button" id="chipSearchBtn">Suchen</button>
+                    </div>
+                    <div class="hint" id="chipSearchHint"></div>
+                    <button type="button" class="adm-ghost-btn" id="chipSelfBtn" style="margin-top:10px;">Meinen eigenen Account bearbeiten</button>
+                    <div id="chipSearchResults" class="chipadm-list"></div>
+                  </div>
+                </div>
+  
+                <!-- ===== Reiter: Adminzugriff ===== -->
+                <div class="adm-panel" id="adm-panel-admins">
+                  <div class="adm-card wide" data-accent="danger">
+                    <div class="adm-card-head">
+                      <div class="adm-card-icon danger">
+                        <svg viewBox="0 0 24 24"><path d="M19.4 13a7.9 7.9 0 000-2l2.1-1.6-2-3.4-2.5 1a8 8 0 00-1.7-1L14.9 3H9.1l-.4 2.9a8 8 0 00-1.7 1l-2.5-1-2 3.4L4.6 11a7.9 7.9 0 000 2l-2.1 1.6 2 3.4 2.5-1a8 8 0 001.7 1l.4 2.9h5.8l.4-2.9a8 8 0 001.7-1l2.5 1 2-3.4z"/></svg>
+                      </div>
+                      <div class="adm-card-title">Admin-Zugriff verwalten</div>
+                    </div>
+                    <p class="adm-card-note">Nutzername oder E-Mail eingeben, um Admin-Rechte zu vergeben. Der Haupt-Admin kann nicht entfernt werden.</p>
+                    <div class="wl-add-row">
+                      <input id="adminIdentifierInput" type="text" placeholder="Benutzername oder E-Mail">
+                      <button type="button" id="adminAddBtn">Hinzufügen</button>
+                    </div>
+                    <div class="hint" id="adminHint"></div>
+                    <div class="wl-list" id="adminList"></div>
+                  </div>
+                </div>
+  
+              </div>
+          </div>
         </div>
-      </div>
       </div>
     </div>
   </div>
@@ -4846,6 +4840,7 @@
       chat: document.getElementById('chatView'),
       leaderboard: document.getElementById('leaderboardView'),
       settings: document.getElementById('settingsView'),
+      admin: document.getElementById('adminView'),
     };
     const target = views[view] ? view : 'home';
     Object.entries(views).forEach(([name, el]) => {
@@ -4894,7 +4889,7 @@
     item.addEventListener('click', () => {
       const clickedLabel = item.querySelector('span')?.textContent;
       if(clickedLabel === 'Admin'){
-        if(currentProfile && isAdmin){ openSettings(currentUserEmail); switchPane('admin'); }
+        if(currentProfile && isAdmin){ openAdminView(); }
         else if(!currentProfile){ openModal('login'); }
         return;
       }
@@ -8836,22 +8831,6 @@
     updateProfileConsole();
     if(typeof renderSessionsList === 'function') renderSessionsList();
 
-    // Admin-Knopf nur für Admin-Konten einblenden — fest am unteren Rand der Einstellungen,
-    // getrennt von den horizontalen Kategorien oben.
-    document.getElementById('settingsAdminFooter')?.classList.toggle('show', !!isAdmin);
-
-    if(isAdmin){
-      maintenanceToggle.checked = maintenanceMode;
-      document.getElementById('maintenanceToggleHint').textContent = '';
-      comingSoonToggle.checked = comingSoonMode;
-      document.getElementById('comingSoonToggleHint').textContent = '';
-      updateAdminStatusConsole();
-      loadWhitelist();
-      loadComingSoonWhitelist();
-      loadAlphaAccessRequests();
-      loadAdminList();
-    }
-
     document.querySelectorAll('#settingsGenderSelect .gender-opt').forEach(o => {
       o.classList.toggle('selected', currentProfile && o.dataset.gender === currentProfile.gender);
     });
@@ -8956,21 +8935,17 @@
 
   document.getElementById('closeSettings')?.addEventListener('click', closeSettingsView);
 
-  const spaneLabels = { profile: 'Profil', notifications: 'Benachrichtigungen', privacy: 'Privatsphäre', appearance: 'Darstellung', volume: 'Lautstärke', security: 'Sicherheit', admin: 'Admin' };
+  const spaneLabels = { profile: 'Profil', notifications: 'Benachrichtigungen', privacy: 'Privatsphäre', appearance: 'Darstellung', volume: 'Lautstärke', security: 'Sicherheit' };
   function positionStabHighlight(activeEl){
     const hl = document.getElementById('stabHighlight');
     if(!hl || !activeEl) return;
-    if(activeEl.dataset.spane === 'admin'){
-      hl.style.opacity = '0';
-      return;
-    }
     hl.style.opacity = '1';
     hl.style.width = activeEl.offsetWidth + 'px';
     hl.style.transform = `translateX(${activeEl.offsetLeft}px)`;
   }
   function switchPane(name){
     let activeTab = null;
-    document.querySelectorAll('.settings-tabnav .stab, .settings-admin-footer .stab').forEach(t => {
+    document.querySelectorAll('.settings-tabnav .stab').forEach(t => {
       const isActive = t.dataset.spane === name;
       t.classList.toggle('active', isActive);
       if(isActive) activeTab = t;
@@ -8979,13 +8954,27 @@
     const label = document.getElementById('settingsPaneLabel');
     if(label) label.textContent = spaneLabels[name] || name;
     positionStabHighlight(activeTab);
-    // Sidebar: Admin-Pane hebt den permanenten Admin-Knopf hervor statt "Einstellungen".
-    document.getElementById('navSettings')?.classList.toggle('active', name !== 'admin');
-    document.getElementById('navAdmin')?.classList.toggle('active', name === 'admin');
   }
-  document.querySelectorAll('.settings-tabnav .stab[data-spane], .settings-admin-footer .stab[data-spane]').forEach(t => {
+  document.querySelectorAll('.settings-tabnav .stab[data-spane]').forEach(t => {
     t.addEventListener('click', () => switchPane(t.dataset.spane));
   });
+
+  // ---- Eigenständige Admin-Ansicht (separat von den Kontoeinstellungen) ----
+  function openAdminView(){
+    if(!isAdmin) return;
+    maintenanceToggle.checked = maintenanceMode;
+    document.getElementById('maintenanceToggleHint').textContent = '';
+    comingSoonToggle.checked = comingSoonMode;
+    document.getElementById('comingSoonToggleHint').textContent = '';
+    updateAdminStatusConsole();
+    loadWhitelist();
+    loadComingSoonWhitelist();
+    loadAlphaAccessRequests();
+    loadAdminList();
+    switchMainView('admin');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('navAdmin')?.classList.add('active');
+  }
 
   // ============================================================
   // --- Zusätzliche Einstellungen: Benachrichtigungen, Privatsphäre,
