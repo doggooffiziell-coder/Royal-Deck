@@ -164,11 +164,12 @@
   .search input:focus{border-color:var(--accent-dim);box-shadow:0 0 0 3px var(--accent-soft);}
   .search svg{position:absolute;left:13px;top:10.5px;width:15px;height:15px;fill:var(--faint);}
 
-  .top-right{margin-left:auto;display:flex;align-items:center;}
+  .top-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
 
-  /* --- HUD-Rail: alles oben rechts in einer durchgehenden Glas-Leiste,
-     getrennt durch feine Gold-Trennlinien statt einzelner Boxen --- */
-  .hud-rail{
+  /* --- HUD-Cluster: zwei getrennte Glas-Pillen statt einer durchgehenden
+     Leiste — links Utility (Level/Chips + Icons), rechts Identität (Nutzer).
+     Die Trennung macht auf einen Blick klar: das eine ist Status, das andere bist du. --- */
+  .hud-cluster{
     display:flex;align-items:stretch;gap:0;padding:5px;border-radius:18px;
     background:linear-gradient(180deg,rgba(24,40,30,.85),rgba(10,18,14,.92));
     border:1px solid var(--border-soft);
@@ -201,15 +202,15 @@
   .points-chip .chip-points{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);font-family:var(--font-mono);letter-spacing:.2px;}
   .points-chip .chip-points svg{width:10px;height:10px;fill:var(--accent-dim);flex-shrink:0;}
 
-  .hud-rail .icon-btn-wrap{display:flex;}
-  .hud-rail .icon-btn{
+  .hud-cluster .icon-btn-wrap{display:flex;}
+  .hud-cluster .icon-btn{
     width:40px;height:40px;border-radius:12px;background:transparent;display:flex;align-items:center;
     justify-content:center;cursor:pointer;color:var(--muted);position:relative;transition:.16s;
     border:1px solid transparent;margin:auto;
   }
-  .hud-rail .icon-btn:hover{color:var(--accent-hi);background:rgba(212,175,106,.08);border-color:rgba(212,175,106,.22);}
-  .hud-rail .icon-btn:active{transform:scale(.92);}
-  .hud-rail .icon-btn.active{
+  .hud-cluster .icon-btn:hover{color:var(--accent-hi);background:rgba(212,175,106,.08);border-color:rgba(212,175,106,.22);}
+  .hud-cluster .icon-btn:active{transform:scale(.92);}
+  .hud-cluster .icon-btn.active{
     color:var(--accent-hi);background:rgba(212,175,106,.13);border-color:rgba(212,175,106,.4);
     box-shadow:0 0 0 3px rgba(212,175,106,.1),inset 0 0 0 1px rgba(212,175,106,.15);
   }
@@ -664,24 +665,23 @@
   }
   .overlay.open .modal{animation:modalIn .22s cubic-bezier(.16,1,.3,1);}
 
-  .modal.settings{
-    width:min(1120px,94vw);height:min(760px,88vh);padding:0;overflow:hidden;
-    border:1px solid var(--border);
+  #settingsView{padding:0;overflow:hidden;display:flex;}
+  .settings-page{
+    width:100%;height:100%;padding:0;overflow:hidden;
+    border:none;
     background:var(--panel);
-    box-shadow:0 40px 100px rgba(0,0,0,.7), inset 0 0 0 1px rgba(212,175,106,.05);
     display:flex;flex-direction:column;
-    border-radius:18px;
     contain:layout style paint;transform:translateZ(0);
   }
-  .modal.settings:before{display:none;}
 
-  /* ---- top bar: context + close ---- */
+  /* ---- top bar: context + back ---- */
   .settings-topbar{
     display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
-    padding:18px 24px;border-bottom:1px solid var(--border-soft);
+    padding:18px 28px;border-bottom:1px solid var(--border-soft);
     background:linear-gradient(180deg,var(--panel),rgba(14,26,20,.5));
   }
-  .settings-topbar-title{display:flex;align-items:center;gap:13px;}
+  .settings-topbar-title{display:flex;align-items:center;gap:14px;}
+  .settings-topbar .bj-back{margin-right:2px;}
   .settings-topbar-icon{
     width:38px;height:38px;border-radius:50%;
     background:radial-gradient(circle at 32% 28%,var(--felt-hi),var(--felt) 65%,#081911);
@@ -692,7 +692,6 @@
   .settings-topbar-icon svg{width:16px;height:16px;fill:currentColor;}
   .settings-topbar-heading{font-family:var(--font-display);font-style:italic;font-size:15.5px;font-weight:600;color:var(--text);letter-spacing:-.1px;}
   .settings-topbar-sub{font-size:11px;color:var(--muted);margin-top:1px;}
-  .settings-topbar .close{position:static;}
 
   .settings-body-wrap{flex:1;display:flex;min-height:0;}
 
@@ -819,7 +818,6 @@
   .lux-card .card-title svg{width:12px;height:12px;fill:var(--accent-hi);}
 
   @media (max-width:760px){
-    .modal.settings{width:100vw;height:100vh;border-radius:0;}
     .settings-body-wrap{flex-direction:column;}
     .settings-rail{width:100%;flex-direction:row;flex-wrap:wrap;padding:18px 20px;border-right:none;border-bottom:1px solid var(--border);}
     .rail-avatar-wrap{margin:0;}
@@ -915,12 +913,20 @@
   }
   .lux-card button.submit.ghost:hover{box-shadow:inset 0 0 0 1px var(--accent-dim);background:var(--surface-2);}
 
-  /* Logged-in state in topbar */
-  .user-chip{display:flex;align-items:center;gap:8px;cursor:pointer;position:relative;padding:4px 10px 4px 4px;border-radius:14px;transition:.16s;}
-  .user-chip:hover{background:rgba(212,175,106,.07);}
+  /* Logged-in state in topbar — eigene "Identitäts-Pille", optisch abgesetzt
+     vom Utility-Cluster (Level/Chips/Icons): dezente Goldkontur, weil es hier
+     um "dich" geht statt um Status-Werte. */
+  .user-chip{
+    display:flex;align-items:center;gap:9px;cursor:pointer;position:relative;
+    padding:6px 14px 6px 6px;border-radius:16px;transition:.16s;
+    background:linear-gradient(180deg,rgba(24,40,30,.85),rgba(10,18,14,.92));
+    border:1px solid var(--border-soft);
+    box-shadow:inset 0 0 0 1px rgba(212,175,106,.06),inset 0 1px 0 rgba(255,255,255,.03),0 10px 26px rgba(0,0,0,.4);
+  }
+  .user-chip:hover{border-color:rgba(212,175,106,.28);box-shadow:inset 0 0 0 1px rgba(212,175,106,.14),0 10px 26px rgba(0,0,0,.4);}
   .user-chip:active{transform:scale(.97);}
   .user-chip.active:active{transform:none;}
-  .user-chip.active{background:rgba(212,175,106,.1);box-shadow:inset 0 0 0 1px rgba(212,175,106,.22);}
+  .user-chip.active{border-color:rgba(212,175,106,.4);box-shadow:inset 0 0 0 1px rgba(212,175,106,.22),0 0 0 3px rgba(212,175,106,.08);}
   .user-chip.active .caret{fill:var(--accent-hi);transform:rotate(180deg);}
   .user-chip .avatar{
     display:flex;align-items:center;justify-content:center;color:var(--accent-ink);font-weight:700;font-size:13px;flex-shrink:0;
@@ -941,9 +947,9 @@
   .admin-access-tag svg{width:8px;height:8px;fill:var(--accent-ink);flex-shrink:0;}
   .dd-info .admin-access-tag{margin:4px 0 5px;}
   .dropdown{
-    position:absolute;top:48px;right:0;background:var(--surface);border:1px solid rgba(212,175,106,.22);border-radius:12px;
-    box-shadow:0 16px 40px rgba(0,0,0,.55),0 0 0 1px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.03);
-    min-width:230px;display:none;overflow:hidden;z-index:50;
+    position:absolute;top:54px;right:0;background:var(--surface);border:1px solid rgba(212,175,106,.22);border-radius:15px;
+    box-shadow:0 20px 46px rgba(0,0,0,.55),0 0 0 1px rgba(0,0,0,.2),0 0 32px -12px rgba(212,175,106,.18),inset 0 1px 0 rgba(255,255,255,.03);
+    min-width:250px;display:none;overflow:hidden;z-index:50;
     max-width:calc(100vw - 32px);max-height:calc(100vh - 90px);
   }
   .dropdown.open{display:block;animation:ddPop .16s cubic-bezier(.2,.9,.3,1) both;}
@@ -951,7 +957,7 @@
   /* kleiner Zeiger, der optisch zurück auf den Auslöser-Knopf verweist —
      macht klar, dass das Panel zum Button gehört statt beliebig über der Seite zu schweben */
   .dropdown:before{
-    content:"";position:absolute;top:-6px;right:16px;width:11px;height:11px;
+    content:"";position:absolute;top:-6px;right:20px;width:11px;height:11px;
     background:var(--surface);border-left:1px solid rgba(212,175,106,.22);border-top:1px solid rgba(212,175,106,.22);
     transform:rotate(45deg);border-radius:2px 0 0 0;
   }
@@ -1115,37 +1121,29 @@
 
   /* user-chip dropdown header */
   .dropdown .dd-head{
-    display:flex;align-items:center;gap:11px;padding:15px 15px 14px;
-    background:linear-gradient(180deg,rgba(212,175,106,.06),transparent);
+    display:flex;align-items:center;gap:12px;padding:17px 16px 15px;
+    background:linear-gradient(180deg,rgba(212,175,106,.07),transparent);
   }
   .dropdown .dd-head .avatar{display:flex;align-items:center;
     justify-content:center;color:var(--accent-ink);font-weight:700;font-size:15px;flex-shrink:0;}
   .dropdown .dd-head .avatar-ring{width:46px;height:46px;border-radius:13px;}
   .dropdown .dd-info{min-width:0;flex:1;}
-  .dropdown .dd-name{font-size:13.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--font-display);}
-  .dropdown .dd-menu{padding:6px;}
-  .dropdown .dd-menu div{border-radius:9px;padding:8px 10px;gap:11px;}
-  .dropdown .dd-menu .dd-icon-circle{
-    width:26px;height:26px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;
-    justify-content:center;flex-shrink:0;transition:.15s;
-  }
-  .dropdown .dd-menu div:hover .dd-icon-circle{background:var(--accent-soft);}
-  .dropdown .dd-menu div svg{width:13px;height:13px;fill:var(--muted);transition:.15s;}
-  .dropdown .dd-menu-divider{height:1px;background:var(--border);margin:5px 8px;}
-  .dropdown .dd-menu .dd-logout{color:var(--muted);font-weight:600;}
-  .dropdown .dd-menu #logoutBtn:hover{color:var(--danger);}
-  .dropdown .dd-menu #logoutBtn:hover .dd-icon-circle{background:rgba(193,68,60,.15);}
-  .dropdown .dd-menu #logoutBtn:hover .dd-icon-circle svg{fill:var(--danger);}
+  .dropdown .dd-name{font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--font-display);}
+  .dropdown .dd-menu-divider{height:1px;background:var(--border);margin:0 8px;}
+  .dropdown .dd-menu{padding:8px;}
 
-  /* Quick-Stats im User-Dropdown: Level + Chips auf einen Blick, ohne extra Klick */
-  .dropdown .dd-stats{
-    display:flex;align-items:center;margin:0 12px 8px;padding:10px 14px;border-radius:10px;
-    background:var(--surface-2);box-shadow:inset 0 0 0 1px rgba(212,175,106,.1);
+  /* einziger Menüpunkt, der übrig bleibt (Einstellungen wohnt jetzt in der
+     Sidebar) — deshalb als klarer, eigenständiger Button statt Listenzeile */
+  .dropdown .dd-logout-btn{
+    width:100%;display:flex;align-items:center;justify-content:center;gap:9px;
+    padding:11px 14px;border-radius:10px;border:1px solid var(--border);
+    background:var(--surface-2);color:var(--muted);font-size:13px;font-weight:600;
+    font-family:var(--font-body);cursor:pointer;transition:.15s;
   }
-  .dropdown .dd-stat{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;}
-  .dropdown .dd-stat-val{font-family:var(--font-display);font-size:15px;font-weight:600;color:var(--accent-hi);line-height:1;}
-  .dropdown .dd-stat-label{font-size:9.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--faint);}
-  .dropdown .dd-stat-sep{width:1px;align-self:stretch;background:var(--border);margin:0 4px;}
+  .dropdown .dd-logout-btn svg{width:14px;height:14px;fill:currentColor;transition:.15s;}
+  .dropdown .dd-logout-btn:hover{
+    color:var(--danger);border-color:rgba(193,68,60,.4);background:rgba(193,68,60,.1);
+  }
 
   /* signed-out state inside notification / mail panels */
   .panel-loggedout{
@@ -3271,7 +3269,7 @@
     </div>
     <div class="alpha-tag" title="Royal Deck befindet sich noch in der Alpha-Phase – es kann zu Bugs, Datenverlust oder Änderungen ohne Vorwarnung kommen.">ALPHA BUILD</div>
     <div class="top-right">
-      <div class="hud-rail">
+      <div class="hud-cluster hud-cluster-utility">
         <div class="points-chip" id="pointsDisplay" title="Dein Level basiert auf deinen Einsätzen, nicht auf deinem Kontostand" style="--ring-pct:8">
           <div class="chip-coin"><div class="chip-coin-inner"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg></div></div>
           <div class="chip-text"><span class="chip-level">Level 1</span><span class="chip-points"><svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 4.5 2 7.5V16.5C2 19.5 6.5 22 12 22S22 19.5 22 16.5V7.5C22 4.5 17.5 2 12 2ZM12 4C16.4 4 20 5.6 20 7.5S16.4 11 12 11 4 9.4 4 7.5 7.6 4 12 4Z"/></svg>0 Chips</span></div>
@@ -3309,19 +3307,20 @@
             <div id="mailBody"></div>
           </div>
         </div>
-
-        <div class="hud-divider"></div>
-
-        <div id="authArea"></div>
       </div>
+
+      <div id="authArea"></div>
     </div>
   </div>
 
   <!-- ================= ACCOUNT SETTINGS MODAL ================= -->
-  <div class="overlay" id="settingsOverlay">
-    <div class="modal settings">
+  <div class="content" id="settingsView" style="display:none;">
+    <div class="settings-page">
       <div class="settings-topbar">
         <div class="settings-topbar-title">
+          <button class="bj-back" id="closeSettings" title="Zurück">
+            <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>
+          </button>
           <div class="settings-topbar-icon">
             <svg viewBox="0 0 24 24"><path d="M19.4 13a7.9 7.9 0 000-2l2.1-1.6-2-3.4-2.5 1a8 8 0 00-1.7-1L14.9 3H9.1l-.4 2.9a8 8 0 00-1.7 1l-2.5-1-2 3.4L4.6 11a7.9 7.9 0 000 2l-2.1 1.6 2 3.4 2.5-1a8 8 0 001.7 1l.4 2.9h5.8l.4-2.9a8 8 0 001.7-1l2.5 1 2-3.4z"/></svg>
           </div>
@@ -3330,7 +3329,6 @@
             <div class="settings-topbar-sub" id="settingsPaneLabel">Profil</div>
           </div>
         </div>
-        <div class="close" id="closeSettings">✕</div>
       </div>
 
       <div class="settings-body-wrap">
@@ -4791,102 +4789,58 @@
 
   // Sidebar-Navigation: Home und Freunde sind gebaut, restliche Bereiche folgen später
   function switchMainView(view){
-    const home = document.getElementById('homeView');
-    const discover = document.getElementById('discoverView');
-    const friends = document.getElementById('friendsView');
-    const blackjack = document.getElementById('blackjackView');
-    const slot = document.getElementById('slotView');
-    const rewards = document.getElementById('rewardsView');
-    const crossy = document.getElementById('crossyView');
-    const chat = document.getElementById('chatView');
-    const leaderboard = document.getElementById('leaderboardView');
-    blackjack.style.display = 'none';
-    slot.style.display = 'none';
-    crossy.style.display = 'none';
-    chat.style.display = 'none';
-    leaderboard.style.display = 'none';
-    if(view !== 'blackjack') bjStopMusic();
-    if(view !== 'crossy') crossyStop();
-    if(view !== 'chat') closeChatView();
-    if(view === 'discover'){
-      home.style.display = 'none';
-      friends.style.display = 'none';
-      rewards.style.display = 'none';
-      discover.style.display = '';
-      discover.scrollTo({ top:0 });
+    const views = {
+      home: document.getElementById('homeView'),
+      discover: document.getElementById('discoverView'),
+      friends: document.getElementById('friendsView'),
+      blackjack: document.getElementById('blackjackView'),
+      slot: document.getElementById('slotView'),
+      rewards: document.getElementById('rewardsView'),
+      crossy: document.getElementById('crossyView'),
+      chat: document.getElementById('chatView'),
+      leaderboard: document.getElementById('leaderboardView'),
+      settings: document.getElementById('settingsView'),
+    };
+    const target = views[view] ? view : 'home';
+    Object.entries(views).forEach(([name, el]) => {
+      if(!el) return;
+      el.style.display = (name === target) ? '' : 'none';
+    });
+    if(target !== 'blackjack') bjStopMusic();
+    if(target !== 'crossy') crossyStop();
+    if(target !== 'chat') closeChatView();
+
+    const activeEl = views[target];
+    activeEl.scrollTo({ top:0, behavior: target === 'home' ? 'smooth' : 'auto' });
+
+    if(target === 'discover'){
       renderDiscover();
-    } else if(view === 'friends'){
-      home.style.display = 'none';
-      discover.style.display = 'none';
-      rewards.style.display = 'none';
-      friends.style.display = '';
-      friends.scrollTo({ top:0 });
+    } else if(target === 'friends'){
       if(!currentUserId){
+        views.friends.style.display = 'none'; views.home.style.display = '';
         showToast('Melde dich an, um Freunde hinzuzufügen.');
         openModal('login');
         return;
       }
       loadFriendsData();
-    } else if(view === 'blackjack'){
-      home.style.display = 'none';
-      discover.style.display = 'none';
-      friends.style.display = 'none';
-      rewards.style.display = 'none';
-      blackjack.style.display = '';
-      blackjack.scrollTo({ top:0 });
-    } else if(view === 'slot'){
-      home.style.display = 'none';
-      discover.style.display = 'none';
-      friends.style.display = 'none';
-      rewards.style.display = 'none';
-      slot.style.display = '';
-      slot.scrollTo({ top:0 });
-    } else if(view === 'crossy'){
-      home.style.display = 'none';
-      discover.style.display = 'none';
-      friends.style.display = 'none';
-      rewards.style.display = 'none';
-      crossy.style.display = '';
-      crossy.scrollTo({ top:0 });
-    } else if(view === 'rewards'){
-      home.style.display = 'none';
-      discover.style.display = 'none';
-      friends.style.display = 'none';
-      rewards.style.display = '';
-      rewards.scrollTo({ top:0 });
+    } else if(target === 'rewards'){
       if(!currentUserId){
+        views.rewards.style.display = 'none'; views.home.style.display = '';
         showToast('Melde dich an, um Belohnungen abzuholen.');
         openModal('login');
         return;
       }
       refreshDailyBonusUI();
-    } else if(view === 'chat'){
-      home.style.display = 'none';
-      discover.style.display = 'none';
-      friends.style.display = 'none';
-      rewards.style.display = 'none';
-      chat.style.display = '';
-      chat.scrollTo({ top:0 });
+    } else if(target === 'chat'){
       if(!currentUserId){
+        views.chat.style.display = 'none'; views.home.style.display = '';
         showToast('Melde dich an, um zu chatten.');
         openModal('login');
         return;
       }
       openChatView();
-    } else if(view === 'leaderboard'){
-      home.style.display = 'none';
-      discover.style.display = 'none';
-      friends.style.display = 'none';
-      rewards.style.display = 'none';
-      leaderboard.style.display = '';
-      leaderboard.scrollTo({ top:0 });
+    } else if(target === 'leaderboard'){
       loadLeaderboard();
-    } else {
-      discover.style.display = 'none';
-      friends.style.display = 'none';
-      rewards.style.display = 'none';
-      home.style.display = '';
-      home.scrollTo({ top:0, behavior:'smooth' });
     }
   }
 
@@ -7637,7 +7591,7 @@
   }
 
   document.getElementById('previewMaintenanceBtn').addEventListener('click', () => {
-    settingsOverlay.classList.remove('open');
+    closeSettingsView();
     showMaintenancePreview();
   });
 
@@ -7736,7 +7690,7 @@
   }
 
   document.getElementById('previewComingSoonBtn').addEventListener('click', () => {
-    settingsOverlay.classList.remove('open');
+    closeSettingsView();
     showComingSoonPreview();
   });
 
@@ -8095,22 +8049,12 @@
               <div class="dd-handle" style="color:var(--accent-hi);font-size:11px;font-weight:600;">${profile.username ? '@' + profile.username : ''}</div>
             </div>
           </div>
-          <div class="dd-stats">
-            <div class="dd-stat">
-              <span class="dd-stat-val">${level}</span>
-              <span class="dd-stat-label">Level</span>
-            </div>
-            <div class="dd-stat-sep"></div>
-            <div class="dd-stat">
-              <span class="dd-stat-val">${chips.toLocaleString('de-DE')}</span>
-              <span class="dd-stat-label">Chips</span>
-            </div>
-          </div>
+          <div class="dd-menu-divider"></div>
           <div class="dd-menu">
-            <div id="logoutBtn" class="dd-logout">
-              <div class="dd-icon-circle"><svg viewBox="0 0 24 24"><path d="M16 13v-2H7V8l-5 4 5 4v-3zM20 3H10v2h10v14H10v2h10a2 2 0 002-2V5a2 2 0 00-2-2z"/></svg></div>
+            <button type="button" id="logoutBtn" class="dd-logout-btn">
+              <svg viewBox="0 0 24 24"><path d="M16 13v-2H7V8l-5 4 5 4v-3zM20 3H10v2h10v14H10v2h10a2 2 0 002-2V5a2 2 0 00-2-2z"/></svg>
               Abmelden
-            </div>
+            </button>
           </div>
         </div>
       </div>`;
@@ -8139,7 +8083,13 @@
   }
 
   // --- Settings modal ---
-  const settingsOverlay = document.getElementById('settingsOverlay');
+  const settingsView = document.getElementById('settingsView');
+  function closeSettingsView(){
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const homeNav = document.querySelectorAll('.nav-item')[0];
+    if(homeNav) homeNav.classList.add('active');
+    switchMainView('home');
+  }
   const panes = document.querySelectorAll('.settings-pane');
   const colorSwatches = document.getElementById('colorSwatches');
   const symbolColorSwatches = document.getElementById('symbolColorSwatches');
@@ -8876,7 +8826,9 @@
       updateAvatarPreviews(initial);
     }
     document.getElementById('settingsEmail').textContent = email || '—';
-    settingsOverlay.classList.add('open');
+    switchMainView('settings');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('navSettings')?.classList.add('active');
     switchPane('profile');
   }
 
@@ -8962,8 +8914,7 @@
     });
   }
 
-  document.getElementById('closeSettings').addEventListener('click', () => settingsOverlay.classList.remove('open'));
-  settingsOverlay.addEventListener('click', e => { if(e.target === settingsOverlay) settingsOverlay.classList.remove('open'); });
+  document.getElementById('closeSettings').addEventListener('click', closeSettingsView);
 
   const spaneLabels = { profile: 'Profil', notifications: 'Benachrichtigungen', privacy: 'Privatsphäre', appearance: 'Darstellung', volume: 'Lautstärke', security: 'Sicherheit', admin: 'Admin' };
   function positionStabHighlight(activeEl){
