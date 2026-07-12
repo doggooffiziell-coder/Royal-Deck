@@ -3318,9 +3318,6 @@
     <div class="settings-page">
       <div class="settings-topbar">
         <div class="settings-topbar-title">
-          <button class="bj-back" id="closeSettings" title="Zurück">
-            <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>
-          </button>
           <div class="settings-topbar-icon">
             <svg viewBox="0 0 24 24"><path d="M19.4 13a7.9 7.9 0 000-2l2.1-1.6-2-3.4-2.5 1a8 8 0 00-1.7-1L14.9 3H9.1l-.4 2.9a8 8 0 00-1.7 1l-2.5-1-2 3.4L4.6 11a7.9 7.9 0 000 2l-2.1 1.6 2 3.4 2.5-1a8 8 0 001.7 1l.4 2.9h5.8l.4-2.9a8 8 0 001.7-1l2.5 1 2-3.4z"/></svg>
           </div>
@@ -8914,7 +8911,7 @@
     });
   }
 
-  document.getElementById('closeSettings').addEventListener('click', closeSettingsView);
+  document.getElementById('closeSettings')?.addEventListener('click', closeSettingsView);
 
   const spaneLabels = { profile: 'Profil', notifications: 'Benachrichtigungen', privacy: 'Privatsphäre', appearance: 'Darstellung', volume: 'Lautstärke', security: 'Sicherheit', admin: 'Admin' };
   function positionStabHighlight(activeEl){
