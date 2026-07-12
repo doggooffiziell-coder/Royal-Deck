@@ -93,36 +93,59 @@
   }
 
   /* Sidebar — a strip of felt trimmed in foil, like the rail of a table */
+  /* ===== Sidebar: breite, beschriftete Lounge-Navigation (kein Roblox-Icon-Rail) ===== */
   .sidebar{
-    width:76px;
+    width:220px;
     background:
-      linear-gradient(180deg, rgba(212,175,106,.05), transparent 120px),
-      var(--sidebar);
+      linear-gradient(180deg, rgba(212,175,106,.06), transparent 220px),
+      linear-gradient(180deg, var(--sidebar), #06110d);
     border-right:1px solid var(--border-soft);
-    box-shadow:inset -1px 0 0 rgba(212,175,106,.04);
-    display:flex;flex-direction:column;align-items:center;padding:18px 0;gap:4px;
+    box-shadow:inset -1px 0 0 rgba(212,175,106,.05), 10px 0 30px -22px rgba(0,0,0,.9);
+    display:flex;flex-direction:column;align-items:stretch;padding:18px 14px 16px;gap:2px;
     flex-shrink:0;position:relative;
   }
-  .logo{
-    width:38px;height:38px;background:var(--surface);border:1px solid var(--border);border-radius:9px;margin-bottom:20px;
-    display:flex;align-items:center;justify-content:center;color:var(--accent-hi);font-weight:600;font-size:17px;
-    font-family:var(--font-display);position:relative;
+
+  /* Marken-Kopf mit Emblem + Wortmarke, darunter feine Gold-Trennung */
+  .brand-head{display:flex;align-items:center;gap:11px;padding:2px 8px 16px;margin-bottom:8px;position:relative;cursor:default;}
+  .brand-head:after{
+    content:"";position:absolute;left:6px;right:6px;bottom:4px;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(212,175,106,.30),transparent);
   }
-  .logo:after{
-    content:"";position:absolute;inset:0;border-radius:9px;box-shadow:inset 0 0 0 1px rgba(212,175,106,.22);
+  .brand-emblem{
+    width:40px;height:40px;border-radius:12px;flex-shrink:0;position:relative;
+    background:radial-gradient(circle at 32% 28%,var(--felt-hi),var(--felt) 65%,#081911);
+    border:1px solid var(--accent-dim);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 0 0 1px rgba(212,175,106,.22), 0 4px 12px rgba(0,0,0,.45);
   }
+  .brand-emblem:after{
+    content:"";position:absolute;inset:3px;border-radius:9px;
+    background:repeating-conic-gradient(from 0deg, rgba(212,175,106,.05) 0deg 3deg, transparent 3deg 12deg);
+  }
+  .brand-emblem svg{width:21px;height:21px;position:relative;z-index:1;}
+  .brand-word{display:flex;flex-direction:column;line-height:1.12;min-width:0;}
+  .brand-name{font-family:var(--font-display);font-style:italic;font-weight:600;font-size:17px;color:var(--text);letter-spacing:.2px;}
+  .brand-alpha{font-family:var(--font-mono);font-size:8px;font-weight:600;letter-spacing:1.5px;color:var(--accent);opacity:.85;}
+
   .nav-item{
-    width:60px;height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:6px;border-radius:10px;cursor:pointer;color:var(--faint);transition:.15s;position:relative;
+    display:flex;flex-direction:row;align-items:center;gap:12px;
+    height:42px;padding:0 12px;border-radius:11px;cursor:pointer;
+    color:var(--muted);transition:.16s;position:relative;border:1px solid transparent;
   }
-  .nav-item svg{width:22px;height:22px;fill:currentColor;}
-  .nav-item span{font-size:10.5px;letter-spacing:.3px;font-weight:500;}
-  .nav-item.active{color:var(--accent-hi);background:var(--accent-soft);box-shadow:inset 0 0 0 1px rgba(212,175,106,.22);}
+  .nav-item svg{width:19px;height:19px;fill:currentColor;flex-shrink:0;}
+  .nav-item span{font-size:13.5px;letter-spacing:.1px;font-weight:600;font-family:var(--font-body);flex:1;min-width:0;}
+  .nav-item:hover{background:rgba(212,175,106,.05);color:var(--text);}
+  .nav-item.active{
+    color:var(--accent-hi);
+    background:linear-gradient(90deg,var(--accent-soft),rgba(201,160,91,.03));
+    border-color:rgba(212,175,106,.22);
+    box-shadow:inset 0 1px 0 rgba(240,207,142,.07);
+  }
   .nav-item.active:before{
-    content:"";position:absolute;left:-1px;top:10px;bottom:10px;width:2px;border-radius:2px;
-    background:linear-gradient(180deg,transparent,var(--accent-hi),transparent);
+    content:"";position:absolute;left:-14px;top:9px;bottom:9px;width:3px;border-radius:0 3px 3px 0;
+    background:linear-gradient(180deg,var(--accent-hi),var(--accent));
+    box-shadow:0 0 10px rgba(240,207,142,.5);
   }
-  .nav-item:hover{background:rgba(212,175,106,.045);color:var(--text);}
 
   /* Main layout */
   .main{flex:1;display:flex;flex-direction:column;min-width:0;}
@@ -1147,18 +1170,21 @@
 
   /* --------- expanded sidebar sections --------- */
   .nav-divider{
-    width:34px;height:1px;background:var(--border-soft);margin:8px 0;flex-shrink:0;
+    width:auto;height:1px;background:var(--border-soft);margin:10px 8px;flex-shrink:0;
   }
   .nav-group-label{
-    font-size:8.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--faint);
-    text-align:center;margin:2px 0 2px;flex-shrink:0;
+    font-size:9.5px;letter-spacing:1.3px;text-transform:uppercase;color:var(--faint);
+    text-align:left;margin:8px 0 5px;padding:0 12px;flex-shrink:0;font-weight:700;
   }
   .nav-item.soon{position:relative;}
   .nav-item.soon:after{
-    content:"";position:absolute;top:8px;right:10px;width:6px;height:6px;border-radius:50%;
+    content:"";position:absolute;top:50%;transform:translateY(-50%);right:12px;width:6px;height:6px;border-radius:50%;
     background:var(--brass);box-shadow:0 0 0 2px var(--sidebar);
   }
-  .sidebar-bottom{margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:8px;}
+  .sidebar-bottom{margin-top:auto;display:flex;flex-direction:column;align-items:stretch;gap:2px;padding-top:10px;position:relative;}
+  .sidebar-bottom:before{
+    content:"";height:1px;background:var(--border-soft);margin:0 8px 8px;
+  }
 
   /* --------- maintenance screen --------- */
   #maintenanceScreen{
@@ -1289,8 +1315,62 @@
   .soon-alpha-form button:hover{background:var(--accent-hi);}
   .soon-alpha-form button:disabled{opacity:.55;cursor:default;}
   .soon-alpha-hint{font-size:12px;color:var(--muted);text-align:center;margin-top:8px;max-width:300px;line-height:1.5;}
-  .soon-alpha-hint.error{color:var(--danger);}
-  .soon-alpha-hint.success{color:var(--success);}
+  .soon-alpha-hint:not(:empty){
+    padding:9px 14px;border-radius:11px;
+    border:1px solid rgba(201,160,91,.28);
+    background:linear-gradient(180deg, rgba(201,160,91,.12), rgba(201,160,91,.05));
+    color:var(--accent-hi);
+    box-shadow:inset 0 1px 0 rgba(240,207,142,.10);
+    animation:noticeIn .3s ease both;
+  }
+  .soon-alpha-hint.error:not(:empty){
+    color:#e8938c;border-color:rgba(193,68,60,.34);
+    background:linear-gradient(180deg, rgba(193,68,60,.14), rgba(193,68,60,.06));
+    box-shadow:inset 0 1px 0 rgba(255,120,110,.08);
+  }
+  .soon-alpha-hint.success:not(:empty){
+    color:#7fe0ac;border-color:rgba(76,191,131,.34);
+    background:linear-gradient(180deg, rgba(76,191,131,.13), rgba(76,191,131,.05));
+    box-shadow:inset 0 1px 0 rgba(140,255,190,.08);
+  }
+
+  /* ===== Inline-Hinweise & Fehler – im Royal-Deck-Stil (Karten-Motiv) ===== */
+  /* Betrifft alle .hint / .error Meldungen (Profil, Login, Admin, Settings …). */
+  .hint:empty, .error:empty,
+  .modal .hint:empty, .modal .error:empty{ display:none; }
+
+  .hint:not(:empty), .error:not(:empty),
+  .modal .hint:not(:empty), .modal .error:not(:empty){
+    position:relative;
+    margin-top:10px;min-height:0;
+    padding:9px 12px 9px 32px;
+    font-size:12px;line-height:1.5;
+    border-radius:10px;
+    font-family:var(--font-body);
+    animation:noticeIn .28s ease both;
+  }
+  .hint:not(:empty)::before, .error:not(:empty)::before,
+  .modal .hint:not(:empty)::before, .modal .error:not(:empty)::before{
+    position:absolute;left:11px;top:8px;
+    font-size:12px;line-height:1.5;
+  }
+  /* Info / Erfolg – Gold ♦ */
+  .hint:not(:empty), .modal .hint:not(:empty){
+    color:var(--accent-hi);
+    border:1px solid rgba(201,160,91,.26);
+    background:linear-gradient(180deg, rgba(201,160,91,.10), rgba(201,160,91,.04));
+    box-shadow:inset 0 1px 0 rgba(240,207,142,.08);
+  }
+  .hint:not(:empty)::before, .modal .hint:not(:empty)::before{ content:'♦';color:var(--accent-hi); }
+  /* Fehler / Sperre – Rot ♠ */
+  .error:not(:empty), .modal .error:not(:empty){
+    color:#e8938c;
+    border:1px solid rgba(193,68,60,.32);
+    background:linear-gradient(180deg, rgba(193,68,60,.13), rgba(193,68,60,.05));
+    box-shadow:inset 0 1px 0 rgba(255,120,110,.06);
+  }
+  .error:not(:empty)::before, .modal .error:not(:empty)::before{ content:'♠';color:var(--danger); }
+  @keyframes noticeIn{ from{opacity:0;transform:translateY(-3px);} to{opacity:1;transform:none;} }
 
   .maint-login-row{margin-top:8px;display:flex;gap:10px;align-items:center;justify-content:center;}
   .maint-login-btn{
@@ -1818,9 +1898,9 @@
 
   /* ---------- Freunde-System ---------- */
   .nav-badge{
-    position:absolute;top:2px;right:6px;background:var(--danger);color:#1a0808;font-size:9px;
-    min-width:15px;height:15px;padding:0 3px;border-radius:8px;display:none;align-items:center;justify-content:center;
-    font-weight:700;border:2px solid var(--sidebar);
+    position:static;margin-left:auto;background:var(--danger);color:#1a0808;font-size:10px;
+    min-width:19px;height:19px;padding:0 5px;border-radius:10px;display:none;align-items:center;justify-content:center;
+    font-weight:700;border:none;flex-shrink:0;box-shadow:0 0 8px rgba(193,68,60,.45);
   }
   .nav-item{position:relative;}
   .friends-wrap{max-width:760px;}
@@ -2927,11 +3007,6 @@
 
     <div class="soon-alpha-request">
       <button type="button" class="maint-login-btn" id="soonAlphaRequestBtn">Alpha-Zugriff anfordern</button>
-      <form class="soon-alpha-form" id="soonAlphaForm" autocomplete="off">
-        <input type="text" id="soonAlphaName" placeholder="Dein Name" required>
-        <input type="email" id="soonAlphaEmail" placeholder="Deine E-Mail-Adresse" required>
-        <button type="submit" id="soonAlphaSubmitBtn">Anfrage senden</button>
-      </form>
       <div class="soon-alpha-hint" id="soonAlphaHint"></div>
     </div>
 
@@ -2992,7 +3067,14 @@
           <svg class="field-icon" viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5zm-7 19c0-3.9 3.1-7 7-7s7 3.1 7 7z"/></svg>
           <input id="regName" placeholder="z. B. HighRoller_88" maxlength="12">
         </div>
-        <div class="field-hint">Das ist einfach dein Spitzname (2–12 Zeichen), taucht z. B. in der Begrüßung auf. Deinen echten <strong>Benutzernamen</strong>, über den dich andere Spieler finden, wählst du gleich im nächsten Schritt.</div>
+        <div class="field-hint">Das ist einfach dein Spitzname (2–12 Zeichen), taucht z. B. in der Begrüßung auf.</div>
+
+        <label>Benutzername <span style="text-transform:none;font-weight:500;color:var(--faint);">(eindeutig, für die Freunde-Suche)</span></label>
+        <div class="field-icon-wrap">
+          <svg class="field-icon" viewBox="0 0 24 24"><path d="M16 11c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3 1.3 3 3 3zm-8 0c1.7 0 3-1.3 3-3S9.7 5 8 5 5 6.3 5 8s1.3 3 3 3z"/></svg>
+          <input id="regUsername" placeholder="z. B. HighRoller88" autocomplete="off" maxlength="20">
+        </div>
+        <div class="field-hint">3–20 Zeichen, mind. 1 Buchstabe. Nur Buchstaben, Zahlen und Unterstrich. Über den finden dich andere Spieler – später max. 1x im Monat änderbar.</div>
 
         <label>Geschlecht</label>
         <div class="gender-select" id="genderSelect">
@@ -3078,10 +3160,17 @@
 </div>
 
 <div class="sidebar">
-  <div class="brand" title="Royal Table – Alpha Build" style="position:relative;">
-    <svg viewBox="0 0 24 24"><path fill="var(--accent-hi)" d="M12 2l2.6 5.9 6.4.6-4.8 4.3 1.5 6.3L12 15.8 6.3 19.1l1.5-6.3-4.8-4.3 6.4-.6z" opacity="0.9"/></svg>
-    <div class="brand-alpha-badge">ALPHA</div>
+  <div class="brand-head" title="Royal Deck – Alpha Build">
+    <div class="brand-emblem">
+      <svg viewBox="0 0 24 24"><path fill="var(--accent-hi)" d="M12 2l2.6 5.9 6.4.6-4.8 4.3 1.5 6.3L12 15.8 6.3 19.1l1.5-6.3-4.8-4.3 6.4-.6z"/></svg>
+    </div>
+    <div class="brand-word">
+      <span class="brand-name">Royal Deck</span>
+      <span class="brand-alpha">ALPHA BUILD</span>
+    </div>
   </div>
+
+  <div class="nav-group-label">Spielen</div>
   <div class="nav-item active">
     <svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9h-5v-6H11v6H6v-9H3z"/></svg>
     <span>Home</span>
@@ -6482,7 +6571,13 @@
 
   // Gibt null zurück wenn ok, sonst eine Fehlermeldung zum Anzeigen.
   async function validateEmailForSignup(email){
+    const localPart = email.split('@')[0] || '';
     const domain = email.split('@')[1] || '';
+    // 0) Wortfilter auch auf E-Mails anwenden — der Teil vor dem @ (z. B. "nigga123")
+    //    wird genau wie ein Benutzername/Anzeigename gegen die Denylist geprüft.
+    if(containsBadWord(localPart)){
+      return 'Diese E-Mail-Adresse enthält unangemessene Wörter und ist nicht erlaubt.';
+    }
     if(isDisposableEmailDomain(domain)){
       return 'Bitte eine echte E-Mail-Adresse verwenden (keine Wegwerf-Adressen).';
     }
@@ -6504,19 +6599,36 @@
   // Kleiner Denylist-Filter gegen offensichtlich unangemessene Namen. Prüft normalisiert
   // (klein geschrieben, Zahlen-als-Buchstaben-Ersatz entfernt) auf Teilstrings.
   const BAD_WORDS = [
-    'fuck','shit','bitch','asshole','cunt','nigger','nigga','fag','whore','slut',
-    'hurensohn','wichser','arschloch','fotze','schlampe','hure','nazi','hitler',
-    'kanake','spast','mongo','neger',
-    // Anatomisch/vulgär
+    // Slurs (inkl. gängiger Verschleierungen/Phonetik, die die Normalisierung
+    // allein nicht abfängt)
+    'nigger','nigga','neyga','neiga','nayga','nyga','nygga','niga','nigar','nigr',
+    'negro','neger','coon','chink','gook','kike','wetback','beaner',
+    'tranny','faggot','fag','dyke','retard','retarded',
+    'kanake','spast','spasti','mongo','untermensch','missgeburt',
+    // Beleidigungen / vulgär
+    'fuck','shit','bitch','asshole','cunt','whore','slut','bastard',
+    'hurensohn','huso','wichser','arschloch','fotze','schlampe','hure','nutte',
+    'schwuchtel',
+    // Hass / Extremismus
+    'nazi','hitler','judensau','siegheil','heilhitler',
+    // Anatomisch/sexuell
     'penis','vagina','pussy','dick','cock','boobs','tits','titten','muschi',
     'schwanz','pimmel','sperma','anal','porn','porno','sex','nackt','nude',
-    'blowjob','handjob','wank','masturbat'
+    'blowjob','handjob','wank','masturbat','dildo','fick','ficken','arsch',
+    'pedo','rapist'
   ];
   function normalizeForFilter(str){
     return str.toLowerCase()
-      .replace(/0/g,'o').replace(/1/g,'i').replace(/3/g,'e').replace(/4/g,'a')
-      .replace(/5/g,'s').replace(/7/g,'t').replace(/@/g,'a').replace(/\$/g,'s')
-      .replace(/[^a-z0-9]/g,'');
+      // gängige Buchstaben-Digraphen zusammenziehen (ph -> f)
+      .replace(/ph/g,'f')
+      // Leetspeak & Symbol-Ersatz -> Buchstaben (deckt n1gg4, n!gga, niqqa, … ab)
+      .replace(/0/g,'o').replace(/1/g,'i').replace(/2/g,'z').replace(/3/g,'e')
+      .replace(/4/g,'a').replace(/5/g,'s').replace(/6/g,'g').replace(/7/g,'t')
+      .replace(/8/g,'b').replace(/9/g,'g')
+      .replace(/@/g,'a').replace(/\$/g,'s').replace(/!/g,'i').replace(/\|/g,'i')
+      .replace(/\+/g,'t').replace(/q/g,'g')
+      // alles außer Buchstaben entfernen (Punkte, Unterstriche, Leerzeichen …)
+      .replace(/[^a-z]/g,'');
   }
   // Reduziert wiederholte Buchstaben auf einen ("niiggeer" -> "niger", "fuuuck" -> "fuck").
   // Fängt damit auch Varianten wie "Niger" (single-g) gegen "Nigger" (double-g) ab,
@@ -6524,9 +6636,21 @@
   function collapseRepeats(str){
     return str.replace(/(.)\1+/g, '$1');
   }
+  // Phonetischer Fang speziell fürs N-Wort: erwischt alles, das sich beim
+  // Aussprechen gleich anhört (nigga, nigger, niga, nayga, neyga, naygha, nikka,
+  // niqqa, nicca, nygga …), auch wenn es so nicht in der Wortliste steht.
+  //   n  +  vorderer Vokal-Cluster (a/e/i/y)  +  harter Laut  +  End-Vokal
+  // Harter Laut: g (auch einfach) ODER doppeltes k/q/c (einfaches k/c bleibt frei,
+  // damit gängige Namen wie Monika, Annika, Nika, Nico, Nick nicht blockiert werden).
+  // Bewusst streng — im Zweifel lieber blocken, wie gewünscht.
+  const NWORD_PHONETIC_RE = /n[aeiy]{1,3}(g+|k{2,}|c{2,}|q{2,})h?(a|ah|er|uh|ur)/;
+  function soundsLikeNWord(norm, collapsed){
+    return NWORD_PHONETIC_RE.test(norm) || NWORD_PHONETIC_RE.test(collapsed);
+  }
   function containsBadWord(str){
     const norm = normalizeForFilter(str);
     const collapsed = collapseRepeats(norm);
+    if(soundsLikeNWord(norm, collapsed)) return true;
     return BAD_WORDS.some(w => norm.includes(w) || collapsed.includes(collapseRepeats(w)));
   }
   function isValidUsername(uname){
@@ -7186,11 +7310,37 @@
         authError.textContent = 'Bitte ein Geschlecht auswählen.';
         return;
       }
+      const uname = document.getElementById('regUsername').value.trim();
+      if(!isValidUsername(uname)){
+        authError.textContent = 'Benutzername: 3–20 Zeichen, mind. 1 Buchstabe. Nur Buchstaben/Zahlen/Unterstrich, kein _ am Anfang/Ende oder doppelt.';
+        return;
+      }
+      if(containsBadWord(uname)){
+        authError.textContent = 'Dieser Benutzername ist nicht erlaubt.';
+        return;
+      }
       submitBtn.disabled = true;
       submitBtn.textContent = 'Prüfe E-Mail-Adresse...';
       const emailProblem = await validateEmailForSignup(email);
       if(emailProblem){
         authError.textContent = emailProblem;
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Konto erstellen';
+        return;
+      }
+      // Benutzername-Verfügbarkeit vorab prüfen (case-insensitive), damit wir eine
+      // klare Fehlermeldung geben, bevor das Konto überhaupt angelegt wird.
+      submitBtn.textContent = 'Prüfe Benutzername...';
+      const { data: unameTaken, error: unameErr } = await supabaseClient
+        .from('public_profiles').select('id').ilike('username', uname).maybeSingle();
+      if(unameErr && unameErr.code !== 'PGRST116'){
+        authError.textContent = unameErr.message;
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Konto erstellen';
+        return;
+      }
+      if(unameTaken){
+        authError.textContent = 'Dieser Benutzername ist bereits vergeben.';
         submitBtn.disabled = false;
         submitBtn.textContent = 'Konto erstellen';
         return;
@@ -7201,6 +7351,7 @@
     submitBtn.textContent = 'Bitte warten...';
 
     if(mode === 'register'){
+      const uname = document.getElementById('regUsername').value.trim();
       const name = document.getElementById('regName').value.trim() || email.split('@')[0].slice(0, DISPLAY_NAME_MAX);
       if(!isValidDisplayName(name)){
         authError.textContent = `Anzeigename muss ${DISPLAY_NAME_MIN}–${DISPLAY_NAME_MAX} Zeichen lang sein.`;
@@ -7216,7 +7367,7 @@
       }
       const { data, error } = await supabaseClient.auth.signUp({
         email, password: pass,
-        options: { data: { name, gender: selectedGenderAuth } }
+        options: { data: { name, username: uname, gender: selectedGenderAuth } }
       });
       submitBtn.disabled = false;
       submitBtn.textContent = 'Konto erstellen';
@@ -7225,9 +7376,10 @@
         return;
       }
       if(data.session){
-        // Falls der DB-Trigger "gender" nicht selbst setzt, hier sicherheitshalber nachziehen.
+        // Falls der DB-Trigger "gender"/"username" nicht selbst setzt, hier
+        // sicherheitshalber nachziehen (Benutzername ist Pflicht bei Registrierung).
         try {
-          await supabaseClient.from('profiles').update({ gender: selectedGenderAuth }).eq('id', data.user.id);
+          await supabaseClient.from('profiles').update({ gender: selectedGenderAuth, username: uname }).eq('id', data.user.id);
         } catch(e){ console.error(e); }
         // Hinweis: die Willkommens-Benachrichtigung wird per DB-Trigger auf auth.users angelegt,
         // nicht hier im Client — das funktioniert dann auch zuverlässig mit E-Mail-Bestätigung.
@@ -7545,49 +7697,31 @@
   // --- "Alpha-Zugriff anfordern" auf dem Coming-Soon-Bildschirm ---
   // Öffnet ein kleines Formular (Name + E-Mail); Anfragen landen in der Tabelle
   // "alpha_access_requests" und werden im Admin-Bereich unter "Alpha Access" angezeigt.
-  document.getElementById('soonAlphaRequestBtn').addEventListener('click', () => {
-    // Alpha-Zugriff kann nur anfordern, wer angemeldet ist — ohne Login öffnet
-    // sich das Formular nicht, stattdessen wird direkt der Login-Dialog geöffnet.
+  document.getElementById('soonAlphaRequestBtn').addEventListener('click', async () => {
+    const hint = document.getElementById('soonAlphaHint');
+    const btn = document.getElementById('soonAlphaRequestBtn');
+    hint.className = 'soon-alpha-hint';
+    hint.textContent = '';
+    // Alpha-Zugriff kann nur anfordern, wer angemeldet ist — ohne Login wird
+    // stattdessen direkt der Login-Dialog geöffnet.
     if(!currentUserId){
-      const hint = document.getElementById('soonAlphaHint');
       hint.className = 'soon-alpha-hint error';
       hint.textContent = 'Bitte melde dich zuerst an, um Alpha-Zugriff anzufordern.';
       openModal('login');
       return;
     }
-    const form = document.getElementById('soonAlphaForm');
-    const btn = document.getElementById('soonAlphaRequestBtn');
-    const showing = form.classList.toggle('show');
-    btn.style.display = showing ? 'none' : '';
-    if(showing){
-      const nameInput = document.getElementById('soonAlphaName');
-      const emailInput = document.getElementById('soonAlphaEmail');
-      if(!nameInput.value) nameInput.value = currentProfile?.name || currentProfile?.username || '';
-      if(!emailInput.value) emailInput.value = currentUserEmail || '';
-    }
-  });
-
-  document.getElementById('soonAlphaForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const hint = document.getElementById('soonAlphaHint');
-    const submitBtn = document.getElementById('soonAlphaSubmitBtn');
-    const name = document.getElementById('soonAlphaName').value.trim();
-    const email = document.getElementById('soonAlphaEmail').value.trim();
-    hint.className = 'soon-alpha-hint';
-    hint.textContent = '';
-    if(!currentUserId){
-      hint.textContent = 'Bitte melde dich zuerst an, um Alpha-Zugriff anzufordern.';
-      hint.classList.add('error');
-      openModal('login');
+    // Anzeigename & E-Mail kommen direkt aus dem angemeldeten Konto — es muss
+    // kein zusätzlicher Name mehr eingegeben werden.
+    const name = (currentProfile?.name || currentProfile?.username || (currentUserEmail ? currentUserEmail.split('@')[0] : '')).trim();
+    const email = (currentUserEmail || '').trim();
+    if(!email){
+      hint.className = 'soon-alpha-hint error';
+      hint.textContent = 'Deine Konto-E-Mail konnte nicht gelesen werden. Bitte melde dich erneut an.';
       return;
     }
-    if(!name || !email){
-      hint.textContent = 'Bitte Name und E-Mail-Adresse angeben.';
-      hint.classList.add('error');
-      return;
-    }
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Sende...';
+    btn.disabled = true;
+    const originalLabel = btn.textContent;
+    btn.textContent = 'Sende…';
     let error = null;
     try {
       const res = await supabaseClient.from('alpha_access_requests').insert({ name, email: email.toLowerCase() });
@@ -7596,20 +7730,18 @@
       error = e;
       console.error('Alpha-Zugriff-Anfrage fehlgeschlagen (Exception):', e);
     }
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'Anfrage senden';
     if(error){
+      btn.disabled = false;
+      btn.textContent = originalLabel;
       const msg = error.message || 'Unbekannter Fehler beim Senden.';
+      hint.className = 'soon-alpha-hint error';
       hint.textContent = msg.includes('duplicate') ? 'Für diese E-Mail liegt bereits eine Anfrage vor.' : msg;
-      hint.classList.add('error');
       return;
     }
-    hint.textContent = 'Danke! Wir melden uns, sobald Alpha-Zugriff freigeschaltet wird.';
-    hint.classList.add('success');
-    const form = document.getElementById('soonAlphaForm');
-    form.reset();
-    form.classList.remove('show');
-    document.getElementById('soonAlphaRequestBtn').style.display = '';
+    hint.className = 'soon-alpha-hint success';
+    hint.textContent = `Danke, ${name}! Wir melden uns, sobald Alpha-Zugriff freigeschaltet wird.`;
+    btn.disabled = true;
+    btn.textContent = 'Anfrage gesendet ✓';
   });
 
   // --- Login/Logout direkt vom Wartungsbildschirm aus ---
