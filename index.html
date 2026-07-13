@@ -242,11 +242,12 @@
   .level-chip:active{transform:scale(.97);}
   .level-chip.active{background:rgba(212,175,106,.1);border-color:rgba(212,175,106,.32);}
   .level-chip .chip-coin{
-    width:35px;height:35px;border-radius:50%;flex-shrink:0;position:relative;box-sizing:border-box;padding:3px;
+    width:37px;height:37px;border-radius:50%;flex-shrink:0;position:relative;box-sizing:border-box;padding:5px;
     /* Fortschrittsring: startet oben bei 12 Uhr und fuellt im Uhrzeigersinn.
        conic-gradient beginnt ohne "from" bereits bei 0deg = 12 Uhr. Klares
-       Hellgold fuer den Fortschritt, dezente dunkle Rest-Spur dahinter. */
-    background:conic-gradient(var(--accent-hi) calc(var(--ring-pct,8) * 1%), rgba(255,255,255,.07) 0);
+       Hellgold fuer den Fortschritt, dunklere Rest-Spur dahinter. Dickerer Ring
+       = deutlich sichtbarer. */
+    background:conic-gradient(var(--accent-hi) calc(var(--ring-pct,8) * 1%), rgba(212,175,106,.22) 0);
     display:flex;align-items:center;justify-content:center;
   }
   /* feiner dunkler Rand aussen, damit der Ring sich sauber von der HUD-Leiste abhebt */
@@ -306,9 +307,9 @@
   .level-dropdown:before{left:20px;right:auto;}
   .level-panel-body{padding:16px 20px 20px;display:flex;flex-direction:column;align-items:center;text-align:center;}
   .lvl-ring-big{
-    width:64px;height:64px;border-radius:50%;position:relative;padding:5px;box-sizing:border-box;margin-bottom:10px;
-    /* Start oben bei 12 Uhr, im Uhrzeigersinn — klares Hellgold, dezente Rest-Spur */
-    background:conic-gradient(var(--accent-hi) calc(var(--ring-pct,0) * 1%), rgba(255,255,255,.07) 0);
+    width:66px;height:66px;border-radius:50%;position:relative;padding:7.5px;box-sizing:border-box;margin-bottom:10px;
+    /* Start oben bei 12 Uhr, im Uhrzeigersinn — klares Hellgold, kraeftige Rest-Spur, dicker Ring */
+    background:conic-gradient(var(--accent-hi) calc(var(--ring-pct,0) * 1%), rgba(212,175,106,.22) 0);
   }
   .lvl-ring-big::before{
     content:"";position:absolute;inset:-1px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.3);pointer-events:none;
@@ -3620,7 +3621,7 @@
         <div class="hud-divider"></div>
 
         <div class="chips-chip" id="chipsDisplay" title="Dein Chip-Kontostand">
-          <div class="chips-chip-icon"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="14.6" rx="8" ry="3.2"/><ellipse cx="12" cy="11.5" rx="8" ry="3.2"/><ellipse cx="12" cy="8.4" rx="8" ry="3.2"/><g fill="none" stroke="var(--accent)" stroke-width="1"><path d="M4.3 15.1c1.6 1.3 4.5 2.1 7.7 2.1s6.1-.8 7.7-2.1"/><path d="M4.3 12c1.6 1.3 4.5 2.1 7.7 2.1s6.1-.8 7.7-2.1"/></g><ellipse cx="12" cy="8.4" rx="2.7" ry="1" fill="var(--accent)"/></svg></div>
+          <div class="chips-chip-icon"><svg viewBox="0 0 24 24"><rect x="1.8" y="3.7" width="10.4" height="2.2" rx="1.1"/><rect x="1.8" y="6.5" width="10.4" height="2.2" rx="1.1"/><rect x="1.8" y="9.3" width="10.4" height="2.2" rx="1.1"/><rect x="1.8" y="12.1" width="10.4" height="2.2" rx="1.1"/><circle cx="15.6" cy="15.4" r="7.9" fill="var(--accent)"/><circle cx="15.6" cy="15.4" r="6.8"/><circle cx="15.6" cy="15.4" r="5" fill="none" stroke="var(--accent)" stroke-width="0.8"/><path fill="var(--accent)" transform="translate(15.6 15.4) scale(0.34) translate(-12 -12)" d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg></div>
           <div class="chip-text"><span class="chip-points-label">Chips</span><span class="chip-points-val" id="chipsCountVal">0</span></div>
         </div>
 
