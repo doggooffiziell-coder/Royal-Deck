@@ -698,23 +698,42 @@
   .modal .tab{flex:1;text-align:center;padding:8px 0;border-radius:6px;font-size:13px;font-weight:600;
     color:var(--muted);cursor:pointer;transition:.15s;}
   .modal .tab.active{background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:var(--accent-ink);}
-  .modal label{display:block;color:var(--muted);font-size:11.5px;font-weight:600;margin:12px 0 6px;letter-spacing:.2px;text-transform:uppercase;}
-  .modal input{
+  .modal label, .settings-pane form label{display:block;color:var(--muted);font-size:11.5px;font-weight:600;margin:12px 0 6px;letter-spacing:.2px;text-transform:uppercase;}
+  .modal input, .settings-pane form input{
     width:100%;height:41px;border-radius:8px;border:1px solid var(--border);background:var(--surface);
     color:var(--text);padding:0 14px;font-size:13.5px;outline:none;transition:.15s;font-family:var(--font-body);
   }
-  .modal input::placeholder{color:var(--faint);}
-  .modal input:focus{border-color:var(--accent-dim);box-shadow:0 0 0 3px var(--accent-soft);}
+  .modal input::placeholder, .settings-pane form input::placeholder{color:var(--faint);}
+  .modal input:focus, .settings-pane form input:focus{border-color:var(--accent-dim);box-shadow:0 0 0 3px var(--accent-soft);}
   .modal .error{color:var(--danger);font-size:12px;margin-top:8px;min-height:16px;}
   .modal .hint{color:var(--success);font-size:12px;margin-top:8px;min-height:16px;}
-  .modal button.submit{
+  /* Solider Aktions-Button: identische Form/Maße wie im Login-Modal, aber wiederverwendbar
+     außerhalb von .modal (z.B. in den Kontoeinstellungen) — Standard bleibt Gold. */
+  .modal button.submit, .settings-pane button.submit{
     width:100%;height:48px;border:none;border-radius:9px;margin-top:10px;
     background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:var(--accent-ink);font-weight:700;font-size:14.5px;
     cursor:pointer;transition:.15s;font-family:var(--font-body);letter-spacing:.2px;
     box-shadow:0 6px 16px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.3);
   }
-  .modal button.submit:hover{filter:brightness(1.05);transform:translateY(-1px);}
-  .modal button.submit:disabled{opacity:.55;cursor:default;transform:none;}
+  .modal button.submit:hover, .settings-pane button.submit:hover{filter:brightness(1.05);transform:translateY(-1px);}
+  .modal button.submit:disabled, .settings-pane button.submit:disabled{opacity:.55;cursor:default;transform:none;}
+  /* Graue Variante: gleiche Form wie oben, aber neutral statt Gold — für Aktionen, die
+     meist ohnehin gesperrt sind (Cooldown), damit nicht dauerhaft eine grelle Gold-CTA
+     im Leerlauf blinkt. */
+  button.submit.gray{
+    background:linear-gradient(180deg,var(--surface-2),var(--surface));color:var(--text);
+    box-shadow:0 4px 14px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.05), inset 0 0 0 1px var(--border);
+  }
+  button.submit.gray:hover{
+    filter:none;background:linear-gradient(180deg,var(--surface),var(--surface-2));
+    box-shadow:0 4px 14px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.05), inset 0 0 0 1px var(--accent-dim);
+  }
+  /* Ghost-Variante: flach statt solide, für Aktionen, die noch beiläufiger sein sollen
+     (z.B. "Reset-Link senden" in einer bereits gedämpften Karte) */
+  button.submit.ghost{
+    background:var(--surface-2);color:var(--text);box-shadow:inset 0 0 0 1px var(--border);
+  }
+  button.submit.ghost:hover{filter:none;box-shadow:inset 0 0 0 1px var(--accent-dim);}
   .modal button.link-btn{
     background:none;border:none;color:var(--accent-hi);font-size:12px;font-weight:600;cursor:pointer;
     display:block;margin:14px auto 0;text-align:center;
@@ -3634,7 +3653,7 @@
             <div class="rail-avatar-wrap" id="avatarUploadTrigger" title="Profilbild ändern">
               <div class="big-avatar" id="bigAvatar">H</div>
               <div class="avatar-edit-badge">
-                <svg viewBox="0 0 24 24"><path d="M12 9a3.5 3.5 0 100 7 3.5 3.5 0 000-7zM9 3l-1.5 2H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.5L15 3z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M9 3L7.5 5H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.5L15 3z"/><circle cx="17.1" cy="8.4" r="1" opacity=".6"/><path fill-rule="evenodd" d="M12 8.8a4.2 4.2 0 100 8.4 4.2 4.2 0 000-8.4zm0 1.8a2.4 2.4 0 110 4.8 2.4 2.4 0 010-4.8z"/><circle cx="12" cy="13" r="1"/></svg>
               </div>
             </div>
             <div class="rail-id-text">
@@ -3689,7 +3708,7 @@
             <div class="adm-card wide" style="grid-column:1/-1;">
               <div class="adm-card-head">
                 <div class="adm-card-icon">
-                  <svg viewBox="0 0 24 24"><path d="M12 9a3.5 3.5 0 100 7 3.5 3.5 0 000-7zM9 3L7.5 5H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.5L15 3z"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M9 3L7.5 5H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.5L15 3z"/><circle cx="17.1" cy="8.4" r="1" opacity=".6"/><path fill-rule="evenodd" d="M12 8.8a4.2 4.2 0 100 8.4 4.2 4.2 0 000-8.4zm0 1.8a2.4 2.4 0 110 4.8 2.4 2.4 0 010-4.8z"/><circle cx="12" cy="13" r="1"/></svg>
                 </div>
                 <div class="adm-card-title">Profilbild anpassen</div>
               </div>
@@ -3698,7 +3717,7 @@
                 <div class="avatar-picker-preview" id="avatarPickerPreview">H</div>
                 <div class="avatar-picker-actions" style="flex:1;gap:14px;">
                   <button type="button" class="avatar-change-btn" id="avatarChangeBtn">
-                    <svg viewBox="0 0 24 24"><path d="M12 9a3.5 3.5 0 100 7 3.5 3.5 0 000-7zM9 3L7.5 5H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.5L15 3z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M9 3L7.5 5H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.5L15 3z"/><circle cx="17.1" cy="8.4" r="1" opacity=".6"/><path fill-rule="evenodd" d="M12 8.8a4.2 4.2 0 100 8.4 4.2 4.2 0 000-8.4zm0 1.8a2.4 2.4 0 110 4.8 2.4 2.4 0 010-4.8z"/><circle cx="12" cy="13" r="1"/></svg>
                     Profilbild ändern
                   </button>
 
@@ -3750,7 +3769,7 @@
                   <input id="profileName" placeholder="Dein Anzeigename" maxlength="12">
                   <div class="error" id="profileError"></div>
                   <div class="hint" id="profileHint"></div>
-                  <button type="submit" class="submit" id="profileSubmitBtn">Änderungen speichern</button>
+                  <button type="submit" class="submit gray" id="profileSubmitBtn">Änderungen speichern</button>
                 </form>
               </div>
 
@@ -3769,7 +3788,7 @@
                   </div>
                   <div class="error" id="usernameChangeError"></div>
                   <div class="hint" id="usernameChangeHint"></div>
-                  <button type="submit" class="submit" id="usernameChangeBtn">Benutzername ändern</button>
+                  <button type="submit" class="submit gray" id="usernameChangeBtn">Benutzername ändern</button>
                 </form>
               </div>
             </div>
