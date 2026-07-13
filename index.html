@@ -164,8 +164,60 @@
   .search input::placeholder{color:var(--faint);}
   .search input:focus{border-color:var(--accent-dim);box-shadow:0 0 0 3px var(--accent-soft);}
   .search svg{position:absolute;left:13px;top:10.5px;width:15px;height:15px;fill:var(--faint);}
+  .search input{padding-right:64px;}
+  .search-kbd{
+    position:absolute;right:10px;top:50%;transform:translateY(-50%);
+    font-family:var(--font-mono);font-size:9.5px;font-weight:600;letter-spacing:.4px;color:var(--faint);
+    border:1px solid var(--border);border-bottom-width:2px;border-radius:5px;padding:2px 6px;
+    background:var(--panel);pointer-events:none;transition:.15s;
+  }
+  .search input:focus ~ .search-kbd{opacity:0;}
+
+  /* --- Live-Suchergebnisse: gleiche Formsprache wie die Panel-Dropdowns --- */
+  .search-results{
+    position:absolute;top:calc(100% + 8px);left:0;right:0;display:none;
+    background:linear-gradient(165deg,var(--surface),var(--panel));
+    border:1px solid var(--border);border-radius:13px;overflow:hidden;z-index:120;
+    box-shadow:0 18px 44px rgba(0,0,0,.55), inset 0 0 0 1px rgba(212,175,106,.07), inset 0 1px 0 rgba(255,255,255,.03);
+  }
+  .search-results.open{display:block;animation:ddPop .16s cubic-bezier(.2,.9,.3,1) both;}
+  .sr-cat{
+    padding:9px 14px 5px;font-family:var(--font-mono);font-size:9.5px;font-weight:600;
+    letter-spacing:1.2px;text-transform:uppercase;color:var(--accent);
+  }
+  .sr-item{
+    display:flex;align-items:center;gap:11px;padding:9px 14px;cursor:pointer;transition:.12s;
+  }
+  .sr-item:hover, .sr-item.sel{background:var(--accent-soft);}
+  .sr-icon{
+    width:30px;height:30px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    background:var(--surface-2);border:1px solid var(--border);
+    font-family:var(--font-display);font-size:15px;color:var(--accent-hi);
+  }
+  .sr-icon svg{width:15px;height:15px;fill:var(--muted);}
+  .sr-item:hover .sr-icon svg, .sr-item.sel .sr-icon svg{fill:var(--accent-hi);}
+  .sr-text{min-width:0;flex:1;line-height:1.3;}
+  .sr-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .sr-name b{color:var(--accent-hi);font-weight:700;}
+  .sr-sub{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .sr-enter{
+    font-family:var(--font-mono);font-size:9px;color:var(--faint);border:1px solid var(--border);
+    border-radius:4px;padding:1px 5px;flex-shrink:0;opacity:0;transition:.12s;
+  }
+  .sr-item.sel .sr-enter{opacity:1;}
+  .sr-empty{padding:18px 14px;text-align:center;color:var(--faint);font-size:12.5px;}
+  .sr-empty b{color:var(--muted);font-weight:600;}
 
   .top-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+
+  /* Anmelden-Button in der Topbar (ausgeloggter Zustand) */
+  .topbar-login-btn{
+    background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:var(--accent-ink);border:none;
+    padding:9px 20px;border-radius:9px;font-weight:700;font-size:13px;cursor:pointer;font-family:var(--font-body);
+    box-shadow:0 4px 14px -6px rgba(212,175,106,.55), inset 0 1px 0 rgba(255,255,255,.25);transition:.15s;
+  }
+  .topbar-login-btn:hover{filter:brightness(1.06);transform:translateY(-1px);}
+  .topbar-login-btn:active{transform:none;}
 
   /* --- HUD-Cluster: zwei getrennte Glas-Pillen statt einer durchgehenden
      Leiste — links Utility (Level/Chips + Icons), rechts Identität (Nutzer).
@@ -387,6 +439,16 @@
   .section-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:16px;margin-top:36px;}
   .section-head .section-head-text .section-eyebrow{
     font-family:var(--font-mono);font-size:10.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent-dim);margin-bottom:5px;
+  }
+  /* Einheitlicher Seiten-Kopf für Unterseiten (Freunde, Rangliste, Chat, Spiele, Belohnungen):
+     Eyebrow-Zeile in Gold-Mono + kursive Serif-Überschrift — dieselbe Sprache wie auf Home. */
+  .page-eyebrow{
+    font-family:var(--font-mono);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;
+    color:var(--accent-dim);margin-bottom:4px;display:flex;align-items:center;gap:8px;
+  }
+  .page-eyebrow:after{content:"";height:1px;width:34px;background:linear-gradient(90deg,var(--accent-dim),transparent);}
+  .friends-head h1, .lb-head h1, .chat-sidebar-head h1, .bj-head-text h1{
+    font-style:italic;letter-spacing:-.2px;
   }
   .section-head h2{font-family:var(--font-display);font-style:italic;font-size:19px;font-weight:600;color:var(--text);letter-spacing:-.1px;}
   .section-head a{font-size:12.5px;color:var(--muted);text-decoration:none;font-weight:500;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:5px;}
@@ -1213,8 +1275,15 @@
 
   /* user-chip dropdown header */
   .dropdown .dd-head{
-    display:flex;align-items:center;gap:12px;padding:17px 16px 15px;
-    background:linear-gradient(180deg,rgba(212,175,106,.07),transparent);
+    display:flex;align-items:center;gap:12px;padding:17px 16px 15px;position:relative;
+    background:
+      radial-gradient(ellipse 220px 90px at 20% 0%, rgba(212,175,106,.10), transparent 70%),
+      linear-gradient(180deg, rgba(28,72,48,.30), transparent);
+  }
+  /* feine Goldkante unter dem Kopf — dieselbe Sprache wie der Sidebar-Markenkopf */
+  .dropdown .dd-head:after{
+    content:"";position:absolute;left:10px;right:10px;bottom:0;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(212,175,106,.30),transparent);
   }
   .dropdown .dd-head .avatar{display:flex;align-items:center;
     justify-content:center;color:var(--accent-ink);font-weight:700;font-size:15px;flex-shrink:0;}
@@ -1224,10 +1293,9 @@
   .dropdown .dd-menu-divider{height:1px;background:var(--border);margin:0 8px;}
   .dropdown .dd-menu{padding:8px;}
 
-  /* einziger Menüpunkt, der übrig bleibt (Einstellungen wohnt jetzt in der
-     Sidebar) — deshalb als klarer, eigenständiger Button statt Listenzeile */
+  /* Abmelden hebt sich als eigenständiger Button vom restlichen Menü ab */
   .dropdown .dd-logout-btn{
-    width:100%;display:flex;align-items:center;justify-content:center;gap:9px;
+    width:100%;display:flex;align-items:center;justify-content:center;gap:9px;margin-top:6px;
     padding:11px 14px;border-radius:10px;border:1px solid var(--border);
     background:var(--surface-2);color:var(--muted);font-size:13px;font-weight:600;
     font-family:var(--font-body);cursor:pointer;transition:.15s;
@@ -1237,7 +1305,7 @@
     color:var(--danger);border-color:rgba(193,68,60,.4);background:rgba(193,68,60,.1);
   }
 
-  /* ---------- Account-Snapshot im User-Dropdown: kompakte Level-/Chips-Kacheln + Schnellfarbe ---------- */
+  /* ---------- Account-Snapshot im User-Dropdown: kompakte Level-/Chips-Kacheln ---------- */
   .dd-stats{display:flex;gap:8px;padding:14px 14px 12px;}
   .dd-stat-tile{
     flex:1;min-width:0;display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:11px;
@@ -1262,25 +1330,23 @@
   .dd-stat-label{font-size:12.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .dd-stat-sub{font-size:10px;color:var(--muted);font-family:var(--font-mono);letter-spacing:.2px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
-  .dd-color-row{padding:2px 14px 14px;}
-  .dd-color-row-label{
-    display:block;font-size:9.5px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;
-    color:var(--faint);margin-bottom:9px;
+  /* Menü-Einträge im User-Dropdown: Icon-Chip links, Pfeil rechts erscheint beim Hover */
+  .dd-menu-icon{
+    width:28px;height:28px;border-radius:8px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--surface-2);border:1px solid var(--border);transition:.14s;
   }
-  .dd-color-dots{display:flex;align-items:center;gap:8px;}
-  .dd-color-dot{
-    width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent;flex-shrink:0;
-    box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);transition:transform .15s ease, box-shadow .15s ease;
+  .dd-menu-icon svg{width:14px;height:14px;fill:var(--muted);transition:.14s;}
+  .dropdown .dd-menu div:hover .dd-menu-icon{
+    background:var(--accent-soft);border-color:rgba(212,175,106,.35);
   }
-  .dd-color-dot:hover{transform:translateY(-2px);}
-  .dd-color-dot.selected{border-color:var(--accent-hi);box-shadow:0 0 0 3px var(--accent-soft);}
-  .dd-color-more{
-    width:20px;height:20px;border-radius:50%;flex-shrink:0;cursor:pointer;
-    display:flex;align-items:center;justify-content:center;background:var(--surface-2);
-    border:1px dashed var(--border);color:var(--muted);transition:.15s;
+  .dropdown .dd-menu div:hover .dd-menu-icon svg{fill:var(--accent-hi);}
+  .dd-menu-arrow{
+    width:12px !important;height:12px !important;margin-left:auto;flex-shrink:0;
+    fill:none !important;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;
+    opacity:0;transform:translateX(-4px);transition:.14s;
   }
-  .dd-color-more:hover{color:var(--accent-hi);border-color:var(--accent-dim);transform:translateY(-2px);}
-  .dd-color-more svg{width:11px;height:11px;fill:currentColor;}
+  .dropdown .dd-menu div:hover .dd-menu-arrow{opacity:.8;transform:none;}
   @media (max-width:420px){
     .dd-stats{flex-wrap:wrap;}
   }
@@ -3111,6 +3177,49 @@
     .glo-title{font-size:27px;margin-bottom:16px;}
     .glo-item{justify-content:center;}
   }
+
+  /* ================= FEINSCHLIFF: kleine Details überall =================== */
+
+  /* Tastatur-Fokus sichtbar in Gold — für alle interaktiven Elemente */
+  :focus-visible{outline:2px solid var(--accent-dim);outline-offset:2px;border-radius:6px;}
+
+  /* Gold-Buttons bekommen beim Hover einen Lichtstreifen, der durchläuft */
+  #heroCta, .submit, .topbar-login-btn, .reward-claim-btn{position:relative;overflow:hidden;}
+  #heroCta:after, .submit:after, .topbar-login-btn:after, .reward-claim-btn:after{
+    content:"";position:absolute;top:-40%;bottom:-40%;left:-70%;width:34%;
+    background:linear-gradient(105deg,transparent,rgba(255,255,255,.34),transparent);
+    transform:skewX(-18deg);transition:none;pointer-events:none;
+  }
+  #heroCta:hover:after, .submit:hover:after, .topbar-login-btn:hover:after, .reward-claim-btn:hover:after{
+    animation:btnSheen .7s ease;
+  }
+  @keyframes btnSheen{ from{left:-70%;} to{left:140%;} }
+
+  /* Sidebar: Icons rücken beim Hover eine Idee mit, aktive Glyphe glüht */
+  .nav-item svg{transition:transform .16s ease;}
+  .nav-item:hover svg{transform:translateX(2px);}
+  .nav-item.active svg{filter:drop-shadow(0 0 5px rgba(240,207,142,.45));}
+
+  /* Große Kartensymbol-Wasserzeichen in den Seiten-Köpfen der Unterseiten */
+  .friends-wrap, .lb-wrap, .rewards-wrap{position:relative;}
+  .friends-wrap:before, .lb-wrap:before, .rewards-wrap:before{
+    position:absolute;top:-44px;right:-8px;font-family:var(--font-display);
+    font-size:190px;line-height:1;color:rgba(212,175,106,.045);pointer-events:none;user-select:none;
+  }
+  .friends-wrap:before{content:"♥";}
+  .lb-wrap:before{content:"♛";}
+  .rewards-wrap:before{content:"♦";}
+
+  /* Schlanke Scrollbalken in Panels & Listen (statt Browser-Standard) */
+  .panel-dropdown ::-webkit-scrollbar, .chat-messages::-webkit-scrollbar,
+  .friend-panel::-webkit-scrollbar, .search-results::-webkit-scrollbar{width:8px;}
+  .panel-dropdown ::-webkit-scrollbar-thumb, .chat-messages::-webkit-scrollbar-thumb,
+  .friend-panel::-webkit-scrollbar-thumb, .search-results::-webkit-scrollbar-thumb{
+    background:var(--border);border-radius:6px;
+  }
+  .panel-dropdown ::-webkit-scrollbar-thumb:hover, .chat-messages::-webkit-scrollbar-thumb:hover{
+    background:var(--accent-dim);
+  }
 </style>
 </head>
 <body>
@@ -3433,11 +3542,12 @@
 
 <div class="main">
   <div class="topbar">
-    <div class="search">
+    <div class="search" id="topSearch">
       <svg viewBox="0 0 24 24"><path d="M15.5 14h-.8l-.3-.3a6.5 6.5 0 10-.7.7l.3.3v.8l5 5L20.5 19zm-6 0a4.5 4.5 0 110-9 4.5 4.5 0 010 9z"/></svg>
-      <input placeholder="Spiele, Erlebnisse suchen">
+      <input id="topSearchInput" placeholder="Spiele &amp; Seiten suchen" autocomplete="off" spellcheck="false">
+      <span class="search-kbd" id="searchKbd">Strg K</span>
+      <div class="search-results" id="searchResults"></div>
     </div>
-    <div class="alpha-tag" title="Royal Deck befindet sich noch in der Alpha-Phase – es kann zu Bugs, Datenverlust oder Änderungen ohne Vorwarnung kommen.">ALPHA BUILD</div>
     <div class="top-right">
       <div class="hud-cluster hud-cluster-utility" id="statusCluster">
         <div class="icon-btn-wrap">
@@ -4339,7 +4449,7 @@
         Entdecken
       </div>
       <h1>Erweitere deine Bibliothek</h1>
-      <p>Alle Tische von Royal Table an einem Ort – füg dir die Spiele hinzu, die du am Tisch haben willst.</p>
+      <p>Alle Tische von Royal Deck an einem Ort – füg dir die Spiele hinzu, die du am Tisch haben willst.</p>
     </div>
 
     <div class="section-head">
@@ -4354,6 +4464,7 @@
   <div class="content" id="friendsView" style="display:none;">
     <div class="friends-wrap">
       <div class="friends-head">
+        <div class="page-eyebrow">Community</div>
         <h1>Freunde</h1>
         <p>Suche Spieler über ihren Benutzernamen und verwalte deine Freundschaften.</p>
         <p style="margin-top:4px;">Dein Benutzername: <strong style="color:var(--accent-hi);" id="ownUsernameTag">—</strong></p>
@@ -4380,6 +4491,7 @@
     <div class="chat-wrap">
       <div class="chat-sidebar">
         <div class="chat-sidebar-head">
+          <div class="page-eyebrow">Community</div>
           <h1>Chat</h1>
           <p>Schreibe mit deinen Freunden.</p>
         </div>
@@ -4406,6 +4518,7 @@
   <div class="content" id="leaderboardView" style="display:none;">
     <div class="lb-wrap">
       <div class="lb-head">
+        <div class="page-eyebrow">Wettbewerb</div>
         <h1>Rangliste</h1>
         <p>Die Spieler mit den meisten XP. XP verdienst du durch Gewinne — je höher der Gewinn, desto mehr.</p>
       </div>
@@ -4421,6 +4534,7 @@
           <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>
         </button>
         <div class="bj-head-text">
+          <div class="page-eyebrow">Casino-Tisch</div>
           <h1>Blackjack</h1>
           <p>Solo-Tisch gegen den Dealer · schlag ihn auf 21.</p>
         </div>
@@ -4495,6 +4609,7 @@
           <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>
         </button>
         <div class="bj-head-text">
+          <div class="page-eyebrow">Automat</div>
           <h1>Walzenglück</h1>
           <p>Dreh die Walzen und triff drei gleiche Zeichen auf der Linie.</p>
         </div>
@@ -4534,6 +4649,7 @@
         <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>
       </button>
       <div class="bj-head-text">
+        <div class="page-eyebrow">Arcade</div>
         <h1>Chicken Road</h1>
         <p>Überquer die Fahrbahn und nimm deinen Multiplikator mit, bevor's kracht.</p>
       </div>
@@ -4644,6 +4760,7 @@
         <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>
       </button>
       <div class="bj-head-text">
+        <div class="page-eyebrow">Boni des Hauses</div>
         <h1>Belohnungen</h1>
         <p>Schau täglich vorbei und hol dir deinen Bonus.</p>
       </div>
@@ -5030,6 +5147,120 @@
   });
   document.getElementById('allGamesLink').addEventListener('click', () => {
     document.getElementById('gamesSection').scrollIntoView({ behavior:'smooth', block:'start' });
+  });
+
+  // --- Topbar-Suche: durchsucht Spiele + Seiten, mit Tastatursteuerung (Strg+K, Pfeile, Enter) ---
+  const searchInput = document.getElementById('topSearchInput');
+  const searchResults = document.getElementById('searchResults');
+  let searchSel = 0; // Index des per Pfeiltasten markierten Treffers
+  const SEARCH_PAGES = [
+    { label:'Home',          sub:'Deine Spielbibliothek',               icon:'<svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9h-5v-6H11v6H6v-9H3z"/></svg>' },
+    { label:'Entdecken',     sub:'Alle Spiele im Katalog',              icon:'<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm3.6 6.4l-1.9 4.9-4.9 1.9 1.9-4.9z"/></svg>' },
+    { label:'Freunde',       sub:'Spieler finden & verwalten',          icon:'<svg viewBox="0 0 24 24"><path d="M16 11c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3 1.3 3 3 3zm-8 0c1.7 0 3-1.3 3-3S9.7 5 8 5 5 6.3 5 8s1.3 3 3 3zm0 2c-2.3 0-7 1.2-7 3.5V19h9v-2.5c0-.9.4-1.9 1.2-2.7C10 13.4 8.7 13 8 13z"/></svg>' },
+    { label:'Chat',          sub:'Mit Freunden schreiben',              icon:'<svg viewBox="0 0 24 24"><path d="M4 4h16v12H5.2L4 17.2zm2 3v2h12V7zm0 4v2h8v-2z"/></svg>' },
+    { label:'Rangliste',     sub:'Die besten Spieler nach XP',          icon:'<svg viewBox="0 0 24 24"><path d="M7 3h10v2h3v3a4 4 0 01-4 3.9 5 5 0 01-3 2.6V17h3v2H8v-2h3v-2.5a5 5 0 01-3-2.6A4 4 0 014 8V5h3z"/></svg>' },
+    { label:'Belohnungen',   sub:'Täglicher Bonus & Levelbelohnungen',  icon:'<svg viewBox="0 0 24 24"><path d="M4 8h16v3h-1.2v9H5.2V11H4zm7 0v11h2V8z"/></svg>' },
+    { label:'Einstellungen', sub:'Profil, Darstellung, Sicherheit',     icon:'<svg viewBox="0 0 24 24"><path d="M19.4 13a7.9 7.9 0 000-2l2.1-1.6-2-3.4-2.5 1a8 8 0 00-1.7-1L14.9 3H9.1l-.4 2.9a8 8 0 00-1.7 1l-2.5-1-2 3.4L4.6 11a7.9 7.9 0 000 2l-2.1 1.6 2 3.4 2.5-1a8 8 0 001.7 1l.4 2.9h5.8l.4-2.9a8 8 0 001.7-1l2.5 1 2-3.4zM12 15.5a3.5 3.5 0 110-7 3.5 3.5 0 010 7z"/></svg>' },
+  ];
+  function searchMatches(q){
+    const n = q.trim().toLowerCase();
+    if(!n) return [];
+    const score = (label, sub) => {
+      const l = label.toLowerCase();
+      if(l.startsWith(n)) return 0;
+      if(l.includes(n)) return 1;
+      if((sub || '').toLowerCase().includes(n)) return 2;
+      return -1;
+    };
+    const hits = [];
+    games.forEach(g => { const s = score(g.name, g.desc); if(s >= 0) hits.push({ type:'game', s, name:g.name, sub:g.desc, suit:g.suit }); });
+    SEARCH_PAGES.forEach(p => { const s = score(p.label, p.sub); if(s >= 0) hits.push({ type:'page', s, name:p.label, sub:p.sub, icon:p.icon }); });
+    return hits.sort((a,b) => a.s - b.s || a.name.localeCompare(b.name)).slice(0, 7);
+  }
+  function highlightName(name, q){
+    const i = name.toLowerCase().indexOf(q.trim().toLowerCase());
+    if(i < 0) return name;
+    return `${name.slice(0,i)}<b>${name.slice(i, i+q.trim().length)}</b>${name.slice(i+q.trim().length)}`;
+  }
+  function renderSearchResults(){
+    const q = searchInput.value;
+    const hits = searchMatches(q);
+    if(!q.trim()){ searchResults.classList.remove('open'); return; }
+    if(hits.length === 0){
+      searchResults.innerHTML = `<div class="sr-empty">Nichts gefunden für „<b>${q.replace(/</g,'&lt;')}</b>“</div>`;
+      searchResults.classList.add('open');
+      return;
+    }
+    searchSel = Math.min(searchSel, hits.length - 1);
+    let html = '', lastType = null;
+    hits.forEach((h, i) => {
+      if(h.type !== lastType){
+        html += `<div class="sr-cat">${h.type === 'game' ? 'Spiele' : 'Seiten'}</div>`;
+        lastType = h.type;
+      }
+      const icon = h.type === 'game' ? h.suit : h.icon;
+      html += `
+        <div class="sr-item${i === searchSel ? ' sel' : ''}" data-sr="${i}">
+          <div class="sr-icon">${icon}</div>
+          <div class="sr-text">
+            <div class="sr-name">${highlightName(h.name, q)}</div>
+            <div class="sr-sub">${h.sub}</div>
+          </div>
+          <span class="sr-enter">Enter</span>
+        </div>`;
+    });
+    searchResults.innerHTML = html;
+    searchResults.classList.add('open');
+    searchResults.querySelectorAll('.sr-item').forEach(el => {
+      el.addEventListener('pointerdown', (e) => { e.preventDefault(); activateSearchHit(hits[parseInt(el.dataset.sr, 10)]); });
+      el.addEventListener('pointerenter', () => {
+        searchSel = parseInt(el.dataset.sr, 10);
+        searchResults.querySelectorAll('.sr-item').forEach(x => x.classList.toggle('sel', x === el));
+      });
+    });
+  }
+  function closeSearch(){
+    searchResults.classList.remove('open');
+    searchSel = 0;
+  }
+  function activateSearchHit(hit){
+    if(!hit) return;
+    closeSearch();
+    searchInput.value = '';
+    searchInput.blur();
+    if(hit.type === 'game'){
+      openGame(hit.name);
+      return;
+    }
+    // Seiten laufen über den normalen Nav-Klick, damit Login-Guards + aktiver Zustand stimmen
+    const nav = [...document.querySelectorAll('.nav-item')].find(n => n.querySelector('span')?.textContent === hit.name);
+    if(nav) nav.click();
+  }
+  searchInput.addEventListener('input', () => { searchSel = 0; renderSearchResults(); });
+  searchInput.addEventListener('focus', () => { if(searchInput.value.trim()) renderSearchResults(); });
+  searchInput.addEventListener('keydown', (e) => {
+    const hits = searchMatches(searchInput.value);
+    if(e.key === 'ArrowDown'){ e.preventDefault(); if(hits.length){ searchSel = (searchSel + 1) % hits.length; renderSearchResults(); } }
+    else if(e.key === 'ArrowUp'){ e.preventDefault(); if(hits.length){ searchSel = (searchSel - 1 + hits.length) % hits.length; renderSearchResults(); } }
+    else if(e.key === 'Enter'){ e.preventDefault(); activateSearchHit(hits[searchSel] || hits[0]); }
+    else if(e.key === 'Escape'){ closeSearch(); searchInput.blur(); }
+  });
+  document.addEventListener('keydown', (e) => {
+    if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k'){
+      e.preventDefault();
+      searchInput.focus();
+      searchInput.select();
+    }
+  });
+  document.addEventListener('click', (e) => {
+    if(!document.getElementById('topSearch').contains(e.target)) closeSearch();
+  });
+
+  // Gesperrte "Bald verfügbar"-Karten geben Feedback statt stumm zu bleiben
+  document.addEventListener('click', (e) => {
+    if(e.target.closest('.card.locked, .discover-card.locked')){
+      showToast('Bald verfügbar — ein neues Spiel ist in Arbeit. 🃏');
+    }
   });
 
   // Sidebar-Navigation: Home und Freunde sind gebaut, restliche Bereiche folgen später
@@ -8374,8 +8605,7 @@
       currentProfile = null;
       pointsDisplay.style.display = 'none';
       updateHeroGreeting('Gast');
-      authArea.innerHTML = `<button id="loginBtn" style="background:var(--accent);color:var(--accent-ink);border:none;
-        padding:9px 20px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;font-family:var(--font-body);">Anmelden</button>`;
+      authArea.innerHTML = `<button id="loginBtn" class="topbar-login-btn">Anmelden</button>`;
       document.getElementById('loginBtn').addEventListener('click', () => openModal('login'));
       updateNotifBadge();
       renderNotifList();
@@ -8405,7 +8635,6 @@
     const adminTagHTML = `<span class="admin-access-tag"><svg viewBox="0 0 24 24"><path d="M5 16L3 6l5.5 4L12 4l3.5 6L21 6l-2 10H5zm0 2h14v2H5z"/></svg>Adminzugriff</span>`;
     const xpIntoLevel = getXp() % XP_PER_LEVEL;
     const xpToNext = XP_PER_LEVEL - xpIntoLevel;
-    const quickColors = AVATAR_COLORS.slice(0, 6);
     authArea.innerHTML = `
       <div class="user-chip" id="userChip">
         <div class="avatar-ring" style="--ring-pct:${ringPct}">
@@ -8449,21 +8678,22 @@
             </div>
           </div>
 
-          <div class="dd-color-row">
-            <span class="dd-color-row-label">Schnellfarbe</span>
-            <div class="dd-color-dots" id="ddColorDots">
-              ${quickColors.map(c => `<div class="dd-color-dot${c === selectedColor ? ' selected' : ''}" style="background:${c}" data-color="${c.replace(/"/g, '&quot;')}"></div>`).join('')}
-              <div class="dd-color-more" id="ddColorMore" title="Weitere Farben in den Einstellungen">
-                <svg viewBox="0 0 24 24"><path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"/></svg>
-              </div>
-            </div>
-          </div>
-
           <div class="dd-menu-divider"></div>
           <div class="dd-menu">
             <div id="ddEditProfileBtn">
-              <svg viewBox="0 0 24 24"><path d="M12 9a3.5 3.5 0 100 7 3.5 3.5 0 000-7zM9 3L7.5 5H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.5L15 3z"/></svg>
+              <span class="dd-menu-icon"><svg viewBox="0 0 24 24"><path d="M12 9a3.5 3.5 0 100 7 3.5 3.5 0 000-7zM9 3L7.5 5H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.5L15 3z"/></svg></span>
               Profil bearbeiten
+              <svg class="dd-menu-arrow" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+            </div>
+            <div id="ddRewardsBtn">
+              <span class="dd-menu-icon"><svg viewBox="0 0 24 24"><path d="M4 8h16v3h-1.2v9H5.2V11H4zm7 0v11h2V8zm-2.5-4.5c1.5 0 2.7 1 3.2 2.3.5-1.3 1.7-2.3 3.2-2.3A2.3 2.3 0 0117.2 6c0 .7-.2 1.4-.7 2H7.5c-.5-.6-.7-1.3-.7-2a2.3 2.3 0 011.7-2.5z"/></svg></span>
+              Belohnungen
+              <svg class="dd-menu-arrow" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+            </div>
+            <div id="ddSettingsBtn">
+              <span class="dd-menu-icon"><svg viewBox="0 0 24 24"><path d="M19.4 13a7.9 7.9 0 000-2l2.1-1.6-2-3.4-2.5 1a8 8 0 00-1.7-1L14.9 3H9.1l-.4 2.9a8 8 0 00-1.7 1l-2.5-1-2 3.4L4.6 11a7.9 7.9 0 000 2l-2.1 1.6 2 3.4 2.5-1a8 8 0 001.7 1l.4 2.9h5.8l.4-2.9a8 8 0 001.7-1l2.5 1 2-3.4zM12 15.5a3.5 3.5 0 110-7 3.5 3.5 0 010 7z"/></svg></span>
+              Einstellungen
+              <svg class="dd-menu-arrow" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
             </div>
             <button type="button" id="logoutBtn" class="dd-logout-btn">
               <svg viewBox="0 0 24 24"><path d="M16 13v-2H7V8l-5 4 5 4v-3zM20 3H10v2h10v14H10v2h10a2 2 0 002-2V5a2 2 0 00-2-2z"/></svg>
@@ -8484,25 +8714,20 @@
       e.stopPropagation();
       logout();
     });
-    document.querySelectorAll('#ddColorDots .dd-color-dot').forEach(dot => {
-      dot.addEventListener('click', async (e) => {
-        e.stopPropagation();
-        selectedColor = dot.dataset.color;
-        if(typeof syncAvatarSwatchSelection === 'function') syncAvatarSwatchSelection();
-        const initial2 = currentProfile ? currentProfile.name.charAt(0).toUpperCase() : 'H';
-        updateAvatarPreviews(initial2);
-        await persistAvatarSelection();
-        renderAuthArea(currentProfile, currentUserEmail);
-        // Dropdown nach der Schnellauswahl offen halten, damit man mehrere Farben vergleichen kann.
-        document.getElementById('dropdown')?.classList.add('open');
-        document.getElementById('userChip')?.classList.add('active');
-      });
-    });
-    document.getElementById('ddColorMore')?.addEventListener('click', (e) => {
-      e.stopPropagation();
+    const closeUserDropdown = () => {
       document.getElementById('dropdown')?.classList.remove('open');
       document.getElementById('userChip')?.classList.remove('active');
-      openSettings(currentUserEmail, 'appearance');
+    };
+    document.getElementById('ddRewardsBtn')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeUserDropdown();
+      const nav = [...document.querySelectorAll('.nav-item')].find(n => n.querySelector('span')?.textContent === 'Belohnungen');
+      if(nav) nav.click();
+    });
+    document.getElementById('ddSettingsBtn')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeUserDropdown();
+      openSettings(currentUserEmail);
     });
     document.getElementById('ddEditProfileBtn')?.addEventListener('click', (e) => {
       e.stopPropagation();
