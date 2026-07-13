@@ -242,20 +242,44 @@
   .level-chip:active{transform:scale(.97);}
   .level-chip.active{background:rgba(212,175,106,.1);border-color:rgba(212,175,106,.32);}
   .level-chip .chip-coin{
-    width:32px;height:32px;border-radius:50%;flex-shrink:0;position:relative;box-sizing:border-box;padding:2.5px;
-    background:conic-gradient(var(--accent-hi) calc(var(--ring-pct,35) * 1%),rgba(212,175,106,.16) 0);
+    width:35px;height:35px;border-radius:50%;flex-shrink:0;position:relative;box-sizing:border-box;padding:3px;
+    /* Professioneller Fortschrittsring: startet oben (12 Uhr, from -90deg), verlaeuft
+       von Dunkelgold zu Hellgold bis zum Fortschritt, danach dezente Rest-Spur. */
+    background:conic-gradient(from -90deg,
+      var(--accent-dim),
+      var(--accent-hi) calc(var(--ring-pct,8) * 1%),
+      rgba(212,175,106,.14) calc(var(--ring-pct,8) * 1%));
     display:flex;align-items:center;justify-content:center;
+    filter:drop-shadow(0 0 3px rgba(240,207,142,.30));
   }
   .level-chip .chip-coin-inner{
-    width:100%;height:100%;border-radius:50%;
+    width:100%;height:100%;border-radius:50%;position:relative;overflow:hidden;
     background:radial-gradient(circle at 34% 30%,var(--accent-hi),var(--accent) 65%,var(--accent-dim));
     display:flex;align-items:center;justify-content:center;
     box-shadow:0 0 0 2px var(--panel);
   }
-  .level-chip .chip-coin-inner svg{width:12px;height:12px;fill:var(--accent-ink);}
+  /* Glanzstrahl, der langsam ueber die Muenze wandert — laesst das Gold "leben" */
+  .level-chip .chip-coin-inner::after{
+    content:"";position:absolute;inset:0;border-radius:50%;
+    background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.55) 50%,transparent 65%);
+    transform:translateX(-120%);animation:coinSheen 4.5s ease-in-out infinite;
+  }
+  @keyframes coinSheen{0%,55%{transform:translateX(-120%);}75%,100%{transform:translateX(120%);}}
+  .level-chip .chip-coin-inner svg{width:13px;height:13px;fill:var(--accent-ink);position:relative;z-index:1;
+    transform-origin:center;animation:starTwinkle 4.5s ease-in-out infinite;}
+  /* Der Stern "funkelt" einmal pro Zyklus: kurzer Pop + Mini-Drehung */
+  @keyframes starTwinkle{
+    0%,60%,100%{transform:scale(1) rotate(0deg);}
+    68%{transform:scale(1.28) rotate(9deg);}
+    76%{transform:scale(.94) rotate(-4deg);}
+    84%{transform:scale(1.08) rotate(0deg);}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .level-chip .chip-coin-inner svg, .level-chip .chip-coin-inner::after{animation:none;}
+  }
   .level-chip .chip-text{display:flex;flex-direction:column;line-height:1.2;gap:2px;}
-  .level-chip .chip-level{font-size:11.5px;font-weight:700;color:var(--accent-hi);letter-spacing:.3px;font-family:var(--font-body);}
-  .level-chip .chip-sub{font-size:9.5px;color:var(--faint);font-family:var(--font-mono);letter-spacing:.2px;}
+  .level-chip .chip-level{font-size:12px;font-weight:700;color:var(--accent-hi);letter-spacing:.2px;font-family:var(--font-body);}
+  .level-chip .chip-sub{font-size:10.5px;color:var(--muted);font-family:var(--font-body);font-weight:600;letter-spacing:.1px;}
   .level-chip .chip-caret{width:11px;height:11px;fill:var(--faint);flex-shrink:0;transition:.16s;}
   .level-chip:hover .chip-caret{fill:var(--accent-hi);}
   .level-chip.active .chip-caret{fill:var(--accent-hi);transform:rotate(180deg);}
@@ -281,12 +305,17 @@
   .level-dropdown:before{left:20px;right:auto;}
   .level-panel-body{padding:16px 20px 20px;display:flex;flex-direction:column;align-items:center;text-align:center;}
   .lvl-ring-big{
-    width:60px;height:60px;border-radius:50%;position:relative;padding:4px;box-sizing:border-box;margin-bottom:10px;
-    background:conic-gradient(var(--accent-hi) calc(var(--ring-pct,0) * 1%),rgba(212,175,106,.16) 0);
+    width:64px;height:64px;border-radius:50%;position:relative;padding:5px;box-sizing:border-box;margin-bottom:10px;
+    background:conic-gradient(from -90deg,
+      var(--accent-dim),
+      var(--accent-hi) calc(var(--ring-pct,0) * 1%),
+      rgba(212,175,106,.14) calc(var(--ring-pct,0) * 1%));
+    filter:drop-shadow(0 0 5px rgba(240,207,142,.28));
   }
   .lvl-ring-big span{
     width:100%;height:100%;border-radius:50%;background:var(--panel);display:flex;align-items:center;justify-content:center;
-    font-family:var(--font-display);font-size:19px;font-weight:700;color:var(--accent-hi);
+    font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--accent-hi);
+    box-shadow:inset 0 0 0 1px rgba(212,175,106,.15);
   }
   .lvl-panel-level{font-family:var(--font-display);font-size:14.5px;font-weight:600;color:var(--text);}
   .lvl-panel-xp{font-size:11px;color:var(--muted);font-family:var(--font-mono);margin-top:3px;margin-bottom:12px;}
@@ -3590,7 +3619,7 @@
         <div class="hud-divider"></div>
 
         <div class="chips-chip" id="chipsDisplay" title="Dein Chip-Kontostand">
-          <div class="chips-chip-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 4.5 2 7.5V16.5C2 19.5 6.5 22 12 22S22 19.5 22 16.5V7.5C22 4.5 17.5 2 12 2ZM12 4C16.4 4 20 5.6 20 7.5S16.4 11 12 11 4 9.4 4 7.5 7.6 4 12 4Z"/></svg></div>
+          <div class="chips-chip-icon"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="14.6" rx="8" ry="3.2"/><ellipse cx="12" cy="11.5" rx="8" ry="3.2"/><ellipse cx="12" cy="8.4" rx="8" ry="3.2"/><g fill="none" stroke="var(--accent)" stroke-width="1"><path d="M4.3 15.1c1.6 1.3 4.5 2.1 7.7 2.1s6.1-.8 7.7-2.1"/><path d="M4.3 12c1.6 1.3 4.5 2.1 7.7 2.1s6.1-.8 7.7-2.1"/></g><ellipse cx="12" cy="8.4" rx="2.7" ry="1" fill="var(--accent)"/></svg></div>
           <div class="chip-text"><span class="chip-points-label">Chips</span><span class="chip-points-val" id="chipsCountVal">0</span></div>
         </div>
 
@@ -3598,7 +3627,7 @@
 
         <div class="icon-btn-wrap">
           <div class="icon-btn" id="notifBtn">
-            <svg viewBox="0 0 24 24"><path d="M12 22a2 2 0 002-2h-4a2 2 0 002 2zm6-6v-5a6 6 0 10-12 0v5l-2 2v1h16v-1z"/></svg>
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="4.2" r="1.5"/><path d="M12 5.5C7.9 5.5 4.6 8.8 4.6 12.9V14.6H19.4V12.9C19.4 8.8 16.1 5.5 12 5.5Z"/><rect x="2.8" y="15.2" width="18.4" height="2.2" rx="1.1"/></svg>
             <div class="badge" id="notifBadge">3</div>
           </div>
           <div class="dropdown panel-dropdown" id="notifDropdown">
@@ -3616,7 +3645,7 @@
 
         <div class="icon-btn-wrap">
           <div class="icon-btn" id="mailBtn">
-            <svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 4l-8 5-8-5V6l8 5 8-5z"/></svg>
+            <svg viewBox="0 0 24 24" fill-rule="evenodd"><path d="M4 5.5h16a2 2 0 012 2v9a2 2 0 01-2 2H4a2 2 0 01-2-2v-9a2 2 0 012-2zm.4 2.3L12 12.6l7.6-4.8v1.2L12 13.8 4.4 9z"/><circle cx="12" cy="14.6" r="3.2" fill="var(--accent)"/><path fill="var(--panel)" d="M12 12.6l1.7 2-1.7 2-1.7-2z"/></svg>
             <div class="badge badge-gold" id="mailBadge">0</div>
           </div>
           <div class="dropdown panel-dropdown" id="mailDropdown">
