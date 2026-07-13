@@ -243,14 +243,15 @@
   .level-chip.active{background:rgba(212,175,106,.1);border-color:rgba(212,175,106,.32);}
   .level-chip .chip-coin{
     width:35px;height:35px;border-radius:50%;flex-shrink:0;position:relative;box-sizing:border-box;padding:3px;
-    /* Professioneller Fortschrittsring: startet oben (12 Uhr, from -90deg), verlaeuft
-       von Dunkelgold zu Hellgold bis zum Fortschritt, danach dezente Rest-Spur. */
-    background:conic-gradient(from -90deg,
-      var(--accent-dim),
-      var(--accent-hi) calc(var(--ring-pct,8) * 1%),
-      rgba(212,175,106,.14) calc(var(--ring-pct,8) * 1%));
+    /* Fortschrittsring: startet oben bei 12 Uhr und fuellt im Uhrzeigersinn.
+       conic-gradient beginnt ohne "from" bereits bei 0deg = 12 Uhr. Klares
+       Hellgold fuer den Fortschritt, dezente dunkle Rest-Spur dahinter. */
+    background:conic-gradient(var(--accent-hi) calc(var(--ring-pct,8) * 1%), rgba(255,255,255,.07) 0);
     display:flex;align-items:center;justify-content:center;
-    filter:drop-shadow(0 0 3px rgba(240,207,142,.30));
+  }
+  /* feiner dunkler Rand aussen, damit der Ring sich sauber von der HUD-Leiste abhebt */
+  .level-chip .chip-coin::before{
+    content:"";position:absolute;inset:-1px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.35);pointer-events:none;
   }
   .level-chip .chip-coin-inner{
     width:100%;height:100%;border-radius:50%;position:relative;overflow:hidden;
@@ -306,11 +307,11 @@
   .level-panel-body{padding:16px 20px 20px;display:flex;flex-direction:column;align-items:center;text-align:center;}
   .lvl-ring-big{
     width:64px;height:64px;border-radius:50%;position:relative;padding:5px;box-sizing:border-box;margin-bottom:10px;
-    background:conic-gradient(from -90deg,
-      var(--accent-dim),
-      var(--accent-hi) calc(var(--ring-pct,0) * 1%),
-      rgba(212,175,106,.14) calc(var(--ring-pct,0) * 1%));
-    filter:drop-shadow(0 0 5px rgba(240,207,142,.28));
+    /* Start oben bei 12 Uhr, im Uhrzeigersinn — klares Hellgold, dezente Rest-Spur */
+    background:conic-gradient(var(--accent-hi) calc(var(--ring-pct,0) * 1%), rgba(255,255,255,.07) 0);
+  }
+  .lvl-ring-big::before{
+    content:"";position:absolute;inset:-1px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.3);pointer-events:none;
   }
   .lvl-ring-big span{
     width:100%;height:100%;border-radius:50%;background:var(--panel);display:flex;align-items:center;justify-content:center;
