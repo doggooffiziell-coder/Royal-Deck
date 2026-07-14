@@ -544,16 +544,91 @@
      kippender 3D-Rahmen, ein durchlaufender Foil-Wisch beim Hover und ein
      spielfarbiger Ambient-Glow. Bewegt sich klar weg vom reinen Icon-Quadrat,
      bleibt aber in der Gold/Filz-Materialsprache der Seite. */
+  /* ---- Kategorie-Filter über der Bibliothek: gruppiert die Tische optisch
+     und gibt der Sektion mehr Struktur, statt dass Karten frei im Raum stehen. ---- */
+  .lib-filter-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
+  .lib-filter-chip{
+    padding:7px 15px;border-radius:20px;font-size:12.5px;font-weight:600;cursor:pointer;
+    color:var(--muted);background:var(--surface);border:1px solid var(--border);transition:.15s;
+    font-family:var(--font-body);user-select:none;
+  }
+  .lib-filter-chip:hover{color:var(--text);border-color:var(--accent-dim);}
+  .lib-filter-chip.active{
+    color:var(--accent-ink);background:linear-gradient(180deg,var(--accent-hi),var(--accent));
+    border-color:transparent;box-shadow:0 4px 12px -4px rgba(212,175,106,.5);
+  }
+
   .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:22px;}
   .row-empty{
     grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    text-align:center;gap:8px;padding:56px 24px;border:1.5px dashed var(--border);border-radius:16px;
-    color:var(--muted);background:rgba(212,175,106,.02);
+    text-align:center;gap:6px;padding:64px 24px;border:1.5px dashed var(--border);border-radius:16px;
+    color:var(--muted);background:
+      radial-gradient(circle at 1px 1px, rgba(212,175,106,.06) 1px, transparent 1.4px) 0 0/24px 24px,
+      rgba(212,175,106,.02);
   }
-  .row-empty svg{width:30px;height:30px;stroke:var(--accent-dim);stroke-width:1.6;fill:none;margin-bottom:6px;}
-  .row-empty p{font-family:var(--font-display);font-size:17px;color:var(--text);font-weight:600;}
-  .row-empty span{font-size:13.5px;color:var(--faint);max-width:360px;}
+  .row-empty-badge{
+    width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:10px;
+    background:radial-gradient(circle at 34% 30%,var(--accent-hi),var(--accent) 65%,var(--accent-dim));
+    box-shadow:0 8px 20px -6px rgba(212,175,106,.5);
+  }
+  .row-empty-badge svg{width:24px;height:24px;fill:none;stroke:var(--accent-ink);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .row-empty p{font-family:var(--font-display);font-style:italic;font-size:18px;color:var(--text);font-weight:600;}
+  .row-empty span{font-size:13.5px;color:var(--faint);max-width:360px;line-height:1.5;margin-bottom:6px;}
+  .row-empty-cta{
+    margin-top:6px;padding:9px 20px;border-radius:9px;border:none;cursor:pointer;
+    background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:var(--accent-ink);
+    font-weight:700;font-size:12.5px;font-family:var(--font-body);transition:.15s;
+  }
+  .row-empty-cta:hover{filter:brightness(1.05);transform:translateY(-1px);}
   .card{cursor:pointer;}
+
+  /* ---- "Warum Royal Deck"-Streifen: fuellt die Seite mit echten Inhalten statt
+     Leerraum, ohne die Tisch-Karten selbst anzufassen. ---- */
+  .perk-section{margin-top:44px;}
+  .perk-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;}
+  .perk-card{
+    padding:20px 20px 22px;border-radius:16px;background:var(--surface);border:1px solid var(--border-soft);
+    transition:.18s;
+  }
+  .perk-card:hover{border-color:rgba(212,175,106,.28);transform:translateY(-2px);box-shadow:0 14px 28px -14px rgba(0,0,0,.5);}
+  .perk-card-icon{
+    width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;
+    background:var(--accent-soft);border:1px solid rgba(212,175,106,.22);
+  }
+  .perk-card-icon svg{width:18px;height:18px;fill:var(--accent-hi);}
+  .perk-card-title{font-family:var(--font-display);font-style:italic;font-size:16px;font-weight:600;color:var(--text);margin-bottom:6px;}
+  .perk-card p{font-size:12.5px;color:var(--muted);line-height:1.6;}
+
+  /* ---- Abschluss-Banner: leitet weiter statt die Seite abrupt enden zu lassen ---- */
+  .lib-more-banner{
+    margin-top:26px;border-radius:18px;padding:26px 28px;display:flex;align-items:center;gap:22px;
+    position:relative;overflow:hidden;
+    background:
+      radial-gradient(ellipse 480px 220px at 85% -30%, rgba(212,175,106,.14), transparent 60%),
+      linear-gradient(120deg,#0b1c13,var(--felt) 60%,#0e2417);
+    border:1px solid var(--border);
+  }
+  .lib-more-banner-suits{
+    position:absolute;right:18px;top:50%;transform:translateY(-50%);font-family:var(--font-display);
+    font-size:44px;color:rgba(212,175,106,.07);letter-spacing:6px;pointer-events:none;white-space:nowrap;
+  }
+  .lib-more-banner-text{flex:1;min-width:0;position:relative;z-index:1;}
+  .lib-more-banner-title{font-family:var(--font-display);font-style:italic;font-size:18px;font-weight:600;color:var(--text);margin-bottom:4px;}
+  .lib-more-banner p{font-size:12.5px;color:var(--muted);line-height:1.55;max-width:480px;}
+  #libMoreBannerBtn{
+    flex-shrink:0;position:relative;z-index:1;display:inline-flex;align-items:center;gap:7px;
+    padding:11px 20px;border-radius:9px;border:none;cursor:pointer;
+    background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:var(--accent-ink);
+    font-weight:700;font-size:13px;font-family:var(--font-body);transition:.15s;
+  }
+  #libMoreBannerBtn:hover{filter:brightness(1.05);transform:translateY(-1px);}
+  #libMoreBannerBtn svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;transition:.15s;}
+  #libMoreBannerBtn:hover svg{transform:translateX(2px);}
+  @media (max-width:640px){
+    .lib-more-banner{flex-direction:column;align-items:flex-start;}
+    .lib-more-banner-suits{display:none;}
+    #libMoreBannerBtn{width:100%;justify-content:center;}
+  }
 
   .table-card{
     position:relative;overflow:hidden;border-radius:20px;min-height:200px;
@@ -4625,7 +4700,37 @@
       </div>
       <a id="allGamesLink">Alle anzeigen<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a>
     </div>
+    <div class="lib-filter-row" id="libFilterRow"></div>
     <div class="row" id="row1"></div>
+
+    <div class="perk-section">
+      <div class="perk-row">
+        <div class="perk-card">
+          <div class="perk-card-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 4.5 2 7.5V16.5C2 19.5 6.5 22 12 22S22 19.5 22 16.5V7.5C22 4.5 17.5 2 12 2ZM12 4C16.4 4 20 5.6 20 7.5S16.4 11 12 11 4 9.4 4 7.5 7.6 4 12 4Z"/></svg></div>
+          <div class="perk-card-title">Kein Echtgeld</div>
+          <p>Du spielst ausschließlich mit Punkten. Keine Einzahlung, kein Risiko — nur der Nervenkitzel am Tisch.</p>
+        </div>
+        <div class="perk-card">
+          <div class="perk-card-icon"><svg viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5-3.4 9-8 10-4.6-1-8-5-8-10V6z"/><path fill="var(--panel)" d="M9.8 12.3l1.7 1.7 3.7-4"/></svg></div>
+          <div class="perk-card-title">Faire Tische</div>
+          <p>Jede Karte, jede Walze, jede Runde läuft nach denselben klaren Regeln — für dich einsehbar direkt an jedem Tisch.</p>
+        </div>
+        <div class="perk-card">
+          <div class="perk-card-icon"><svg viewBox="0 0 24 24"><path d="M16 11c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3 1.3 3 3 3zm-8 0c1.7 0 3-1.3 3-3S9.7 5 8 5 5 6.3 5 8s1.3 3 3 3zm0 2c-2.3 0-7 1.2-7 3.5V19h9v-2.5c0-.9.4-1.9 1.2-2.7C10 13.4 8.7 13 8 13zm8 0c-.3 0-.6 0-1 .1 1 .8 1.7 1.9 1.7 3.4V19h6v-2.5c0-2.3-4.7-3.5-6.7-3.5z"/></svg></div>
+          <div class="perk-card-title">Mit Freunden</div>
+          <p>Füg Freunde hinzu, seht euren Fortschritt in der Rangliste und schreibt euch direkt aus dem Spiel heraus.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="lib-more-banner" id="libMoreBanner">
+      <div class="lib-more-banner-suits" aria-hidden="true">♠&nbsp;♥&nbsp;♣&nbsp;♦</div>
+      <div class="lib-more-banner-text">
+        <div class="lib-more-banner-title">Der Saal wächst weiter</div>
+        <p>Neue Tische sind in Arbeit. Schau unter „Entdecken" vorbei, um zu sehen, was als Nächstes an den Tisch kommt.</p>
+      </div>
+      <button type="button" id="libMoreBannerBtn">Zum Katalog<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
   </div>
 
   <div class="content" id="discoverView" style="display:none;">
@@ -5060,14 +5165,14 @@
 
   // Drei echte Spiele — der Rest folgt später als "Bald verfügbar".
   const games = [
-    { name:"Blackjack", suit:"♣", c1:"#1c1408", c2:"#8a6a35", players:"—", desc:"Schlag den Dealer auf 21.",
+    { name:"Blackjack", suit:"♣", c1:"#1c1408", c2:"#8a6a35", players:"—", category:"Kartenspiele", desc:"Schlag den Dealer auf 21.",
       rules:"Ziel: näher an 21 als der Dealer, ohne drüber zu gehen. Bube/Dame/König zählen 10, Ass 1 oder 11. Nach dem Einsatz kannst du Karten ziehen (Hit), stehen bleiben (Stand), verdoppeln (Double) oder bei gleichem Kartenpaar splitten." },
-    { name:"Walzenglück", suit:"★", c1:"#3a0d12", c2:"#c1443c", players:"—", desc:"Drei gleiche Zeichen bringen den Gewinn.",
+    { name:"Walzenglück", suit:"★", c1:"#3a0d12", c2:"#c1443c", players:"—", category:"Automaten", desc:"Drei gleiche Zeichen bringen den Gewinn.",
       rules:"Setz deinen Einsatz und dreh die drei Walzen. Landen alle drei auf demselben Symbol, gewinnst du entsprechend der Symbol-Auszahlung deines Einsatzes." },
-    { name:"Chicken Road", suit:"♠", c1:"#141f0d", c2:"#6fae4a", players:"—", desc:"Über die Fahrbahn hüpfen und Multiplikatoren einsammeln.",
+    { name:"Chicken Road", suit:"♠", c1:"#141f0d", c2:"#6fae4a", players:"—", category:"Arcade", desc:"Über die Fahrbahn hüpfen und Multiplikatoren einsammeln.",
       rules:"Setz deinen Einsatz und wähle eine Schwierigkeit. Das Huhn läuft automatisch über die Fahrbahn — jede überquerte Spur erhöht deinen Multiplikator. Nimm jederzeit deinen Gewinn mit (Auszahlen), oder riskier die nächste Spur für mehr. Erwischt dich ein Auto, ist der Einsatz verloren." },
   ];
-  const PLACEHOLDER_SLOTS = 1; // leere Plätze, bis mehr Spiele folgen
+  const PLACEHOLDER_SLOTS = 2; // leere Plätze, bis mehr Spiele folgen — füllt die Reihe sichtbar auf
 
   // Leicht variierender Text im Ruhezustand der Karte (statt festem Button-Label)
   const CTA_PHRASES = [
@@ -5086,23 +5191,62 @@
     }).join('');
   }
 
+  // Aktuell gewählter Kategorie-Filter für die Bibliothek ('Alle' = kein Filter)
+  let libActiveFilter = 'Alle';
+
+  function renderLibFilters(){
+    const el = document.getElementById('libFilterRow');
+    if(!el) return;
+    // Nur Kategorien anbieten, die tatsächlich in der Bibliothek des Nutzers stecken —
+    // Filter für leere/fremde Kategorien wären nur verwirrend.
+    const inLib = games.filter(g => isInLibrary(g.name));
+    const cats = ['Alle', ...new Set(inLib.map(g => g.category).filter(Boolean))];
+    if(cats.length <= 2){ el.innerHTML = ''; return; } // bei 0-1 Kategorien lohnt kein Filter
+    el.innerHTML = cats.map(c =>
+      `<div class="lib-filter-chip${c === libActiveFilter ? ' active' : ''}" data-filter="${c}">${c}</div>`
+    ).join('');
+    el.querySelectorAll('.lib-filter-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        libActiveFilter = chip.dataset.filter;
+        makeRow('row1');
+      });
+    });
+  }
+
   function makeRow(id){
     const el = document.getElementById(id);
     el.innerHTML = '';
-    const libraryGames = games.filter(g => isInLibrary(g.name));
+    renderLibFilters();
+    const libraryGames = games.filter(g => isInLibrary(g.name))
+      .filter(g => libActiveFilter === 'Alle' || g.category === libActiveFilter);
     if(libraryGames.length === 0){
-      el.innerHTML = `
+      const hasAnyInLibrary = games.some(g => isInLibrary(g.name));
+      el.innerHTML = hasAnyInLibrary ? `
         <div class="row-empty">
-          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-          <p>Deine Bibliothek ist noch leer.</p>
-          <span>Füg dir Spiele unter „Entdecken“ hinzu, damit sie hier erscheinen.</span>
+          <div class="row-empty-badge"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm4 11H8v-2h8z"/></svg></div>
+          <p>Keine Tische in „${libActiveFilter}“</p>
+          <span>In dieser Kategorie hast du noch kein Spiel zu deiner Bibliothek hinzugefügt.</span>
+          <button type="button" class="row-empty-cta" data-lib-filter-reset>Alle Spiele anzeigen</button>
+        </div>
+      ` : `
+        <div class="row-empty">
+          <div class="row-empty-badge"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div>
+          <p>Deine Bibliothek ist noch leer</p>
+          <span>Füg dir Spiele unter „Entdecken“ hinzu, damit sie hier an deinem Tisch erscheinen.</span>
+          <button type="button" class="row-empty-cta" data-lib-goto-discover>Spiele entdecken</button>
         </div>
       `;
+      el.querySelector('[data-lib-filter-reset]')?.addEventListener('click', () => { libActiveFilter = 'Alle'; makeRow('row1'); });
+      el.querySelector('[data-lib-goto-discover]')?.addEventListener('click', () => {
+        const discoverNav = [...document.querySelectorAll('.nav-item')].find(n => n.querySelector('span')?.textContent === 'Entdecken');
+        if(discoverNav) discoverNav.click();
+      });
       return;
     }
     libraryGames.forEach((g, i) => {
       const card = document.createElement('div');
       card.className = 'card';
+      card.dataset.category = g.category || '';
       card.innerHTML = `
         <div class="table-card" data-suit="${g.suit}" style="--c1:${g.c1};--c2:${g.c2}">
           <div class="table-card-stripes"></div>
@@ -5141,20 +5285,28 @@
       card.addEventListener('click', () => openGame(g.name));
       el.appendChild(card);
     });
-    for(let i=0;i<PLACEHOLDER_SLOTS;i++){
-      const card = document.createElement('div');
-      card.className = 'card locked';
-      card.innerHTML = `
-        <div class="table-card">
-          <svg viewBox="0 0 24 24" class="table-card-lock"><path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-9h-1V6a5 5 0 00-10 0v2H6a2 2 0 00-2 2v9a2 2 0 002 2h12a2 2 0 002-2v-9a2 2 0 00-2-2zM9 6a3 3 0 016 0v2H9z"/></svg>
-          <div class="table-card-locked-label">Bald verfügbar</div>
-          <div class="table-card-locked-sub">Neues Spiel folgt</div>
-        </div>
-      `;
-      el.appendChild(card);
+    // Platzhalter-Slots gehören zu keiner Kategorie — bei aktivem Filter blenden
+    // wir sie aus, damit "Kartenspiele" nicht plötzlich ein fremdes "Bald verfügbar" zeigt.
+    if(libActiveFilter === 'Alle'){
+      for(let i=0;i<PLACEHOLDER_SLOTS;i++){
+        const card = document.createElement('div');
+        card.className = 'card locked';
+        card.innerHTML = `
+          <div class="table-card">
+            <svg viewBox="0 0 24 24" class="table-card-lock"><path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-9h-1V6a5 5 0 00-10 0v2H6a2 2 0 00-2 2v9a2 2 0 002 2h12a2 2 0 002-2v-9a2 2 0 00-2-2zM9 6a3 3 0 016 0v2H9z"/></svg>
+            <div class="table-card-locked-label">Bald verfügbar</div>
+            <div class="table-card-locked-sub">Neues Spiel folgt</div>
+          </div>
+        `;
+        el.appendChild(card);
+      }
     }
   }
   makeRow('row1');
+  document.getElementById('libMoreBannerBtn')?.addEventListener('click', () => {
+    const discoverNav = [...document.querySelectorAll('.nav-item')].find(n => n.querySelector('span')?.textContent === 'Entdecken');
+    if(discoverNav) discoverNav.click();
+  });
   const heroStatTablesEl = document.getElementById('heroStatTables');
   if(heroStatTablesEl) heroStatTablesEl.textContent = games.length;
 
