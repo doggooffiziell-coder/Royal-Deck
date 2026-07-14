@@ -293,10 +293,12 @@
   }
   .chips-chip-icon{
     width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    overflow:hidden;
     background:radial-gradient(circle at 34% 30%,var(--accent-hi),var(--accent) 65%,var(--accent-dim));
     box-shadow:0 0 0 2px var(--panel);
   }
-  .chips-chip-icon svg{width:14px;height:14px;fill:var(--accent-ink);}
+  /* Icon fast randfuellend, aber ein schmaler Goldrand bleibt rundum sichtbar */
+  .chips-chip-icon svg{width:26px;height:26px;fill:var(--accent-ink);}
   .chips-chip .chip-text{display:flex;flex-direction:column;line-height:1.2;gap:2px;}
   .chips-chip .chip-points-label{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--faint);}
   .chips-chip .chip-points-val{font-size:12.5px;font-weight:700;color:var(--text);font-family:var(--font-mono);letter-spacing:.2px;}
