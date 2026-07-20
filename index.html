@@ -1800,6 +1800,10 @@
     position:absolute;top:50%;left:50%;width:520px;height:520px;
     transform:translate(-50%,-50%);
     background:conic-gradient(from 0deg, transparent 0deg, rgba(240,207,142,.08) 8deg, transparent 16deg, transparent 60deg, rgba(240,207,142,.08) 68deg, transparent 76deg, transparent 120deg, rgba(240,207,142,.08) 128deg, transparent 136deg, transparent 180deg, rgba(240,207,142,.08) 188deg, transparent 196deg, transparent 240deg, rgba(240,207,142,.08) 248deg, transparent 256deg, transparent 300deg, rgba(240,207,142,.08) 308deg, transparent 316deg, transparent 360deg);
+    /* Rund ausblenden statt hart an der Quadrat-Kante abzuschneiden — sonst sieht man
+       eine gedrehte Quadrat-Silhouette auf dem Hintergrund. */
+    -webkit-mask-image:radial-gradient(circle, #000 0%, #000 42%, transparent 76%);
+    mask-image:radial-gradient(circle, #000 0%, #000 42%, transparent 76%);
     animation:bootRaysSpin 12s linear infinite;
     pointer-events:none;
   }
@@ -1809,11 +1813,17 @@
      Kartenstapel in einen Faecher, halten kurz und ziehen sich zurueck. */
   .boot-deal{position:relative;width:160px;height:112px;}
   .boot-deck{position:absolute;left:50%;bottom:2px;width:34px;height:46px;transform:translateX(-50%);}
+  /* Gleicher Kartenrücken wie am Blackjack-Tisch (bj-shoe-card/bj-card-back) —
+     dasselbe Motiv wiedererkennbar auch auf dem Ladebildschirm. */
   .boot-deck-card{
     position:absolute;inset:0;border-radius:5px;
-    background:repeating-linear-gradient(45deg, var(--accent-dim) 0 5px, #16110a 5px 10px);
-    border:1px solid rgba(212,175,106,.35);
-    box-shadow:0 6px 14px rgba(0,0,0,.45);
+    background:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 196'><rect width='140' height='196' rx='10' fill='%23a3123f'/><rect x='6' y='6' width='128' height='184' rx='7' fill='none' stroke='%23f2e4d8' stroke-width='4'/><rect x='12' y='12' width='116' height='172' rx='5' fill='none' stroke='%23c98aa0' stroke-width='1.4'/><g transform='translate(70,98)'><path d='M0,-58 L20,-30 L20,30 L0,58 L-20,30 L-20,-30 Z' fill='%23c2647e' opacity='.55'/><path d='M0,-40 L14,-18 L14,18 L0,40 L-14,18 L-14,-18 Z' fill='%23e8b7c4' opacity='.75'/><ellipse cx='0' cy='0' rx='16' ry='22' fill='%23f7e6ea'/><ellipse cx='0' cy='0' rx='9' ry='13' fill='%23c2647e' opacity='.6'/></g><g fill='%238a8a5a' opacity='.85'><path d='M14,14 q10,0 14,10 q-10,-2 -14,4 q-4,-8 0,-14 Z'/><path d='M126,14 q-10,0 -14,10 q10,-2 14,4 q4,-8 0,-14 Z'/><path d='M14,182 q10,0 14,-10 q-10,2 -14,-4 q-4,8 0,14 Z'/><path d='M126,182 q-10,0 -14,-10 q10,2 14,-4 q4,8 0,14 Z'/></g></svg>")
+      center/cover no-repeat;
+    box-shadow:
+      inset 0 0 0 2px #f2e4c4,
+      inset 0 0 0 3px #a52c42,
+      0 6px 14px rgba(0,0,0,.45);
   }
   .boot-deck-card:nth-child(1){transform:translate(0,0) rotate(0deg);}
   .boot-deck-card:nth-child(2){transform:translate(1.5px,-1.5px) rotate(-3deg);}
