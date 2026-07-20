@@ -5161,11 +5161,21 @@
 
 <script>
   // Blendet den Ladescreen sanft aus (Fade + leichtes Hochskalieren), statt ihn abrupt zu verstecken.
+  // Zeigt ihn zusaetzlich mindestens BOOT_GATE_MIN_MS lang, auch wenn loadProfile()
+  // (z.B. dank Cache) fast sofort durch ist — sonst blitzt die Deal-Animation nur kurz
+  // auf und man sieht sie kaum.
+  const BOOT_GATE_MIN_MS = 1700;
+  const bootGateStartedAt = Date.now();
+  let bootGateHidePending = false;
   function hideBootGate(){
     const bg = document.getElementById('bootGate');
-    if(!bg || bg.classList.contains('boot-hide')) return;
-    bg.classList.add('boot-hide');
-    setTimeout(() => { bg.style.display = 'none'; }, 650);
+    if(!bg || bg.classList.contains('boot-hide') || bootGateHidePending) return;
+    bootGateHidePending = true;
+    const remaining = Math.max(0, BOOT_GATE_MIN_MS - (Date.now() - bootGateStartedAt));
+    setTimeout(() => {
+      bg.classList.add('boot-hide');
+      setTimeout(() => { bg.style.display = 'none'; }, 650);
+    }, remaining);
   }
 
   // Drei echte Spiele — der Rest folgt später als "Bald verfügbar".
