@@ -1799,20 +1799,60 @@
   .boot-rays{
     position:absolute;top:50%;left:50%;width:520px;height:520px;
     transform:translate(-50%,-50%);
-    background:conic-gradient(from 0deg, transparent 0deg, rgba(240,207,142,.08) 8deg, transparent 16deg, transparent 60deg, rgba(240,207,142,.08) 68deg, transparent 76deg, transparent 120deg, rgba(240,207,142,.08) 128deg, transparent 136deg, transparent 180deg, rgba(240,207,142,.08) 188deg, transparent 196deg, transparent 240deg, rgba(240,207,142,.08) 248deg, transparent 256deg, transparent 300deg, rgba(240,207,142,.08) 308deg, transparent 316deg, transparent 360deg);
+    background:conic-gradient(from 0deg, transparent 0deg, rgba(240,207,142,.11) 8deg, transparent 16deg, transparent 60deg, rgba(240,207,142,.11) 68deg, transparent 76deg, transparent 120deg, rgba(240,207,142,.11) 128deg, transparent 136deg, transparent 180deg, rgba(240,207,142,.11) 188deg, transparent 196deg, transparent 240deg, rgba(240,207,142,.11) 248deg, transparent 256deg, transparent 300deg, rgba(240,207,142,.11) 308deg, transparent 316deg, transparent 360deg);
     /* Rund ausblenden statt hart an der Quadrat-Kante abzuschneiden — sonst sieht man
-       eine gedrehte Quadrat-Silhouette auf dem Hintergrund. */
-    -webkit-mask-image:radial-gradient(circle, #000 0%, #000 42%, transparent 76%);
-    mask-image:radial-gradient(circle, #000 0%, #000 42%, transparent 76%);
+       eine gedrehte Quadrat-Silhouette auf dem Hintergrund. Der Uebergang bleibt breit
+       genug, dass man ihn noch als weichen Verlauf wahrnimmt statt eines harten Kreises. */
+    -webkit-mask-image:radial-gradient(circle, #000 0%, #000 46%, transparent 84%);
+    mask-image:radial-gradient(circle, #000 0%, #000 46%, transparent 84%);
     animation:bootRaysSpin 12s linear infinite;
     pointer-events:none;
   }
   @keyframes bootRaysSpin{to{transform:translate(-50%,-50%) rotate(360deg);}}
 
+  /* Zweite, groessere Strahlenlage: weniger, breitere Strahlen, gegenlaeufig und
+     langsamer — nur als Ring sichtbar (nicht bis zur Mitte), dadurch entsteht ein
+     Tiefeneffekt (Parallaxe) statt eines einzelnen flachen Sunbursts. */
+  .boot-rays-2{
+    position:absolute;top:50%;left:50%;width:640px;height:640px;
+    transform:translate(-50%,-50%);
+    background:conic-gradient(from 0deg, transparent 0deg, rgba(212,175,106,.09) 4deg, transparent 14deg, transparent 84deg, rgba(212,175,106,.09) 92deg, transparent 102deg, transparent 172deg, rgba(212,175,106,.09) 180deg, transparent 190deg, transparent 260deg, rgba(212,175,106,.09) 268deg, transparent 278deg, transparent 348deg, rgba(212,175,106,.09) 356deg, transparent 360deg);
+    -webkit-mask-image:radial-gradient(circle, transparent 30%, #000 48%, transparent 86%);
+    mask-image:radial-gradient(circle, transparent 30%, #000 48%, transparent 86%);
+    animation:bootRaysSpinRev 22s linear infinite;
+    pointer-events:none;
+  }
+  @keyframes bootRaysSpinRev{to{transform:translate(-50%,-50%) rotate(-360deg);}}
+
+  /* Duenner Gold-Ring als ruhiger Fixpunkt zwischen den beiden rotierenden
+     Strahlenlagen — minimalistisches Detail, markiert den "Uebergang" sichtbar. */
+  .boot-ring{
+    position:absolute;top:50%;left:50%;width:236px;height:236px;
+    transform:translate(-50%,-50%);border-radius:50%;
+    border:1px solid rgba(212,175,106,.16);
+    box-shadow:0 0 0 1px rgba(212,175,106,.05), inset 0 0 26px rgba(240,207,142,.06);
+    pointer-events:none;
+  }
+
+  /* Ein paar winzige, versetzt aufblitzende Funken — dezent ueber den ganzen
+     Screen verteilt statt gehaeuft an einer Stelle. */
+  .boot-sparkle{
+    position:absolute;width:3px;height:3px;border-radius:50%;background:var(--accent-hi);
+    box-shadow:0 0 6px 1px rgba(240,207,142,.75);opacity:0;
+    animation:bootSparkle 2.8s ease-in-out infinite;pointer-events:none;
+  }
+  @keyframes bootSparkle{0%,100%{opacity:0;transform:scale(.4);}50%{opacity:.85;transform:scale(1);}}
+  .boot-sparkle.sp-1{top:16%;left:22%;animation-delay:.2s;}
+  .boot-sparkle.sp-2{top:74%;left:17%;animation-delay:1.3s;}
+  .boot-sparkle.sp-3{top:20%;left:80%;animation-delay:1.9s;}
+  .boot-sparkle.sp-4{top:76%;left:78%;animation-delay:.8s;}
+  .boot-sparkle.sp-5{top:46%;left:9%; animation-delay:2.3s;}
+  .boot-sparkle.sp-6{top:40%;left:91%;animation-delay:1.5s;}
+
   /* Eine Hand wird ausgeteilt: 4 Karten fliegen nacheinander aus dem
      Kartenstapel in einen Faecher, halten kurz und ziehen sich zurueck. */
   .boot-deal{position:relative;width:160px;height:112px;}
-  .boot-deck{position:absolute;left:50%;bottom:2px;width:34px;height:46px;transform:translateX(-50%);}
+  .boot-deck{position:absolute;left:50%;bottom:2px;width:34px;height:46px;transform:translateX(-50%);z-index:2;}
   /* Gleicher Kartenrücken wie am Blackjack-Tisch (bj-shoe-card/bj-card-back) —
      dasselbe Motiv wiedererkennbar auch auf dem Ladebildschirm. */
   .boot-deck-card{
@@ -1829,16 +1869,16 @@
   .boot-deck-card:nth-child(2){transform:translate(1.5px,-1.5px) rotate(-3deg);}
   .boot-deck-card:nth-child(3){transform:translate(3px,-3px) rotate(-6deg);}
   .boot-deck-shadow{
-    position:absolute;left:50%;bottom:-8px;width:46px;height:10px;transform:translateX(-50%);
+    position:absolute;left:50%;bottom:-8px;width:46px;height:10px;transform:translateX(-50%);z-index:1;
     background:radial-gradient(ellipse, rgba(0,0,0,.5), transparent 70%);
   }
   .boot-deal-card{
-    position:absolute;left:50%;bottom:2px;width:34px;height:46px;margin-left:-17px;
+    position:absolute;left:50%;bottom:2px;width:34px;height:46px;margin-left:-17px;z-index:3;
     border-radius:5px;background:linear-gradient(160deg,#f2ecdd,#e4d9bd);
     box-shadow:0 10px 22px rgba(0,0,0,.5), 0 0 0 1px rgba(212,175,106,.3);
     display:flex;align-items:center;justify-content:center;
     font-family:var(--font-display);font-size:16px;font-weight:600;
-    opacity:0;transform:translate(0,0) scale(.6) rotate(0deg);
+    opacity:0;transform:translate(2px,-2px) scale(.58) rotate(-6deg);
     animation:bootDealCard 3.6s cubic-bezier(.5,0,.2,1) infinite;
   }
   .boot-deal-card.suit-black{color:#241a0c;}
@@ -1847,11 +1887,16 @@
   .boot-deal-card.bdc-2{--tx:-19px;--ty:-58px;--rot:-7deg;animation-delay:.22s;}
   .boot-deal-card.bdc-3{--tx:19px; --ty:-58px;--rot:7deg; animation-delay:.44s;}
   .boot-deal-card.bdc-4{--tx:54px; --ty:-44px;--rot:22deg;animation-delay:.66s;}
+  /* Startet exakt an der Position/Neigung der obersten Stapelkarte (siehe
+     .boot-deck-card:nth-child(3): translate(3px,-3px) rotate(-6deg)) — so wirkt
+     es, als wuerde genau diese Karte abgehoben, kurz angehoben ("lift") und dann
+     erst in den Faecher geschwungen, statt einfach in der Luft zu erscheinen. */
   @keyframes bootDealCard{
-    0%{transform:translate(0,0) scale(.6) rotate(0deg);opacity:0;}
-    9%{opacity:1;}
-    26%,76%{transform:translate(var(--tx),var(--ty)) scale(1) rotate(var(--rot));opacity:1;}
-    93%,100%{transform:translate(0,0) scale(.6) rotate(0deg);opacity:0;}
+    0%{transform:translate(2px,-2px) scale(.58) rotate(-6deg);opacity:0;}
+    5%{opacity:1;}
+    18%{transform:translate(calc(var(--tx) * .22), calc(var(--ty) * .4)) scale(.84) rotate(calc(var(--rot) * .3));opacity:1;}
+    30%,74%{transform:translate(var(--tx),var(--ty)) scale(1) rotate(var(--rot));opacity:1;}
+    90%,100%{transform:translate(2px,-2px) scale(.58) rotate(-6deg);opacity:0;}
   }
 
   .boot-logo{
@@ -3472,9 +3517,21 @@
 </head>
 <body>
 <div id="bootGate">
+  <!-- Ueber den ganzen Screen verteilte Funken — direkte Kinder von #bootGate
+       (nicht .boot-inner), damit die Prozent-Positionen sich auf den kompletten
+       Viewport beziehen statt nur auf die kleine Inhaltsspalte. -->
+  <div class="boot-sparkle sp-1"></div>
+  <div class="boot-sparkle sp-2"></div>
+  <div class="boot-sparkle sp-3"></div>
+  <div class="boot-sparkle sp-4"></div>
+  <div class="boot-sparkle sp-5"></div>
+  <div class="boot-sparkle sp-6"></div>
+
   <div class="boot-inner">
     <div class="boot-glow"></div>
     <div class="boot-rays"></div>
+    <div class="boot-rays-2"></div>
+    <div class="boot-ring"></div>
 
     <!-- Statt einer einzelnen Flip-Karte: eine Hand, die immer wieder neu ausgeteilt
          wird — vier Karten fliegen nacheinander aus dem Stapel in einen Fächer,
