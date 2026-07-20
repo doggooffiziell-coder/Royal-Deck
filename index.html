@@ -150,35 +150,47 @@
   /* Main layout */
   .main{flex:1;display:flex;flex-direction:column;min-width:0;}
 
+  /* ============================================================
+     TOPBAR — "Ticket Rail": geprägtes Messing auf Filz statt Glas-Pillen.
+     Jedes Cluster sitzt wie ein eingelassener Chip-Tray in der Leiste,
+     mit angeschnittenen Ecken (Ticket-Look) statt runden Kapseln.
+     ============================================================ */
   .topbar{
-    height:60px;display:flex;align-items:center;gap:16px;padding:0 24px;
-    background:var(--panel);border-bottom:1px solid var(--border-soft);flex-shrink:0;
-    position:relative;z-index:80;
+    height:64px;display:flex;align-items:center;gap:18px;padding:0 26px;
+    background:
+      linear-gradient(180deg, rgba(201,160,91,.05), transparent 40%),
+      repeating-linear-gradient(115deg, rgba(212,175,106,.025) 0 2px, transparent 2px 26px),
+      var(--panel);
+    border-bottom:1px solid rgba(0,0,0,.5);
+    box-shadow:0 1px 0 rgba(212,175,106,.22), 0 2px 0 rgba(0,0,0,.4), 0 14px 30px -18px rgba(0,0,0,.7);
+    flex-shrink:0;position:relative;z-index:80;
   }
-  .search{flex:1;max-width:480px;position:relative;}
+  .search{flex:1;max-width:460px;position:relative;}
   .search input{
-    width:100%;height:37px;border-radius:8px;border:1px solid var(--border);
-    background:var(--surface);color:var(--text);padding:0 16px 0 38px;font-size:13.5px;outline:none;transition:.15s;
-    font-family:var(--font-body);
+    width:100%;height:38px;border:none;border-radius:0;clip-path:polygon(10px 0,100% 0,100% 100%,0 100%,0 10px);
+    background:linear-gradient(180deg,rgba(0,0,0,.32),rgba(0,0,0,.18));
+    color:var(--text);padding:0 16px 0 40px;font-size:13px;outline:none;transition:.15s;
+    font-family:var(--font-mono);letter-spacing:.2px;
+    box-shadow:inset 0 0 0 1px rgba(212,175,106,.2), inset 0 2px 4px rgba(0,0,0,.4);
   }
-  .search input::placeholder{color:var(--faint);}
-  .search input:focus{border-color:var(--accent-dim);box-shadow:0 0 0 3px var(--accent-soft);}
-  .search svg{position:absolute;left:13px;top:10.5px;width:15px;height:15px;fill:var(--faint);}
+  .search input::placeholder{color:var(--faint);font-family:var(--font-body);}
+  .search input:focus{box-shadow:inset 0 0 0 1px var(--accent-hi), inset 0 2px 4px rgba(0,0,0,.4), 0 0 0 3px var(--accent-soft);}
+  .search svg{position:absolute;left:15px;top:11.5px;width:14px;height:14px;fill:var(--accent-dim);}
   .search input{padding-right:64px;}
   .search-kbd{
-    position:absolute;right:10px;top:50%;transform:translateY(-50%);
-    font-family:var(--font-mono);font-size:9.5px;font-weight:600;letter-spacing:.4px;color:var(--faint);
-    border:1px solid var(--border);border-bottom-width:2px;border-radius:5px;padding:2px 6px;
-    background:var(--panel);pointer-events:none;transition:.15s;
+    position:absolute;right:0;top:0;bottom:0;display:flex;align-items:center;padding:0 12px;
+    font-family:var(--font-mono);font-size:9px;font-weight:600;letter-spacing:.6px;color:var(--accent-dim);
+    border-left:1px solid rgba(212,175,106,.2);
+    background:rgba(212,175,106,.05);pointer-events:none;transition:.15s;text-transform:uppercase;
   }
   .search input:focus ~ .search-kbd{opacity:0;}
 
   /* --- Live-Suchergebnisse: gleiche Formsprache wie die Panel-Dropdowns --- */
   .search-results{
-    position:absolute;top:calc(100% + 8px);left:0;right:0;display:none;
+    position:absolute;top:calc(100% + 10px);left:0;right:0;display:none;
     background:linear-gradient(165deg,var(--surface),var(--panel));
-    border:1px solid var(--border);border-radius:13px;overflow:hidden;z-index:120;
-    box-shadow:0 18px 44px rgba(0,0,0,.55), inset 0 0 0 1px rgba(212,175,106,.07), inset 0 1px 0 rgba(255,255,255,.03);
+    border:none;clip-path:polygon(14px 0,100% 0,100% 100%,0 100%,0 14px);overflow:hidden;z-index:120;
+    box-shadow:0 18px 44px rgba(0,0,0,.55), inset 0 0 0 1px rgba(212,175,106,.16), inset 0 1px 0 rgba(255,255,255,.03);
   }
   .search-results.open{display:block;animation:ddPop .16s cubic-bezier(.2,.9,.3,1) both;}
   .sr-cat{
@@ -208,58 +220,59 @@
   .sr-empty{padding:18px 14px;text-align:center;color:var(--faint);font-size:12.5px;}
   .sr-empty b{color:var(--muted);font-weight:600;}
 
-  .top-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+  .top-right{margin-left:auto;display:flex;align-items:stretch;gap:0;height:100%;}
 
-  /* Anmelden-Button in der Topbar (ausgeloggter Zustand) */
+  /* Anmelden — jetzt ein Siegel-Knopf statt einer Pille: eckig angeschnitten,
+     wie ein Wachssiegel/Chip-Tag statt eines generischen CTA-Buttons. */
   .topbar-login-btn{
     background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:var(--accent-ink);border:none;
-    padding:9px 20px;border-radius:9px;font-weight:700;font-size:13px;cursor:pointer;font-family:var(--font-body);
+    padding:0 22px;height:38px;align-self:center;font-weight:800;font-size:12.5px;cursor:pointer;font-family:var(--font-body);
+    letter-spacing:.4px;text-transform:uppercase;
+    clip-path:polygon(0 0,calc(100% - 10px) 0,100% 100%,10px 100%);
     box-shadow:0 4px 14px -6px rgba(212,175,106,.55), inset 0 1px 0 rgba(255,255,255,.25);transition:.15s;
   }
-  .topbar-login-btn:hover{filter:brightness(1.06);transform:translateY(-1px);}
-  .topbar-login-btn:active{transform:none;}
+  .topbar-login-btn:hover{filter:brightness(1.08);}
+  .topbar-login-btn:active{filter:brightness(.96);}
 
-  /* --- HUD-Cluster: zwei getrennte Glas-Pillen statt einer durchgehenden
-     Leiste — links Utility (Level/Chips + Icons), rechts Identität (Nutzer).
-     Die Trennung macht auf einen Blick klar: das eine ist Status, das andere bist du. --- */
+  /* --- HUD-Cluster: eine durchgehende Messing-Schiene statt Glas-Pillen.
+     Level/Chips/Icons sitzen als eingelassene Segmente nebeneinander,
+     getrennt durch dünne Niet-Linien statt weichem Verlauf. --- */
   .hud-cluster{
-    display:flex;align-items:stretch;gap:0;padding:5px;border-radius:18px;
-    background:linear-gradient(180deg,rgba(24,40,30,.85),rgba(10,18,14,.92));
-    border:1px solid var(--border-soft);
-    box-shadow:inset 0 0 0 1px rgba(212,175,106,.06),inset 0 1px 0 rgba(255,255,255,.03),0 10px 26px rgba(0,0,0,.4);
+    display:flex;align-items:stretch;gap:0;height:100%;padding:0;
+    background:transparent;border:none;border-left:1px solid rgba(212,175,106,.14);
+    box-shadow:none;
   }
-  .hud-divider{width:1px;align-self:stretch;margin:6px 3px;flex-shrink:0;
-    background:linear-gradient(180deg,transparent,rgba(212,175,106,.28),transparent);}
+  /* Segmente tragen jetzt ihre eigene border-right als Trennlinie */
+  .hud-divider{display:none;}
 
   /* Level-Kapsel: klickbar, öffnet den Fortschritts-Dropdown zum nächsten Level.
      Der Ring am Coin zeigt schon vorab live den XP-Fortschritt — dieselbe
      Sprache wie der Avatar-Ring. */
   .level-chip{
-    display:flex;align-items:center;gap:9px;padding:5px 10px 5px 5px;border-radius:16px;cursor:pointer;
-    transition:.18s;position:relative;border:1px solid transparent;
+    display:flex;align-items:center;gap:10px;height:100%;padding:0 16px;cursor:pointer;
+    transition:.18s;position:relative;border-right:1px solid rgba(212,175,106,.14);
   }
-  .level-chip:hover{background:rgba(212,175,106,.08);border-color:rgba(212,175,106,.18);}
-  .level-chip:active{transform:scale(.97);}
-  .level-chip.active{background:rgba(212,175,106,.1);border-color:rgba(212,175,106,.32);}
+  .level-chip:hover{background:rgba(212,175,106,.07);}
+  .level-chip:active{background:rgba(212,175,106,.1);}
+  .level-chip.active{background:rgba(212,175,106,.1);box-shadow:inset 0 -2px 0 var(--accent-hi);}
+  /* Diamant-Chip statt runder Münze: rotiertes Quadrat, Inhalt gegengedreht,
+     damit Text/Icon aufrecht bleiben. */
   .level-chip .chip-coin{
-    width:37px;height:37px;border-radius:50%;flex-shrink:0;position:relative;box-sizing:border-box;padding:5px;
-    /* Fortschrittsring: startet oben bei 12 Uhr und fuellt im Uhrzeigersinn.
-       conic-gradient beginnt ohne "from" bereits bei 0deg = 12 Uhr. Klares
-       Hellgold fuer den Fortschritt, dunklere Rest-Spur dahinter. Dickerer Ring
-       = deutlich sichtbarer. */
-    background:conic-gradient(var(--accent-hi) calc(var(--ring-pct,8) * 1%), rgba(212,175,106,.22) 0);
-    display:flex;align-items:center;justify-content:center;
+    width:26px;height:26px;flex-shrink:0;position:relative;box-sizing:border-box;
+    transform:rotate(45deg);
+    background:conic-gradient(var(--accent-hi) calc(var(--ring-pct,8) * 1%), rgba(212,175,106,.2) 0);
+    display:flex;align-items:center;justify-content:center;padding:3px;
   }
-  /* feiner dunkler Rand aussen, damit der Ring sich sauber von der HUD-Leiste abhebt */
   .level-chip .chip-coin::before{
-    content:"";position:absolute;inset:-1px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.35);pointer-events:none;
+    content:"";position:absolute;inset:-1px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.35);pointer-events:none;
   }
   .level-chip .chip-coin-inner{
-    width:100%;height:100%;border-radius:50%;position:relative;overflow:hidden;
+    width:100%;height:100%;position:relative;overflow:hidden;
     background:radial-gradient(circle at 34% 30%,var(--accent-hi),var(--accent) 65%,var(--accent-dim));
     display:flex;align-items:center;justify-content:center;
     box-shadow:0 0 0 2px var(--panel);
   }
+
   /* Glanzstrahl, der langsam ueber die Muenze wandert — laesst das Gold "leben" */
   .level-chip .chip-coin-inner::after{
     content:"";position:absolute;inset:0;border-radius:50%;
@@ -267,41 +280,46 @@
     transform:translateX(-120%);animation:coinSheen 4.5s ease-in-out infinite;
   }
   @keyframes coinSheen{0%,55%{transform:translateX(-120%);}75%,100%{transform:translateX(120%);}}
-  .level-chip .chip-coin-inner svg{width:13px;height:13px;fill:var(--accent-ink);position:relative;z-index:1;
-    transform-origin:center;animation:starTwinkle 4.5s ease-in-out infinite;}
-  /* Der Stern "funkelt" einmal pro Zyklus: kurzer Pop + Mini-Drehung */
+  .level-chip .chip-coin-inner svg{width:11px;height:11px;fill:var(--accent-ink);position:relative;z-index:1;
+    transform-origin:center;transform:rotate(-45deg);animation:starTwinkle 4.5s ease-in-out infinite;}
+  /* Der Stern "funkelt" einmal pro Zyklus: kurzer Pop + Mini-Drehung (Basis -45° gleicht die Diamant-Drehung des Chips aus) */
   @keyframes starTwinkle{
-    0%,60%,100%{transform:scale(1) rotate(0deg);}
-    68%{transform:scale(1.28) rotate(9deg);}
-    76%{transform:scale(.94) rotate(-4deg);}
-    84%{transform:scale(1.08) rotate(0deg);}
+    0%,60%,100%{transform:rotate(-45deg) scale(1) rotate(0deg);}
+    68%{transform:rotate(-45deg) scale(1.28) rotate(9deg);}
+    76%{transform:rotate(-45deg) scale(.94) rotate(-4deg);}
+    84%{transform:rotate(-45deg) scale(1.08) rotate(0deg);}
   }
   @media (prefers-reduced-motion:reduce){
     .level-chip .chip-coin-inner svg, .level-chip .chip-coin-inner::after{animation:none;}
   }
   .level-chip .chip-text{display:flex;flex-direction:column;line-height:1.2;gap:2px;}
-  .level-chip .chip-level{font-size:12px;font-weight:700;color:var(--accent-hi);letter-spacing:.2px;font-family:var(--font-body);}
-  .level-chip .chip-sub{font-size:10.5px;color:var(--muted);font-family:var(--font-body);font-weight:600;letter-spacing:.1px;}
-  .level-chip .chip-caret{width:11px;height:11px;fill:var(--faint);flex-shrink:0;transition:.16s;}
+  .level-chip .chip-level{font-size:11.5px;font-weight:700;color:var(--accent-hi);letter-spacing:.3px;font-family:var(--font-mono);text-transform:uppercase;}
+  .level-chip .chip-sub{font-size:10px;color:var(--muted);font-family:var(--font-body);font-weight:600;letter-spacing:.1px;}
+  .level-chip .chip-caret{width:10px;height:10px;fill:var(--faint);flex-shrink:0;transition:.16s;}
   .level-chip:hover .chip-caret{fill:var(--accent-hi);}
   .level-chip.active .chip-caret{fill:var(--accent-hi);transform:rotate(180deg);}
 
-  /* Chips-Kapsel: reine Anzeige des Kontostands, kein Dropdown — daher optisch
-     ruhiger als die Level-Kapsel und ohne Hover-/Klick-Zustand. */
+  /* Chips-Kapsel: eingelassenes Segment in der Schiene, eigener Chip-Turm-Look
+     statt Münz-Icon — reine Anzeige, kein Dropdown. */
   .chips-chip{
-    display:flex;align-items:center;gap:9px;padding:5px 15px 5px 5px;border-radius:16px;cursor:default;
+    display:flex;align-items:center;gap:10px;height:100%;padding:0 16px;cursor:default;
+    border-right:1px solid rgba(212,175,106,.14);
   }
   .chips-chip-icon{
-    width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;
-    overflow:hidden;
-    background:radial-gradient(circle at 34% 30%,var(--accent-hi),var(--accent) 65%,var(--accent-dim));
-    box-shadow:0 0 0 2px var(--panel);
+    width:22px;height:26px;flex-shrink:0;position:relative;display:flex;align-items:flex-end;justify-content:center;
   }
-  /* Icon fast randfuellend, aber ein schmaler Goldrand bleibt rundum sichtbar */
-  .chips-chip-icon svg{width:26px;height:26px;fill:var(--accent-ink);}
+  /* Gestapelte Chip-Scheiben statt eines runden Münz-Icons */
+  .chips-chip-icon::before, .chips-chip-icon::after{
+    content:"";position:absolute;left:0;width:100%;height:8px;border-radius:2px;
+    background:linear-gradient(180deg,var(--accent-hi),var(--accent-dim));
+    box-shadow:0 0 0 1px var(--panel), inset 0 0 0 1px rgba(0,0,0,.25);
+  }
+  .chips-chip-icon::before{bottom:9px;}
+  .chips-chip-icon::after{bottom:0;}
+  .chips-chip-icon svg{display:none;}
   .chips-chip .chip-text{display:flex;flex-direction:column;line-height:1.2;gap:2px;}
-  .chips-chip .chip-points-label{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--faint);}
-  .chips-chip .chip-points-val{font-size:12.5px;font-weight:700;color:var(--text);font-family:var(--font-mono);letter-spacing:.2px;}
+  .chips-chip .chip-points-label{font-size:8.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--faint);}
+  .chips-chip .chip-points-val{font-size:13px;font-weight:700;color:var(--text);font-family:var(--font-mono);letter-spacing:.2px;}
 
   /* Level-Fortschritt-Panel: öffnet sich unter der Level-Kapsel, zeigt Ring +
      Balken bis zum nächsten Level. */
@@ -327,23 +345,30 @@
   .lvl-progress-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--accent-dim),var(--accent-hi));transition:width .3s ease;}
   .lvl-panel-next{font-size:10.5px;color:var(--faint);font-family:var(--font-mono);}
 
-  .hud-cluster .icon-btn-wrap{display:flex;}
+  .hud-cluster .icon-btn-wrap{display:flex;height:100%;border-right:1px solid rgba(212,175,106,.14);}
   .hud-cluster .icon-btn{
-    width:40px;height:40px;border-radius:12px;background:transparent;display:flex;align-items:center;
+    width:56px;height:100%;border-radius:0;background:transparent;display:flex;align-items:center;
     justify-content:center;cursor:pointer;color:var(--muted);position:relative;transition:.16s;
-    border:1px solid transparent;margin:auto;
+    border:none;margin:auto;
   }
-  .hud-cluster .icon-btn:hover{color:var(--accent-hi);background:rgba(212,175,106,.08);border-color:rgba(212,175,106,.22);}
-  .hud-cluster .icon-btn:active{transform:scale(.92);}
+  /* eingesenkter Kreis wie ein Messingniet in der Schiene, statt schwebender Kapsel */
+  .hud-cluster .icon-btn::before{
+    content:"";width:32px;height:32px;border-radius:50%;position:absolute;
+    box-shadow:inset 0 2px 4px rgba(0,0,0,.4), inset 0 0 0 1px rgba(212,175,106,.14);
+    transition:.16s;
+  }
+  .hud-cluster .icon-btn:hover{color:var(--accent-hi);background:rgba(212,175,106,.06);}
+  .hud-cluster .icon-btn:hover::before{box-shadow:inset 0 2px 4px rgba(0,0,0,.4), inset 0 0 0 1px rgba(212,175,106,.4);}
+  .hud-cluster .icon-btn:active{color:var(--accent-hi);}
   .hud-cluster .icon-btn.active{
-    color:var(--accent-hi);background:rgba(212,175,106,.13);border-color:rgba(212,175,106,.4);
-    box-shadow:0 0 0 3px rgba(212,175,106,.1),inset 0 0 0 1px rgba(212,175,106,.15);
+    color:var(--accent-hi);background:rgba(212,175,106,.1);
   }
-  .icon-btn svg{width:18px;height:18px;fill:currentColor;}
+  .hud-cluster .icon-btn.active::before{box-shadow:inset 0 2px 4px rgba(0,0,0,.4), inset 0 0 0 1.5px var(--accent-hi);}
+  .icon-btn svg{width:17px;height:17px;fill:currentColor;position:relative;z-index:1;}
   .badge{
-    position:absolute;top:-3px;right:-3px;background:var(--danger);color:#1a0808;font-size:9px;
+    position:absolute;top:9px;right:11px;background:var(--danger);color:#1a0808;font-size:9px;
     min-width:15px;height:15px;padding:0 3px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;
-    border:2px solid var(--panel);box-shadow:0 0 6px rgba(220,80,80,.5);
+    border:2px solid var(--panel);box-shadow:0 0 6px rgba(220,80,80,.5);z-index:2;
   }
   .badge.badge-gold{background:var(--accent-hi);color:var(--accent-ink);box-shadow:0 0 6px rgba(212,175,106,.5);}
 
@@ -1189,33 +1214,33 @@
   /* Logged-in state in topbar — eigene "Identitäts-Pille", optisch abgesetzt
      vom Utility-Cluster (Level/Chips/Icons): dezente Goldkontur, weil es hier
      um "dich" geht statt um Status-Werte. */
+  /* VIP-Karten-Tab statt Identitäts-Pille: angeschnittene linke obere Ecke,
+     scharfkantiger Avatar-Rahmen statt runder Kapsel, goldene Steckkarten-Kante links. */
   .user-chip{
-    display:flex;align-items:center;gap:9px;cursor:pointer;position:relative;
-    padding:6px 14px 6px 6px;border-radius:16px;transition:.16s;
-    background:linear-gradient(180deg,rgba(24,40,30,.85),rgba(10,18,14,.92));
-    border:1px solid var(--border-soft);
-    box-shadow:inset 0 0 0 1px rgba(212,175,106,.06),inset 0 1px 0 rgba(255,255,255,.03),0 10px 26px rgba(0,0,0,.4);
+    display:flex;align-items:center;gap:11px;cursor:pointer;position:relative;height:100%;
+    padding:0 18px 0 16px;transition:.16s;
+    background:linear-gradient(90deg,rgba(212,175,106,.09),transparent 65%);
+    border-left:1px solid rgba(212,175,106,.3);
   }
-  .user-chip:hover{border-color:rgba(212,175,106,.28);box-shadow:inset 0 0 0 1px rgba(212,175,106,.14),0 10px 26px rgba(0,0,0,.4);}
-  .user-chip:active{transform:scale(.97);}
-  .user-chip.active:active{transform:none;}
-  .user-chip.active{border-color:rgba(212,175,106,.4);box-shadow:inset 0 0 0 1px rgba(212,175,106,.22),0 0 0 3px rgba(212,175,106,.08);}
+  .user-chip:hover{background:linear-gradient(90deg,rgba(212,175,106,.15),transparent 65%);}
+  .user-chip:active{background:rgba(212,175,106,.18);}
+  .user-chip.active{background:linear-gradient(90deg,rgba(212,175,106,.18),transparent 70%);box-shadow:inset 0 -2px 0 var(--accent-hi);}
   .user-chip.active .caret{fill:var(--accent-hi);transform:rotate(180deg);}
+  .user-chip .avatar-ring{border-radius:0;clip-path:polygon(0 0,100% 0,100% 100%,7px 100%,0 calc(100% - 7px));}
+  .user-chip .avatar-ring .avatar{border-radius:0;}
   .user-chip .avatar{
     display:flex;align-items:center;justify-content:center;color:var(--accent-ink);font-weight:700;font-size:13px;flex-shrink:0;
   }
   .user-chip .uname-stack{display:flex;flex-direction:column;gap:2px;min-width:0;}
-  .user-chip .uname{font-size:12.5px;font-weight:600;color:var(--text);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .user-chip .uname-role{font-size:9.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--accent-hi);opacity:.85;}
-  /* Caret bekommt eine eigene, immer sichtbare Pille statt nur beim Hover
-     aufzutauchen — macht auf den ersten Blick klar, dass hier ein Dropdown-Menü sitzt. */
+  .user-chip .uname{font-size:12.5px;font-weight:600;color:var(--text);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--font-display);font-style:italic;}
+  .user-chip .uname-role{font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--accent-hi);opacity:.85;font-family:var(--font-mono);}
+  /* Caret ohne eigene Pille — schlichter Pfeil am Kartenrand */
   .user-chip .caret-wrap{
-    width:21px;height:21px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;
-    background:rgba(212,175,106,.1);border:1px solid rgba(212,175,106,.24);transition:.16s;margin-left:-1px;
+    width:auto;height:auto;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    background:none;border:none;margin-left:2px;
   }
-  .user-chip:hover .caret-wrap{background:rgba(212,175,106,.18);border-color:rgba(212,175,106,.42);}
-  .user-chip.active .caret-wrap{background:rgba(212,175,106,.22);border-color:rgba(212,175,106,.55);}
-  .user-chip .caret{width:11px;height:11px;fill:var(--accent-hi);flex-shrink:0;transition:.16s;}
+  .user-chip .caret{width:10px;height:10px;fill:var(--accent-dim);flex-shrink:0;transition:.16s;}
+  .user-chip:hover .caret{fill:var(--accent-hi);}
   .user-chip.active .caret{transform:rotate(180deg);}
   .admin-access-tag{
     display:inline-flex;align-items:center;gap:4px;width:fit-content;
@@ -1228,7 +1253,7 @@
   .admin-access-tag svg{width:8px;height:8px;fill:var(--accent-ink);flex-shrink:0;}
   .dd-info .admin-access-tag{margin:4px 0 5px;}
   .dropdown{
-    position:absolute;top:54px;right:0;background:var(--surface);border:1px solid rgba(212,175,106,.22);border-radius:15px;
+    position:absolute;top:60px;right:0;background:var(--surface);border:1px solid rgba(212,175,106,.22);border-radius:15px;
     box-shadow:0 20px 46px rgba(0,0,0,.55),0 0 0 1px rgba(0,0,0,.2),0 0 32px -12px rgba(212,175,106,.18),inset 0 1px 0 rgba(255,255,255,.03);
     min-width:270px;display:none;overflow:hidden;z-index:150;
     max-width:calc(100vw - 32px);max-height:calc(100vh - 90px);
