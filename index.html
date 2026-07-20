@@ -1783,61 +1783,40 @@
 
   .boot-inner{position:relative;display:flex;flex-direction:column;align-items:center;gap:22px;}
 
-  .boot-glow{
-    position:absolute;top:50%;left:50%;width:340px;height:340px;
-    transform:translate(-50%,-50%);
-    background:radial-gradient(circle, rgba(240,207,142,.28), transparent 70%);
-    filter:blur(6px);
-    animation:bootGlowPulse 2.6s ease-in-out infinite;
+  /* Ruhiges, warmes Umgebungslicht statt rotierender Strahlen — ein weich
+     verwaschener Lichtfleck (nur radial-gradient + blur, also strukturell
+     ohne die harten "Klingen"-Kanten, die conic-gradient bei grossem Radius
+     zwangslaeufig erzeugt). Atmet langsam und driftet minimal. */
+  .boot-aura{
+    position:absolute;top:50%;left:50%;width:480px;height:480px;
+    transform:translate(-50%,-50%) rotate(0deg) scale(.95);
+    background:
+      radial-gradient(ellipse 46% 58% at 50% 40%, rgba(240,207,142,.24), transparent 68%),
+      radial-gradient(ellipse 56% 36% at 46% 64%, rgba(201,160,91,.12), transparent 74%);
+    filter:blur(22px);
+    animation:bootAura 7s ease-in-out infinite;
     pointer-events:none;
   }
-  @keyframes bootGlowPulse{
-    0%,100%{opacity:.55;transform:translate(-50%,-50%) scale(.92);}
-    50%{opacity:1;transform:translate(-50%,-50%) scale(1.08);}
+  @keyframes bootAura{
+    0%,100%{opacity:.6;transform:translate(-50%,-50%) rotate(0deg) scale(.95);}
+    50%{opacity:1;transform:translate(-50%,-50%) rotate(5deg) scale(1.08);}
   }
 
-  .boot-rays{
-    position:absolute;top:50%;left:50%;width:520px;height:520px;
-    transform:translate(-50%,-50%);
-    background:conic-gradient(from 0deg, transparent 0deg, rgba(240,207,142,.07) 8deg, transparent 20deg, transparent 60deg, rgba(240,207,142,.07) 68deg, transparent 80deg, transparent 120deg, rgba(240,207,142,.07) 128deg, transparent 140deg, transparent 180deg, rgba(240,207,142,.07) 188deg, transparent 200deg, transparent 240deg, rgba(240,207,142,.07) 248deg, transparent 260deg, transparent 300deg, rgba(240,207,142,.07) 308deg, transparent 320deg, transparent 360deg);
-    /* Weichzeichner statt scharfer Kegel-Kanten — ein conic-gradient wirkt weiter
-       aussen (grosser Radius) immer "klingenartig" hart, egal wie weich der
-       Winkel-Verlauf rechnerisch ist. Der blur loest das zuverlaessig auf. */
-    filter:blur(7px);
-    /* Rund ausblenden statt hart an der Quadrat-Kante abzuschneiden, aber die
-       Uebergangszone eng genug halten, damit es nicht "krass" wirkt. */
-    -webkit-mask-image:radial-gradient(circle, #000 0%, #000 30%, transparent 62%);
-    mask-image:radial-gradient(circle, #000 0%, #000 30%, transparent 62%);
-    animation:bootRaysSpin 14s linear infinite;
-    pointer-events:none;
-  }
-  @keyframes bootRaysSpin{to{transform:translate(-50%,-50%) rotate(360deg);}}
-
-  /* Zweite, groessere Strahlenlage: weniger, breitere Strahlen, gegenlaeufig und
-     langsamer — nur als Ring sichtbar (nicht bis zur Mitte), dadurch entsteht ein
-     Tiefeneffekt (Parallaxe) statt eines einzelnen flachen Sunbursts. Ebenfalls
-     weichgezeichnet und deutlich dezenter als vorher. */
-  .boot-rays-2{
-    position:absolute;top:50%;left:50%;width:640px;height:640px;
-    transform:translate(-50%,-50%);
-    background:conic-gradient(from 0deg, transparent 0deg, rgba(212,175,106,.05) 4deg, transparent 18deg, transparent 84deg, rgba(212,175,106,.05) 92deg, transparent 106deg, transparent 172deg, rgba(212,175,106,.05) 180deg, transparent 194deg, transparent 260deg, rgba(212,175,106,.05) 268deg, transparent 282deg, transparent 348deg, rgba(212,175,106,.05) 356deg, transparent 360deg);
-    filter:blur(9px);
-    -webkit-mask-image:radial-gradient(circle, transparent 26%, #000 40%, transparent 66%);
-    mask-image:radial-gradient(circle, transparent 26%, #000 40%, transparent 66%);
-    animation:bootRaysSpinRev 24s linear infinite;
-    pointer-events:none;
-  }
-  @keyframes bootRaysSpinRev{to{transform:translate(-50%,-50%) rotate(-360deg);}}
-
-  /* Duenner Gold-Ring als ruhiger Fixpunkt zwischen den beiden rotierenden
-     Strahlenlagen — minimalistisches Detail, markiert den "Uebergang" sichtbar. */
-  .boot-ring{
-    position:absolute;top:50%;left:50%;width:236px;height:236px;
+  /* Duennes Zifferblatt statt Sunburst: winzige Gold-Striche wie an einem
+     Roulette-Kessel, nur in einem hauchduennen Ring sichtbar (per Maske), sehr
+     langsame Drehung. Die einzelnen Striche sind bewusst hart (wie Uhr-Marken),
+     aber so klein und schmal, dass nichts "krass" wirkt — ein ruhiges, edles
+     Detail statt eines dominanten Lichteffekts. */
+  .boot-bezel{
+    position:absolute;top:50%;left:50%;width:268px;height:268px;
     transform:translate(-50%,-50%);border-radius:50%;
-    border:1px solid rgba(212,175,106,.16);
-    box-shadow:0 0 0 1px rgba(212,175,106,.05), inset 0 0 26px rgba(240,207,142,.06);
+    background:repeating-conic-gradient(rgba(212,175,106,.4) 0deg 1.1deg, transparent 1.1deg 9deg);
+    -webkit-mask-image:radial-gradient(circle, transparent 95.5%, #000 96.5%, #000 100%);
+    mask-image:radial-gradient(circle, transparent 95.5%, #000 96.5%, #000 100%);
+    animation:bootBezelSpin 46s linear infinite;
     pointer-events:none;
   }
+  @keyframes bootBezelSpin{to{transform:translate(-50%,-50%) rotate(360deg);}}
 
   /* Ein paar winzige, versetzt aufblitzende Funken — dezent ueber den ganzen
      Screen verteilt statt gehaeuft an einer Stelle. */
@@ -1856,8 +1835,8 @@
 
   /* Eine Hand wird ausgeteilt: 4 Karten fliegen nacheinander aus dem
      Kartenstapel in einen Faecher, halten kurz und ziehen sich zurueck. */
-  .boot-deal{position:relative;width:160px;height:112px;}
-  .boot-deck{position:absolute;left:50%;bottom:2px;width:34px;height:46px;transform:translateX(-50%);z-index:2;}
+  .boot-deal{position:relative;width:182px;height:126px;}
+  .boot-deck{position:absolute;left:50%;bottom:2px;width:38px;height:52px;transform:translateX(-50%);z-index:2;}
   /* Gleicher Kartenrücken wie am Blackjack-Tisch (bj-shoe-card/bj-card-back) —
      dasselbe Motiv wiedererkennbar auch auf dem Ladebildschirm. */
   .boot-deck-card{
@@ -1874,7 +1853,7 @@
   .boot-deck-card:nth-child(2){transform:translate(1.5px,-1.5px) rotate(-3deg);}
   .boot-deck-card:nth-child(3){transform:translate(3px,-3px) rotate(-6deg);}
   .boot-deck-shadow{
-    position:absolute;left:50%;bottom:-8px;width:46px;height:10px;transform:translateX(-50%);z-index:1;
+    position:absolute;left:50%;bottom:-9px;width:50px;height:11px;transform:translateX(-50%);z-index:1;
     background:radial-gradient(ellipse, rgba(0,0,0,.5), transparent 70%);
   }
   /* Die Karte liegt zunaechst wie die oberste Stapelkarte da, dreht sich dort
@@ -1884,15 +1863,15 @@
      unabhaengig davon nur die 3D-Drehung — beides zusammen ergibt "erst
      umdrehen, dann rausgleiten". */
   .boot-deal-card{
-    position:absolute;left:50%;bottom:2px;width:34px;height:46px;margin-left:-17px;z-index:3;
-    perspective:260px;
+    position:absolute;left:50%;bottom:2px;width:38px;height:52px;margin-left:-19px;z-index:3;
+    perspective:290px;
     opacity:0;transform:translate(2px,-2px) scale(.58) rotate(-6deg);
     animation:bootDealCard 3.6s cubic-bezier(.5,0,.2,1) infinite;
   }
-  .boot-deal-card.bdc-1{--tx:-54px;--ty:-44px;--rot:-22deg;animation-delay:0s;}
-  .boot-deal-card.bdc-2{--tx:-19px;--ty:-58px;--rot:-7deg;animation-delay:.22s;}
-  .boot-deal-card.bdc-3{--tx:19px; --ty:-58px;--rot:7deg; animation-delay:.44s;}
-  .boot-deal-card.bdc-4{--tx:54px; --ty:-44px;--rot:22deg;animation-delay:.66s;}
+  .boot-deal-card.bdc-1{--tx:-60px;--ty:-50px;--rot:-25deg;animation-delay:0s;}
+  .boot-deal-card.bdc-2{--tx:-21px;--ty:-65px;--rot:-8deg;animation-delay:.22s;}
+  .boot-deal-card.bdc-3{--tx:21px; --ty:-65px;--rot:8deg; animation-delay:.44s;}
+  .boot-deal-card.bdc-4{--tx:60px; --ty:-50px;--rot:25deg;animation-delay:.66s;}
   /* Startet exakt an der Position/Neigung der obersten Stapelkarte (siehe
      .boot-deck-card:nth-child(3): translate(3px,-3px) rotate(-6deg)) — so wirkt
      es, als wuerde genau diese Karte abgehoben. Die Bewegung in den Faecher
@@ -1924,7 +1903,7 @@
   .boot-deal-face{
     position:absolute;inset:0;border-radius:5px;backface-visibility:hidden;
     display:flex;align-items:center;justify-content:center;
-    font-family:var(--font-display);font-size:16px;font-weight:600;
+    font-family:var(--font-display);font-size:18px;font-weight:600;
   }
   .boot-deal-front{
     background:linear-gradient(160deg,#f2ecdd,#e4d9bd);
@@ -1943,9 +1922,16 @@
       0 10px 22px rgba(0,0,0,.5);
   }
 
+  /* Kleiner Zierdivider zwischen Kartenszene und Wortmarke — ruhiges,
+     minimalistisches Detail statt einer weiteren Animation. */
+  .boot-flourish{display:flex;align-items:center;gap:9px;opacity:.85;}
+  .boot-flourish .bf-line{width:24px;height:1px;background:linear-gradient(90deg, transparent, var(--accent-dim));}
+  .boot-flourish .bf-line:last-child{background:linear-gradient(90deg, var(--accent-dim), transparent);}
+  .boot-flourish .bf-mark{font-size:9px;color:var(--accent-hi);line-height:1;}
+
   .boot-logo{
     font-family:var(--font-display);font-style:italic;font-weight:600;
-    font-size:26px;letter-spacing:.3px;
+    font-size:27px;letter-spacing:.3px;position:relative;padding-bottom:9px;
   }
   .boot-logo-royal{color:var(--text);}
   .boot-logo-deck{
@@ -1957,6 +1943,21 @@
   @keyframes bootShimmer{
     0%{background-position:0% center;}
     100%{background-position:200% center;}
+  }
+  /* Feine Gold-Linie, die synchron zum Karten-Zyklus (3.6s) unter dem
+     Schriftzug ein- und wieder auszieht — bindet Wortmarke und Kartenszene
+     rhythmisch zusammen. */
+  .boot-logo:after{
+    content:"";position:absolute;left:50%;bottom:0;height:1px;
+    background:linear-gradient(90deg, transparent, var(--accent-hi), transparent);
+    width:0;opacity:0;transform:translateX(-50%);
+    animation:bootUnderline 3.6s ease-in-out infinite;
+  }
+  @keyframes bootUnderline{
+    0%,8%{width:0;opacity:0;}
+    34%{width:64%;opacity:1;}
+    70%{width:64%;opacity:1;}
+    92%,100%{width:0;opacity:0;}
   }
 
   .boot-sub{
@@ -3572,13 +3573,11 @@
   <div class="boot-sparkle sp-6"></div>
 
   <div class="boot-inner">
-    <div class="boot-glow"></div>
-    <div class="boot-rays"></div>
-    <div class="boot-rays-2"></div>
-    <div class="boot-ring"></div>
+    <div class="boot-aura"></div>
+    <div class="boot-bezel"></div>
 
-    <!-- Statt einer einzelnen Flip-Karte: eine Hand, die immer wieder neu ausgeteilt
-         wird — vier Karten fliegen nacheinander aus dem Stapel in einen Fächer,
+    <!-- Eine Hand wird ausgeteilt: die Karten drehen sich am Stapel einmal um
+         (Rueckseite -> Vorderseite) und schwingen erst danach in den Fächer,
          halten kurz, und ziehen sich dann zurück. Läuft endlos in einer Schleife. -->
     <div class="boot-deal">
       <div class="boot-deck">
@@ -3612,6 +3611,8 @@
         </div>
       </div>
     </div>
+
+    <div class="boot-flourish"><span class="bf-line"></span><span class="bf-mark">✦</span><span class="bf-line"></span></div>
 
     <div class="boot-logo"><span class="boot-logo-royal">Royal</span> <span class="boot-logo-deck">Deck</span></div>
     <div class="boot-sub">Tische werden vorbereitet</div>
