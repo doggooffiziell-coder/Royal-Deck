@@ -1865,7 +1865,7 @@
   .boot-deal-card{
     position:absolute;left:50%;bottom:2px;width:38px;height:52px;margin-left:-19px;z-index:3;
     perspective:290px;
-    opacity:0;transform:translate(2px,-2px) scale(.58) rotate(-6deg);
+    opacity:0;transform:translate(2px,-2px) scale(1) rotate(-6deg);
     animation:bootDealCard 3.6s cubic-bezier(.5,0,.2,1) infinite;
   }
   .boot-deal-card.bdc-1{--tx:-60px;--ty:-50px;--rot:-25deg;animation-delay:0s;}
@@ -1873,15 +1873,19 @@
   .boot-deal-card.bdc-3{--tx:21px; --ty:-65px;--rot:8deg; animation-delay:.44s;}
   .boot-deal-card.bdc-4{--tx:60px; --ty:-50px;--rot:25deg;animation-delay:.66s;}
   /* Startet exakt an der Position/Neigung der obersten Stapelkarte (siehe
-     .boot-deck-card:nth-child(3): translate(3px,-3px) rotate(-6deg)) — so wirkt
-     es, als wuerde genau diese Karte abgehoben. Die Bewegung in den Faecher
-     beginnt erst bei ~24%, nachdem der Flip (siehe bootDealFlip) fertig ist. */
+     .boot-deck-card:nth-child(3): translate(3px,-3px) rotate(-6deg)) — und
+     bleibt dabei in voller Groesse (scale 1), solange sie noch am Stapel liegt
+     und sich dreht — vorher war sie waehrend des Flips verkleinert (.58/.7)
+     und wirkte dadurch kleiner als die Stapelkarten dahinter. Die Bewegung in
+     den Faecher beginnt erst bei ~24%, nachdem der Flip fertig ist, mit einem
+     kurzen Ueberschwung (1.06) kurz vor dem Einrasten in der Faecherposition. */
   @keyframes bootDealCard{
-    0%{transform:translate(2px,-2px) scale(.58) rotate(-6deg);opacity:0;}
+    0%{transform:translate(2px,-2px) scale(1) rotate(-6deg);opacity:0;}
     4%{opacity:1;}
-    24%{transform:translate(2px,-2px) scale(.7) rotate(-6deg);opacity:1;}
-    38%,78%{transform:translate(var(--tx),var(--ty)) scale(1) rotate(var(--rot));opacity:1;}
-    94%,100%{transform:translate(2px,-2px) scale(.58) rotate(-6deg);opacity:0;}
+    24%{transform:translate(2px,-2px) scale(1) rotate(-6deg);opacity:1;}
+    32%{transform:translate(calc(var(--tx) * .92), calc(var(--ty) * 1.05)) scale(1.06) rotate(var(--rot));opacity:1;}
+    40%,78%{transform:translate(var(--tx),var(--ty)) scale(1) rotate(var(--rot));opacity:1;}
+    94%,100%{transform:translate(2px,-2px) scale(1) rotate(-6deg);opacity:0;}
   }
 
   .boot-deal-flip{
