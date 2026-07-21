@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Low-Poly Survival</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #7ec8e3; font-family: 'Segoe UI', sans-serif; }
+  #app { position: fixed; inset: 0; }
+  canvas { display: block; }
+
+  /* ---- HUD ---- */
+  #hud { position: fixed; inset: 0; pointer-events: none; user-select: none; }
+
+  /* Crosshair */
+  #crosshair {
+    position: absolute; left: 50%; top: 50%; width: 6px; height: 6px;
+    margin: -3px 0 0 -3px; border-radius: 50%;
+    background: rgba(255,255,255,0.85); box-shadow: 0 0 4px rgba(0,0,0,0.4);
+  }
+
+  /* Objectives */
+  #objectives {
+    position: absolute; top: 22px; right: 34px; text-align: left; color: #fff;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.45);
+  }
+  #objectives h2 { font-size: 34px; font-weight: 700; margin-bottom: 10px; }
+  .obj { display: flex; align-items: center; font-size: 22px; margin: 6px 0; opacity: 0.95; }
+  .box {
+    width: 18px; height: 18px; border: 3px solid #fff; border-radius: 3px;
+    margin-right: 12px; display: inline-flex; align-items: center; justify-content: center;
+    font-size: 15px; line-height: 1;
+  }
+  .obj.done { color: #bfeecb; }
+  .obj.done .box { border-color: #7ee29a; color: #7ee29a; }
+  .obj.done .label { text-decoration: line-through; opacity: 0.8; }
+
+  /* Bars bottom-left */
+  #bars { position: absolute; left: 22px; bottom: 26px; width: 260px; }
+  .bar-row { display: flex; align-items: center; margin-bottom: 10px; }
+  .bar-icon { width: 26px; font-size: 17px; font-weight: 700; color: #fff; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+  .bar-icon small { font-size: 11px; }
+  .bar {
+    flex: 1; height: 16px; background: rgba(20,40,60,0.55); border: 2px solid #16324a;
+    border-radius: 9px; overflow: hidden;
+  }
+  .bar-fill { height: 100%; width: 100%; border-radius: 7px; transition: width 0.2s linear; }
+  #o2fill { background: linear-gradient(90deg,#dfe9f0,#ffffff); }
+  #hpfill { background: linear-gradient(90deg,#e8695f,#ff8a80); }
+
+  /* Hotbar */
+  #hotbar {
+    position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%);
+    display: flex; gap: 6px;
+  }
+  .slot {
+    width: 76px; height: 60px; background: rgba(16,38,58,0.78); border: 2px solid #2a4f6e;
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    color: #dfe9f0; font-size: 13px; text-align: center; padding: 4px; position: relative;
+  }
+  .slot.active { border-color: #ffd66b; box-shadow: 0 0 12px rgba(255,214,107,0.5); }
+  .slot .num { position: absolute; top: 2px; left: 5px; font-size: 10px; opacity: 0.5; }
+  .slot.tool { background: rgba(240,238,225,0.92); color: #2a2a2a; font-family: 'Comic Sans MS','Segoe UI',cursive; }
+
+  /* Start / pause overlay */
+  #overlay {
+    position: absolute; inset: 0; background: rgba(10,25,40,0.55); backdrop-filter: blur(3px);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: #fff; text-align: center; pointer-events: auto; cursor: pointer; transition: opacity .3s;
+  }
+  #overlay h1 { font-size: 46px; margin-bottom: 14px; letter-spacing: 1px; text-shadow: 0 3px 12px rgba(0,0,0,.5); }
+  #overlay p { font-size: 18px; opacity: .9; margin: 4px 0; }
+  #overlay .keys { margin-top: 20px; font-size: 15px; line-height: 1.9; opacity: .85; }
+  #overlay .play {
+    margin-top: 26px; padding: 14px 40px; background: #ffd66b; color: #1a2a3a; border-radius: 30px;
+    font-size: 20px; font-weight: 700; box-shadow: 0 6px 20px rgba(0,0,0,.3);
+  }
+  kbd {
+    background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3); border-radius: 5px;
+    padding: 1px 8px; font-family: inherit; margin: 0 2px;
+  }
+  #toast {
+    position: absolute; left: 50%; bottom: 120px; transform: translateX(-50%);
+    background: rgba(16,38,58,0.85); color: #fff; padding: 10px 22px; border-radius: 20px;
+    font-size: 16px; opacity: 0; transition: opacity .3s; pointer-events: none;
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<div id="hud">
+  <div id="crosshair"></div>
+
+  <div id="objectives">
+    <h2>Objectives</h2>
+    <div class="obj" data-obj="recycler"><span class="box"></span><span class="label">Get your recycler tool</span></div>
+    <div class="obj" data-obj="build"><span class="box"></span><span class="label">Get your build tool</span></div>
+    <div class="obj" data-obj="fly"><span class="box"></span><span class="label">Fly</span></div>
+  </div>
+
+  <div id="bars">
+    <div class="bar-row"><div class="bar-icon">O<small>2</small></div><div class="bar"><div id="o2fill" class="bar-fill"></div></div></div>
+    <div class="bar-row"><div class="bar-icon">&#9829;</div><div class="bar"><div id="hpfill" class="bar-fill"></div></div></div>
+  </div>
+
+  <div id="hotbar">
+    <div class="slot tool active"><span class="num">1</span>Mining<br>Laser</div>
+    <div class="slot"><span class="num">2</span></div>
+    <div class="slot"><span class="num">3</span></div>
+    <div class="slot"><span class="num">4</span></div>
+    <div class="slot"><span class="num">5</span></div>
+  </div>
+
+  <div id="toast"></div>
+</div>
+
+<div id="overlay">
+  <h1>Low-Poly Survival</h1>
+  <p>Ein kleiner 3D-Prototyp im Stil deines Screenshots</p>
+  <div class="keys">
+    <kbd>W A S D</kbd> Bewegen &nbsp;&nbsp; <kbd>Maus</kbd> Umsehen &nbsp;&nbsp; <kbd>Leertaste</kbd> Springen<br>
+    <kbd>F</kbd> Flugmodus &nbsp;&nbsp; <kbd>Shift</kbd> Sprint &nbsp;&nbsp; <kbd>Linksklick</kbd> Mining Laser<br>
+    <kbd>1-5</kbd> Slots &nbsp;&nbsp; <kbd>Esc</kbd> Pause
+  </div>
+  <div class="play">▶ Klicken zum Spielen</div>
+</div>
+
+<script type="importmap">
+{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+
+// ---------------------------------------------------------------------------
+// Scene, camera, renderer
+// ---------------------------------------------------------------------------
+const app = document.getElementById('app');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x8fc9e8);
+scene.fog = new THREE.Fog(0xbcdcec, 120, 620);
+
+const camera = new THREE.PerspectiveCamera(72, innerWidth/innerHeight, 0.1, 2000);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+app.appendChild(renderer.domElement);
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+// ---------------------------------------------------------------------------
+// Lights
+// ---------------------------------------------------------------------------
+const sun = new THREE.DirectionalLight(0xfff4e0, 2.1);
+sun.position.set(120, 220, 80);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.camera.left = -300; sun.shadow.camera.right = 300;
+sun.shadow.camera.top = 300; sun.shadow.camera.bottom = -300;
+sun.shadow.camera.far = 700;
+scene.add(sun);
+scene.add(new THREE.HemisphereLight(0xbfe3ff, 0x4a7a3a, 0.9));
+scene.add(new THREE.AmbientLight(0xffffff, 0.25));
+
+// ---------------------------------------------------------------------------
+// Terrain — low-poly rolling hills with flat shading
+// ---------------------------------------------------------------------------
+const WORLD = 1000;
+const SEG = 120;
+
+function noise(x, z) {
+  return Math.sin(x*0.012)*Math.cos(z*0.011)*14
+       + Math.sin(x*0.03 + 2.0)*Math.cos(z*0.025)*6
+       + Math.sin(x*0.06)*3.2;
+}
+
+const geo = new THREE.PlaneGeometry(WORLD, WORLD, SEG, SEG);
+geo.rotateX(-Math.PI/2);
+const pos = geo.attributes.position;
+for (let i = 0; i < pos.count; i++) {
+  const x = pos.getX(i), z = pos.getZ(i);
+  pos.setY(i, noise(x, z));
+}
+geo.computeVertexNormals();
+const ground = new THREE.Mesh(
+  geo,
+  new THREE.MeshStandardMaterial({ color: 0x5fa54a, flatShading: true, roughness: 1 })
+);
+ground.receiveShadow = true;
+scene.add(ground);
+
+function groundHeight(x, z) { return noise(x, z); }
+
+// ---------------------------------------------------------------------------
+// Trees (low-poly pines) + rocks — instanced for performance
+// ---------------------------------------------------------------------------
+const rng = (() => { let s = 1337; return () => (s = (s*16807) % 2147483647) / 2147483647; })();
+
+function makePine() {
+  const g = new THREE.Group();
+  const trunk = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.6, 0.9, 4, 6),
+    new THREE.MeshStandardMaterial({ color: 0x6b3f2a, flatShading: true, roughness: 1 })
+  );
+  trunk.position.y = 2; trunk.castShadow = true; g.add(trunk);
+  const leaf = new THREE.MeshStandardMaterial({ color: 0x2f6b3a, flatShading: true, roughness: 1 });
+  const leafDark = new THREE.MeshStandardMaterial({ color: 0x255630, flatShading: true, roughness: 1 });
+  for (let i = 0; i < 4; i++) {
+    const r = 4.2 - i*0.85;
+    const cone = new THREE.Mesh(new THREE.ConeGeometry(r, 3.2, 7), i%2 ? leafDark : leaf);
+    cone.position.y = 4 + i*2.4; cone.castShadow = true; g.add(cone);
+  }
+  return g;
+}
+
+const treeProto = makePine();
+const trees = [];
+for (let i = 0; i < 260; i++) {
+  const t = treeProto.clone();
+  const x = (rng()-0.5)*WORLD*0.92, z = (rng()-0.5)*WORLD*0.92;
+  const s = 0.7 + rng()*1.1;
+  t.position.set(x, groundHeight(x, z)-0.3, z);
+  t.scale.setScalar(s);
+  t.rotation.y = rng()*Math.PI*2;
+  scene.add(t);
+  trees.push({ x, z, r: 1.6*s });
+}
+
+const rockMat = new THREE.MeshStandardMaterial({ color: 0xb9c2ca, flatShading: true, roughness: 1 });
+const rocks = [];
+for (let i = 0; i < 160; i++) {
+  const x = (rng()-0.5)*WORLD*0.94, z = (rng()-0.5)*WORLD*0.94;
+  const s = 0.8 + rng()*2.4;
+  const rock = new THREE.Mesh(new THREE.DodecahedronGeometry(s, 0), rockMat);
+  rock.position.set(x, groundHeight(x, z)+s*0.4, z);
+  rock.rotation.set(rng()*3, rng()*3, rng()*3);
+  rock.castShadow = true; rock.receiveShadow = true;
+  scene.add(rock);
+  rocks.push(rock);
+}
+
+// ---------------------------------------------------------------------------
+// Pickups — the recycler tool & build tool (floating glowing gems)
+// ---------------------------------------------------------------------------
+function makePickup(color) {
+  const m = new THREE.Mesh(
+    new THREE.OctahedronGeometry(1.1, 0),
+    new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.6, flatShading: true })
+  );
+  const ring = new THREE.Mesh(
+    new THREE.TorusGeometry(1.7, 0.12, 6, 20),
+    new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.5 })
+  );
+  ring.rotation.x = Math.PI/2;
+  const g = new THREE.Group(); g.add(m); g.add(ring);
+  const light = new THREE.PointLight(color, 2, 22); g.add(light);
+  return g;
+}
+
+function placePickup(obj, dist, ang) {
+  const x = Math.cos(ang)*dist, z = Math.sin(ang)*dist;
+  const g = makePickup(obj.color);
+  g.position.set(x, groundHeight(x, z)+3, z);
+  scene.add(g);
+  return { mesh: g, x, z, ...obj };
+}
+
+const pickups = [
+  placePickup({ id:'recycler', color:0x54d6ff }, 30, 0.6),
+  placePickup({ id:'build',    color:0xffb347 }, 46, 2.4),
+];
+
+// ---------------------------------------------------------------------------
+// Player controller (first person)
+// ---------------------------------------------------------------------------
+const player = {
+  pos: new THREE.Vector3(0, groundHeight(0,0)+3, 0),
+  vel: new THREE.Vector3(),
+  yaw: 0, pitch: 0,
+  onGround: false, flying: false,
+  eye: 2.6,
+};
+const keys = {};
+let locked = false;
+
+const overlay = document.getElementById('overlay');
+const toast = document.getElementById('toast');
+function showToast(msg) {
+  toast.textContent = msg; toast.style.opacity = 1;
+  clearTimeout(showToast._t); showToast._t = setTimeout(()=>toast.style.opacity=0, 1800);
+}
+
+renderer.domElement.addEventListener('click', () => { if (!locked) renderer.domElement.requestPointerLock(); });
+document.addEventListener('pointerlockchange', () => {
+  locked = document.pointerLockElement === renderer.domElement;
+  overlay.style.opacity = locked ? 0 : 1;
+  overlay.style.pointerEvents = locked ? 'none' : 'auto';
+});
+
+document.addEventListener('mousemove', (e) => {
+  if (!locked) return;
+  player.yaw   -= e.movementX * 0.0022;
+  player.pitch -= e.movementY * 0.0022;
+  player.pitch = Math.max(-1.5, Math.min(1.5, player.pitch));
+});
+
+addEventListener('keydown', (e) => {
+  keys[e.code] = true;
+  if (e.code === 'KeyF') { player.flying = !player.flying; player.vel.y = 0; showToast(player.flying ? '🕊️ Flugmodus AN' : 'Flugmodus AUS'); if (player.flying) complete('fly'); }
+  if (/^Digit[1-5]$/.test(e.code)) selectSlot(+e.code.slice(5)-1);
+});
+addEventListener('keyup', (e) => keys[e.code] = false);
+
+// Mining laser (left click)
+const laser = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.04, 0.04, 1, 6),
+  new THREE.MeshBasicMaterial({ color: 0xff5533 })
+);
+laser.visible = false; scene.add(laser);
+let firing = false;
+renderer.domElement.addEventListener('mousedown', e => { if (locked && e.button===0 && activeSlot===0) firing = true; });
+addEventListener('mouseup', () => firing = false);
+
+// ---------------------------------------------------------------------------
+// Hotbar slots
+// ---------------------------------------------------------------------------
+const slotEls = [...document.querySelectorAll('.slot')];
+let activeSlot = 0;
+function selectSlot(i) {
+  activeSlot = i;
+  slotEls.forEach((el,idx)=>el.classList.toggle('active', idx===i));
+}
+
+// ---------------------------------------------------------------------------
+// Objectives
+// ---------------------------------------------------------------------------
+const done = {};
+function complete(id) {
+  if (done[id]) return;
+  done[id] = true;
+  const el = document.querySelector(`.obj[data-obj="${id}"]`);
+  if (el) { el.classList.add('done'); el.querySelector('.box').textContent = '✓'; }
+  const names = { recycler:'Recycler-Tool erhalten!', build:'Bau-Tool erhalten!', fly:'Du fliegst! 🕊️' };
+  showToast('✅ ' + (names[id]||id));
+}
+
+// ---------------------------------------------------------------------------
+// Bars
+// ---------------------------------------------------------------------------
+let o2 = 100, hp = 100;
+const o2fill = document.getElementById('o2fill');
+const hpfill = document.getElementById('hpfill');
+
+// ---------------------------------------------------------------------------
+// Game loop
+// ---------------------------------------------------------------------------
+const clock = new THREE.Clock();
+const forward = new THREE.Vector3();
+const right = new THREE.Vector3();
+
+function collideTrees(p) {
+  for (const t of trees) {
+    const dx = p.x - t.x, dz = p.z - t.z;
+    const d2 = dx*dx + dz*dz, r = t.r + 0.6;
+    if (d2 < r*r && d2 > 0.0001) {
+      const d = Math.sqrt(d2), push = (r - d);
+      p.x += (dx/d)*push; p.z += (dz/d)*push;
+    }
+  }
+}
+
+function update(dt) {
+  // orientation vectors
+  forward.set(Math.sin(player.yaw), 0, Math.cos(player.yaw));
+  right.set(forward.z, 0, -forward.x);
+
+  const sprint = keys['ShiftLeft'] || keys['ShiftRight'] ? 1.9 : 1;
+  const speed = (player.flying ? 32 : 20) * sprint;
+  const wish = new THREE.Vector3();
+  if (keys['KeyW']) wish.sub(forward);
+  if (keys['KeyS']) wish.add(forward);
+  if (keys['KeyA']) wish.sub(right);
+  if (keys['KeyD']) wish.add(right);
+  if (wish.lengthSq() > 0) wish.normalize();
+
+  if (player.flying) {
+    player.vel.x = wish.x * speed;
+    player.vel.z = wish.z * speed;
+    player.vel.y = 0;
+    if (keys['Space']) player.vel.y = speed*0.7;
+    if (keys['ControlLeft'] || keys['KeyC']) player.vel.y = -speed*0.7;
+  } else {
+    // ground movement with light acceleration
+    player.vel.x += (wish.x*speed - player.vel.x) * Math.min(1, dt*12);
+    player.vel.z += (wish.z*speed - player.vel.z) * Math.min(1, dt*12);
+    player.vel.y -= 30 * dt; // gravity
+    if (keys['Space'] && player.onGround) { player.vel.y = 11; player.onGround = false; }
+  }
+
+  player.pos.addScaledVector(player.vel, dt);
+
+  // terrain collision
+  const gh = groundHeight(player.pos.x, player.pos.z) + player.eye;
+  if (!player.flying && player.pos.y <= gh) {
+    player.pos.y = gh; player.vel.y = 0; player.onGround = true;
+  } else if (player.flying) {
+    if (player.pos.y < gh) player.pos.y = gh;
+    player.onGround = false;
+  } else {
+    player.onGround = false;
+  }
+
+  collideTrees(player.pos);
+  // keep in bounds
+  const lim = WORLD*0.47;
+  player.pos.x = Math.max(-lim, Math.min(lim, player.pos.x));
+  player.pos.z = Math.max(-lim, Math.min(lim, player.pos.z));
+
+  // camera
+  camera.position.copy(player.pos);
+  camera.rotation.set(player.pitch, player.yaw, 0, 'YXZ');
+
+  // pickups
+  for (const p of pickups) {
+    if (p.taken) continue;
+    p.mesh.rotation.y += dt*1.6;
+    p.mesh.children[1].rotation.z += dt*2;
+    p.mesh.position.y = groundHeight(p.x,p.z)+3 + Math.sin(clock.elapsedTime*2)*0.35;
+    const dx = player.pos.x-p.x, dz = player.pos.z-p.z;
+    if (dx*dx+dz*dz < 9) {
+      p.taken = true; scene.remove(p.mesh); complete(p.id);
+      const slot = p.id==='recycler' ? 1 : 2;
+      slotEls[slot].textContent = '';
+      const num = document.createElement('span'); num.className='num'; num.textContent = slot+1;
+      slotEls[slot].appendChild(num);
+      slotEls[slot].appendChild(document.createTextNode(p.id==='recycler'?'Recycler':'Build'));
+    }
+  }
+
+  // laser visuals
+  laser.visible = firing;
+  if (firing) {
+    const from = camera.position.clone();
+    const dir = new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion);
+    const end = from.clone().addScaledVector(dir, 40);
+    const mid = from.clone().lerp(end, 0.5).addScaledVector(dir, 0.0);
+    laser.position.copy(mid);
+    laser.scale.set(1, from.distanceTo(end), 1);
+    laser.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), dir);
+  }
+
+  // bars: O2 slowly drains, regenerates near ground/among trees
+  o2 = Math.max(0, Math.min(100, o2 + (player.flying ? -3 : 2)*dt));
+  if (o2 <= 0) hp = Math.max(0, hp - 6*dt); else hp = Math.min(100, hp + 1.5*dt);
+  o2fill.style.width = o2 + '%';
+  hpfill.style.width = hp + '%';
+
+  // gentle sun/day motion? keep static for now
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = Math.min(0.05, clock.getDelta());
+  if (locked) update(dt);
+  renderer.render(scene, camera);
+}
+animate();
+</script>
+</body>
+</html>
