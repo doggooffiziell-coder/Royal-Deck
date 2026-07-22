@@ -8,6 +8,14 @@
 <meta property="og:title" content="Royal Deck">
 <meta property="og:description" content="Blackjack, Walzenglück und Chicken Road bei Royal Deck. Kein Echtgeld, nur zum Spaß.">
 <meta property="og:type" content="website">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0e1a14">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Royal Deck">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23d4af6a' d='M12 2l2.6 5.9 6.4.6-4.8 4.3 1.5 6.3L12 15.8 6.3 19.1l1.5-6.3-4.8-4.3 6.4-.6z'/%3E%3C/svg%3E">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -151,23 +159,22 @@
   .main{flex:1;display:flex;flex-direction:column;min-width:0;}
 
   /* ============================================================
-     TOPBAR — "Ticket Rail": geprägtes Messing auf Filz statt Glas-Pillen.
-     Jedes Cluster sitzt wie ein eingelassener Chip-Tray in der Leiste,
-     mit angeschnittenen Ecken (Ticket-Look) statt runden Kapseln.
+     TOPBAR — jetzt eine schwebende, abgerundete Filz-Karte statt der alten
+     "Ticket Rail" mit angeschnittenen Ecken. Gleiche Formsprache wie Cards,
+     Buttons und Dropdowns im Rest der Seite: weiche Radien, kein clip-path,
+     keine harten Segment-Trennlinien.
      ============================================================ */
   .topbar{
-    height:64px;display:flex;align-items:center;gap:18px;padding:0 26px;
-    background:
-      linear-gradient(180deg, rgba(201,160,91,.05), transparent 40%),
-      repeating-linear-gradient(115deg, rgba(212,175,106,.025) 0 2px, transparent 2px 26px),
-      var(--panel);
-    border-bottom:1px solid rgba(0,0,0,.5);
-    box-shadow:0 1px 0 rgba(212,175,106,.22), 0 2px 0 rgba(0,0,0,.4), 0 14px 30px -18px rgba(0,0,0,.7);
+    height:64px;display:flex;align-items:center;gap:14px;
+    margin:14px 22px 0;padding:0 18px;border-radius:18px;
+    background:linear-gradient(160deg,var(--panel),var(--felt) 160%);
+    border:1px solid var(--border);
+    box-shadow:0 14px 34px -18px rgba(0,0,0,.65), inset 0 1px 0 rgba(212,175,106,.06);
     flex-shrink:0;position:relative;z-index:80;
   }
   .search{flex:1;max-width:460px;position:relative;}
   .search input{
-    width:100%;height:38px;border:none;border-radius:0;clip-path:polygon(10px 0,100% 0,100% 100%,0 100%,0 10px);
+    width:100%;height:40px;border:none;border-radius:12px;
     background:linear-gradient(180deg,rgba(0,0,0,.32),rgba(0,0,0,.18));
     color:var(--text);padding:0 16px 0 40px;font-size:13px;outline:none;transition:.15s;
     font-family:var(--font-mono);letter-spacing:.2px;
@@ -175,22 +182,22 @@
   }
   .search input::placeholder{color:var(--faint);font-family:var(--font-body);}
   .search input:focus{box-shadow:inset 0 0 0 1px var(--accent-hi), inset 0 2px 4px rgba(0,0,0,.4), 0 0 0 3px var(--accent-soft);}
-  .search svg{position:absolute;left:15px;top:11.5px;width:14px;height:14px;fill:var(--accent-dim);}
+  .search svg{position:absolute;left:15px;top:12.5px;width:14px;height:14px;fill:var(--accent-dim);}
   .search input{padding-right:64px;}
   .search-kbd{
-    position:absolute;right:0;top:0;bottom:0;display:flex;align-items:center;padding:0 12px;
+    position:absolute;right:3px;top:3px;bottom:3px;display:flex;align-items:center;padding:0 11px;
     font-family:var(--font-mono);font-size:9px;font-weight:600;letter-spacing:.6px;color:var(--accent-dim);
-    border-left:1px solid rgba(212,175,106,.2);
-    background:rgba(212,175,106,.05);pointer-events:none;transition:.15s;text-transform:uppercase;
+    border-radius:9px;
+    background:rgba(212,175,106,.07);pointer-events:none;transition:.15s;text-transform:uppercase;
   }
   .search input:focus ~ .search-kbd{opacity:0;}
 
-  /* --- Live-Suchergebnisse: gleiche Formsprache wie die Panel-Dropdowns --- */
+  /* --- Live-Suchergebnisse: abgerundetes Panel, gleiche Sprache wie die Dropdowns --- */
   .search-results{
     position:absolute;top:calc(100% + 10px);left:0;right:0;display:none;
     background:linear-gradient(165deg,var(--surface),var(--panel));
-    border:none;clip-path:polygon(14px 0,100% 0,100% 100%,0 100%,0 14px);overflow:hidden;z-index:120;
-    box-shadow:0 18px 44px rgba(0,0,0,.55), inset 0 0 0 1px rgba(212,175,106,.16), inset 0 1px 0 rgba(255,255,255,.03);
+    border:1px solid rgba(212,175,106,.18);border-radius:15px;overflow:hidden;z-index:120;
+    box-shadow:0 18px 44px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.03);
   }
   .search-results.open{display:block;animation:ddPop .16s cubic-bezier(.2,.9,.3,1) both;}
   .sr-cat{
@@ -220,41 +227,39 @@
   .sr-empty{padding:18px 14px;text-align:center;color:var(--faint);font-size:12.5px;}
   .sr-empty b{color:var(--muted);font-weight:600;}
 
-  .top-right{margin-left:auto;display:flex;align-items:stretch;gap:0;height:100%;}
+  .top-right{margin-left:auto;display:flex;align-items:center;gap:12px;height:100%;}
 
-  /* Anmelden — jetzt ein Siegel-Knopf statt einer Pille: eckig angeschnitten,
-     wie ein Wachssiegel/Chip-Tag statt eines generischen CTA-Buttons. */
+  /* Anmelden — jetzt eine runde Pille wie die anderen CTA-Buttons der Seite,
+     statt eines diagonal angeschnittenen Siegel-Knopfs. */
   .topbar-login-btn{
     background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:var(--accent-ink);border:none;
-    padding:0 22px;height:38px;align-self:center;font-weight:800;font-size:12.5px;cursor:pointer;font-family:var(--font-body);
-    letter-spacing:.4px;text-transform:uppercase;
-    clip-path:polygon(0 0,calc(100% - 10px) 0,100% 100%,10px 100%);
+    padding:0 22px;height:40px;align-self:center;font-weight:800;font-size:12.5px;cursor:pointer;font-family:var(--font-body);
+    letter-spacing:.4px;text-transform:uppercase;border-radius:11px;
     box-shadow:0 4px 14px -6px rgba(212,175,106,.55), inset 0 1px 0 rgba(255,255,255,.25);transition:.15s;
   }
-  .topbar-login-btn:hover{filter:brightness(1.08);}
-  .topbar-login-btn:active{filter:brightness(.96);}
+  .topbar-login-btn:hover{filter:brightness(1.08);transform:translateY(-1px);}
+  .topbar-login-btn:active{filter:brightness(.96);transform:translateY(0);}
 
-  /* --- HUD-Cluster: eine durchgehende Messing-Schiene statt Glas-Pillen.
-     Level/Chips/Icons sitzen als eingelassene Segmente nebeneinander,
-     getrennt durch dünne Niet-Linien statt weichem Verlauf. --- */
+  /* --- HUD-Cluster: runde Kapsel-Gruppe statt durchgehender Messing-Schiene.
+     Level/Chips/Icons sitzen als einzelne, eigenständig abgerundete Segmente
+     mit Abstand zueinander statt als eingelassene Felder mit Niet-Trennlinien. --- */
   .hud-cluster{
-    display:flex;align-items:stretch;gap:0;height:100%;padding:0;
-    background:transparent;border:none;border-left:1px solid rgba(212,175,106,.14);
-    box-shadow:none;
+    display:flex;align-items:center;gap:3px;height:48px;padding:4px;
+    background:var(--surface);border:1px solid var(--border-soft);border-radius:14px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.02);
   }
-  /* Segmente tragen jetzt ihre eigene border-right als Trennlinie */
   .hud-divider{display:none;}
 
   /* Level-Kapsel: klickbar, öffnet den Fortschritts-Dropdown zum nächsten Level.
      Der Ring am Coin zeigt schon vorab live den XP-Fortschritt — dieselbe
      Sprache wie der Avatar-Ring. */
   .level-chip{
-    display:flex;align-items:center;gap:10px;height:100%;padding:0 16px;cursor:pointer;
-    transition:.18s;position:relative;border-right:1px solid rgba(212,175,106,.14);
+    display:flex;align-items:center;gap:10px;height:100%;padding:0 14px;cursor:pointer;
+    transition:.18s;position:relative;border-radius:10px;
   }
-  .level-chip:hover{background:rgba(212,175,106,.07);}
-  .level-chip:active{background:rgba(212,175,106,.1);}
-  .level-chip.active{background:rgba(212,175,106,.1);box-shadow:inset 0 -2px 0 var(--accent-hi);}
+  .level-chip:hover{background:rgba(212,175,106,.09);}
+  .level-chip:active{background:rgba(212,175,106,.14);}
+  .level-chip.active{background:rgba(212,175,106,.14);box-shadow:inset 0 0 0 1px rgba(212,175,106,.3);}
   /* Diamant-Chip statt runder Münze: rotiertes Quadrat, Inhalt gegengedreht,
      damit Text/Icon aufrecht bleiben. */
   .level-chip .chip-coin{
@@ -299,11 +304,11 @@
   .level-chip:hover .chip-caret{fill:var(--accent-hi);}
   .level-chip.active .chip-caret{fill:var(--accent-hi);transform:rotate(180deg);}
 
-  /* Chips-Kapsel: eingelassenes Segment in der Schiene, eigener Chip-Turm-Look
-     statt Münz-Icon — reine Anzeige, kein Dropdown. */
+  /* Chips-Kapsel: eigenes rundes Segment in der Kapsel-Gruppe, eigener
+     Chip-Turm-Look statt Münz-Icon — reine Anzeige, kein Dropdown. */
   .chips-chip{
-    display:flex;align-items:center;gap:10px;height:100%;padding:0 16px;cursor:default;
-    border-right:1px solid rgba(212,175,106,.14);
+    display:flex;align-items:center;gap:10px;height:100%;padding:0 14px;cursor:default;
+    border-radius:10px;
   }
   .chips-chip-icon{
     width:22px;height:26px;flex-shrink:0;position:relative;display:flex;align-items:flex-end;justify-content:center;
@@ -345,25 +350,17 @@
   .lvl-progress-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--accent-dim),var(--accent-hi));transition:width .3s ease;}
   .lvl-panel-next{font-size:10.5px;color:var(--faint);font-family:var(--font-mono);}
 
-  .hud-cluster .icon-btn-wrap{display:flex;height:100%;border-right:1px solid rgba(212,175,106,.14);}
+  .hud-cluster .icon-btn-wrap{display:flex;height:100%;}
   .hud-cluster .icon-btn{
-    width:56px;height:100%;border-radius:0;background:transparent;display:flex;align-items:center;
+    width:42px;height:100%;border-radius:10px;background:transparent;display:flex;align-items:center;
     justify-content:center;cursor:pointer;color:var(--muted);position:relative;transition:.16s;
     border:none;margin:auto;
   }
-  /* eingesenkter Kreis wie ein Messingniet in der Schiene, statt schwebender Kapsel */
-  .hud-cluster .icon-btn::before{
-    content:"";width:32px;height:32px;border-radius:50%;position:absolute;
-    box-shadow:inset 0 2px 4px rgba(0,0,0,.4), inset 0 0 0 1px rgba(212,175,106,.14);
-    transition:.16s;
-  }
-  .hud-cluster .icon-btn:hover{color:var(--accent-hi);background:rgba(212,175,106,.06);}
-  .hud-cluster .icon-btn:hover::before{box-shadow:inset 0 2px 4px rgba(0,0,0,.4), inset 0 0 0 1px rgba(212,175,106,.4);}
-  .hud-cluster .icon-btn:active{color:var(--accent-hi);}
+  .hud-cluster .icon-btn:hover{color:var(--accent-hi);background:rgba(212,175,106,.09);}
+  .hud-cluster .icon-btn:active{color:var(--accent-hi);background:rgba(212,175,106,.14);}
   .hud-cluster .icon-btn.active{
-    color:var(--accent-hi);background:rgba(212,175,106,.1);
+    color:var(--accent-hi);background:rgba(212,175,106,.14);
   }
-  .hud-cluster .icon-btn.active::before{box-shadow:inset 0 2px 4px rgba(0,0,0,.4), inset 0 0 0 1.5px var(--accent-hi);}
   .icon-btn svg{width:17px;height:17px;fill:currentColor;position:relative;z-index:1;}
   .badge{
     position:absolute;top:9px;right:11px;background:var(--danger);color:#1a0808;font-size:9px;
@@ -514,54 +511,155 @@
   .section-head a svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;transition:.15s;}
   .section-head a:hover svg{transform:translateX(2px);}
 
-  /* ================= Entdecken — Katalog-Seite mit "Zur Bibliothek
-     hinzufügen"-Buttons pro Karte ================= */
+  /* ================= Entdecken — Katalog im selben Idiom wie die table-cards
+     der Bibliothek: volle Kartenfläche in Filz-Foliendegradé, Eck-Pip, ein
+     schwebendes Wappen-Symbol und ein Textschild, das aus dem Kartenboden
+     wächst, statt eines separaten Banner-Streifens über einer flachen Box.
+     So fühlt sich Entdecken wie derselbe Raum an wie der Rest der Seite. ================= */
   .discover-hero{
-    position:relative;overflow:hidden;border-radius:22px;padding:34px 32px;margin-bottom:8px;
+    position:relative;overflow:hidden;border-radius:26px;padding:44px 40px;margin-bottom:32px;
     background:
-      radial-gradient(ellipse 700px 400px at 85% -20%, rgba(212,175,106,.16), transparent 60%),
-      linear-gradient(150deg,var(--felt-hi),var(--felt));
-    border:1px solid rgba(212,175,106,.22);
+      radial-gradient(ellipse 800px 420px at 88% -25%, rgba(212,175,106,.22), transparent 62%),
+      radial-gradient(ellipse 460px 280px at 6% 115%, rgba(76,191,131,.09), transparent 60%),
+      linear-gradient(150deg,var(--felt-hi),var(--felt) 70%,#0a1811);
+    border:1px solid rgba(212,175,106,.25);
+    box-shadow:0 30px 60px -22px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.04);
+  }
+  .discover-hero:before{
+    content:"♠ ♥ ♦ ♣";position:absolute;right:-14px;bottom:-36px;font-family:var(--font-display);
+    font-style:italic;font-size:128px;color:rgba(255,255,255,.035);letter-spacing:22px;pointer-events:none;
   }
   .discover-hero-eyebrow{
-    display:inline-flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;
-    letter-spacing:2px;text-transform:uppercase;color:var(--accent-hi);margin-bottom:14px;
+    display:inline-flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;
+    letter-spacing:2px;text-transform:uppercase;color:var(--accent-hi);margin-bottom:14px;position:relative;z-index:1;
   }
-  .discover-hero-eyebrow svg{width:14px;height:14px;fill:var(--accent-hi);}
-  .discover-hero h1{font-family:var(--font-display);font-style:italic;font-weight:600;font-size:30px;color:var(--text);margin-bottom:10px;}
-  .discover-hero p{font-size:13.5px;color:var(--muted);max-width:520px;line-height:1.55;}
+  .discover-hero-eyebrow-badge{
+    width:20px;height:20px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    background:var(--accent-soft);border:1px solid rgba(212,175,106,.35);
+  }
+  .discover-hero-eyebrow svg{width:12px;height:12px;fill:var(--accent-hi);}
+  .discover-hero h1{font-family:var(--font-display);font-style:italic;font-weight:600;font-size:34px;color:var(--text);margin-bottom:10px;position:relative;z-index:1;}
+  .discover-hero p{font-size:13.5px;color:var(--muted);max-width:520px;line-height:1.55;position:relative;z-index:1;}
 
-  .discover-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;}
+  .discover-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:24px;}
+
   .discover-card{
-    position:relative;overflow:hidden;border-radius:18px;min-height:230px;
-    background:linear-gradient(150deg,var(--c1,#182b21),var(--c2,#24402e));
-    border:1px solid rgba(212,175,106,.2);display:flex;flex-direction:column;justify-content:space-between;
-    padding:20px 22px 0;transition:.2s;
+    position:relative;overflow:hidden;border-radius:22px;min-height:352px;
+    display:flex;flex-direction:column;justify-content:flex-end;cursor:default;
+    background:linear-gradient(160deg,var(--c1,#182b21),var(--c2,#24402e));
+    border:1px solid rgba(212,175,106,.22);
+    box-shadow:0 22px 46px -18px rgba(0,0,0,.5), inset 0 0 0 1px rgba(0,0,0,.25);
+    transform:perspective(800px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) scale(var(--s,1)) translateY(var(--ty,0px));
+    transform-style:preserve-3d;
+    transition:transform .18s cubic-bezier(.16,1,.3,1), box-shadow .32s cubic-bezier(.16,1,.3,1), border-color .3s ease;
   }
-  .discover-card:hover{border-color:rgba(212,175,106,.4);transform:translateY(-2px);box-shadow:0 14px 28px rgba(0,0,0,.35);}
-  .discover-card-suit{position:absolute;top:12px;right:16px;font-family:var(--font-display);font-style:italic;font-size:26px;color:rgba(255,255,255,.16);}
-  .discover-card-eyebrow{font-family:var(--font-mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(242,236,221,.55);margin-bottom:6px;}
-  .discover-card h3{font-family:var(--font-display);font-style:italic;font-size:21px;font-weight:600;color:var(--text);margin-bottom:8px;}
-  .discover-card p{font-size:12.5px;color:rgba(242,236,221,.72);line-height:1.5;max-width:260px;padding-bottom:18px;}
+  .discover-card:hover{
+    border-color:rgba(240,211,142,.5);
+    box-shadow:0 32px 64px -18px rgba(0,0,0,.58), 0 18px 44px -16px var(--c2,rgba(0,0,0,.4));
+  }
+  /* feines Foliengewebe, dasselbe Motiv wie auf den Bibliotheks-Kacheln */
+  .discover-card:before{
+    content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+    background:repeating-linear-gradient(135deg, rgba(242,236,221,.035) 0 2px, transparent 2px 34px);
+  }
+  .discover-card-glow{
+    position:absolute;inset:0;pointer-events:none;z-index:0;
+    background:radial-gradient(ellipse 320px 240px at 84% 10%, rgba(255,255,255,.18), transparent 62%);
+    mix-blend-mode:soft-light;
+  }
+  /* Foil-Sheen, der beim Hover über die Karte läuft — dasselbe Motiv wie table-card-sheen */
+  .discover-card-sheen{
+    position:absolute;top:-60%;left:-70%;width:38%;height:220%;pointer-events:none;z-index:1;
+    background:linear-gradient(75deg,transparent,rgba(255,255,255,.22),transparent);
+    transform:rotate(10deg);transition:left .75s cubic-bezier(.16,1,.3,1);
+  }
+  .discover-card:hover .discover-card-sheen{left:135%;}
+  /* Eck-Pip wie bei einer echten Spielkarte */
+  .discover-card-pip{
+    position:absolute;top:16px;left:18px;z-index:2;pointer-events:none;
+    font-family:var(--font-display);font-style:italic;font-size:14px;line-height:1;color:rgba(242,236,221,.55);
+  }
+  .discover-card-suit{
+    position:absolute;right:-6px;top:10px;z-index:1;pointer-events:none;line-height:1;
+    font-family:var(--font-display);font-style:italic;font-size:104px;color:rgba(242,236,221,.14);
+    transition:transform .5s cubic-bezier(.16,1,.3,1);
+  }
+  .discover-card:hover .discover-card-suit{transform:translateY(-6px) scale(1.05);}
+  .discover-card-top{
+    position:absolute;top:14px;left:16px;right:16px;z-index:3;
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+  }
+  .discover-card-status{
+    display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 8px;border-radius:20px;
+    background:rgba(6,10,8,.5);backdrop-filter:blur(2px);
+    font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+    color:var(--success);
+  }
+  .discover-card-status span{width:5px;height:5px;border-radius:50%;background:currentColor;box-shadow:0 0 6px currentColor;flex-shrink:0;animation:thumbLivePulse 1.8s ease-in-out infinite;}
+  .discover-card-cat-badge{
+    padding:4px 10px;border-radius:20px;background:rgba(6,10,8,.42);border:1px solid rgba(255,255,255,.14);
+    font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;
+    color:rgba(242,236,221,.82);
+  }
+  /* Textschild wächst aus dem Kartenboden — kein separater Banner, sondern
+     ein sanfter Verlauf, der die Filzfarbe der Karte durchscheinen lässt. */
+  .discover-card-body{
+    position:relative;z-index:3;padding:38px 22px 22px;
+    background:linear-gradient(to top, rgba(6,10,8,.88) 34%, rgba(6,10,8,.42) 74%, transparent 100%);
+  }
+  .discover-card-eyebrow{font-family:var(--font-mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(240,211,142,.8);margin-bottom:7px;}
+  .discover-card h3{font-family:var(--font-display);font-style:italic;font-size:21px;font-weight:600;color:var(--text);margin-bottom:8px;line-height:1.15;}
+  .discover-card p{font-size:12.5px;color:rgba(242,236,221,.72);line-height:1.55;margin-bottom:18px;}
   .discover-card-add-btn{
-    margin:0 -22px 0;width:calc(100% + 44px);display:flex;align-items:center;justify-content:center;gap:8px;
-    padding:13px 16px;border:none;border-top:1px solid rgba(212,175,106,.22);
-    border-radius:0 0 17px 17px;
-    background:linear-gradient(90deg,rgba(212,175,106,.16),rgba(212,175,106,.08));
-    color:var(--accent-hi);font-size:12.5px;font-weight:700;letter-spacing:.3px;
-    font-family:var(--font-body);cursor:pointer;transition:.15s;
+    position:relative;overflow:hidden;isolation:isolate;
+    width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
+    padding:12.5px 16px;border:none;border-radius:13px;cursor:pointer;
+    background:linear-gradient(135deg,var(--accent-hi),var(--accent));color:var(--accent-ink);
+    font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-family:var(--font-body);
+    box-shadow:0 10px 22px -10px rgba(212,175,106,.55), inset 0 1px 0 rgba(255,255,255,.35);
+    transition:transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease, filter .2s ease;
   }
-  .discover-card-add-btn:hover{background:linear-gradient(90deg,var(--accent-hi),#c79a4e);color:var(--accent-ink);}
+  /* Foil-Sheen, der beim Hover einmal über den Knopf läuft */
+  .discover-card-add-btn:before{
+    content:"";position:absolute;top:-80%;left:-60%;width:26%;height:260%;z-index:0;pointer-events:none;
+    background:linear-gradient(75deg,transparent,rgba(255,255,255,.55),transparent);
+    transform:rotate(18deg);transition:left .6s cubic-bezier(.16,1,.3,1);
+  }
+  .discover-card-add-btn:hover:before{left:130%;}
+  .discover-card-add-btn:hover{
+    transform:translateY(-2px);filter:brightness(1.05);
+    box-shadow:0 16px 30px -10px rgba(212,175,106,.6), inset 0 1px 0 rgba(255,255,255,.35);
+  }
+  .discover-card-add-btn:active{transform:translateY(0) scale(.98);}
+  .discover-card-add-btn span, .discover-card-add-btn svg{position:relative;z-index:1;}
   .discover-card-add-btn svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
-  .discover-card-add-btn.added{background:rgba(76,191,131,.12);color:var(--success);}
-  .discover-card-add-btn.added:hover{background:rgba(76,191,131,.22);color:var(--success);}
-  .discover-card.locked{
-    background:var(--surface);border-color:var(--border);align-items:center;justify-content:center;text-align:center;gap:6px;
-    padding-bottom:20px;
+  .discover-card-add-btn.added{
+    background:rgba(76,191,131,.14);color:var(--success);
+    box-shadow:none;border:1px solid rgba(76,191,131,.4);
   }
-  .discover-card.locked svg{width:26px;height:26px;fill:var(--faint);opacity:.6;margin-bottom:4px;}
-  .discover-card-locked-label{font-family:var(--font-display);font-style:italic;font-size:14px;color:var(--faint);}
-  .discover-card-locked-sub{font-family:var(--font-mono);font-size:10.5px;color:var(--faint);}
+  .discover-card-add-btn.added:before{display:none;}
+  .discover-card-add-btn.added:hover{filter:none;transform:none;background:rgba(76,191,131,.2);box-shadow:none;}
+  .discover-card.locked{
+    align-items:center;justify-content:center;text-align:center;gap:8px;padding:36px 24px;
+    background:var(--surface);border:1.5px dashed var(--border);box-shadow:none;
+  }
+  .discover-card.locked:before,
+  .discover-card.locked .discover-card-glow,
+  .discover-card.locked .discover-card-sheen,
+  .discover-card.locked .discover-card-suit,
+  .discover-card.locked .discover-card-pip{display:none;}
+  .discover-card.locked:hover{transform:none;box-shadow:none;border-color:rgba(212,175,106,.32);}
+  .discover-card-locked-icon{
+    width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    background:rgba(212,175,106,.08);margin-bottom:2px;
+  }
+  .discover-card.locked svg{width:24px;height:24px;fill:var(--faint);opacity:.7;}
+  .discover-card-locked-label{font-family:var(--font-display);font-style:italic;font-size:15px;color:var(--muted);}
+  .discover-card-locked-sub{font-family:var(--font-mono);font-size:10.5px;color:var(--faint);letter-spacing:.3px;text-transform:uppercase;}
+  @media (max-width:560px){
+    .discover-grid{grid-template-columns:1fr;}
+    .discover-card{min-height:300px;}
+  }
 
   /* ================= Spieltische — komplette Neufassung =================
      Breite, quer liegende "Tisch"-Kacheln statt kleiner Quadrate: mehr Vorschau
@@ -583,7 +681,7 @@
     border-color:transparent;box-shadow:0 4px 12px -4px rgba(212,175,106,.5);
   }
 
-  .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:22px;}
+  .row{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:22px;}
   .row-empty{
     grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;
     text-align:center;gap:6px;padding:64px 24px;border:1.5px dashed var(--border);border-radius:16px;
@@ -781,6 +879,78 @@
     opacity:0;pointer-events:none;transition:.22s;z-index:200;
   }
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  /* --------- "Jetzt als App hinzufügen"-Banner (PWA-Install-Hinweis) ---------
+     Ablauf: Ladebildschirm -> Hauptmenü erscheint ganz normal, scharf & ohne
+     Verzögerung -> erst 2-3s SPÄTER (siehe INSTALL_BANNER_DELAY_MS im Script)
+     verschwimmt der Hintergrund sanft und der Banner fährt von unten ein.
+     Backdrop-Blur und Banner-Einfahrt laufen mit fast identischer Dauer/Easing,
+     damit beides wie EIN zusammenhängender Moment wirkt statt zwei Effekte,
+     die zufällig gleichzeitig passieren. */
+  #installBannerBackdrop{
+    position:fixed;inset:0;z-index:140;
+    background:rgba(4,8,6,.5);
+    backdrop-filter:blur(0px);-webkit-backdrop-filter:blur(0px);
+    opacity:0;pointer-events:none;
+    transition:opacity .9s cubic-bezier(.22,.9,.35,1), backdrop-filter .9s cubic-bezier(.22,.9,.35,1), -webkit-backdrop-filter .9s cubic-bezier(.22,.9,.35,1);
+  }
+  #installBannerBackdrop.show{
+    opacity:1;pointer-events:auto;
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  }
+  @keyframes installBannerSlideUp{
+    from{opacity:0;transform:translateX(-50%) translateY(70px);}
+    to{opacity:1;transform:translateX(-50%) translateY(0);}
+  }
+  #installBanner{
+    position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(70px);
+    display:none;align-items:center;gap:14px;
+    background:linear-gradient(160deg,var(--panel),var(--felt) 130%);
+    border:1px solid var(--border);border-radius:14px;
+    padding:14px 16px 14px 14px;
+    box-shadow:0 20px 50px -10px rgba(0,0,0,.55), inset 0 0 0 1px rgba(212,175,106,.08);
+    z-index:150;opacity:0;
+    max-width:420px;width:calc(100% - 32px);
+  }
+  #installBanner.show{
+    display:flex;
+  }
+  #installBanner.ib-animate-in{
+    animation:installBannerSlideUp .9s cubic-bezier(.22,.9,.35,1) forwards;
+  }
+  /* Nutzer mit reduzierter Bewegung bevorzugen: Blur & Slide sofort statt animiert */
+  @media (prefers-reduced-motion:reduce){
+    #installBannerBackdrop{transition:opacity .25s linear;}
+    #installBannerBackdrop.show{backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
+    #installBanner.ib-animate-in{animation-duration:.01s;}
+  }
+  #installBanner .ib-icon{
+    width:40px;height:40px;border-radius:11px;flex-shrink:0;
+    background:radial-gradient(circle at 32% 28%,var(--felt-hi),var(--felt) 65%,#081911);
+    border:1px solid var(--accent-dim);display:flex;align-items:center;justify-content:center;
+  }
+  #installBanner .ib-icon svg{width:19px;height:19px;fill:var(--accent-hi);}
+  #installBanner .ib-body{flex:1;min-width:0;}
+  #installBanner .ib-title{font-family:var(--font-display);font-style:italic;font-weight:600;font-size:14.5px;color:var(--text);}
+  #installBanner .ib-sub{font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.35;}
+  #installBanner .ib-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+  #installBanner .ib-btn{
+    background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:var(--accent-ink);
+    border:none;border-radius:9px;padding:9px 13px;font-size:12.5px;font-weight:700;
+    cursor:pointer;white-space:nowrap;transition:filter .15s,transform .15s;font-family:var(--font-body);
+  }
+  #installBanner .ib-btn:hover{filter:brightness(1.08);transform:translateY(-1px);}
+  #installBanner .ib-close{
+    width:26px;height:26px;border-radius:7px;background:var(--surface);color:var(--muted);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid var(--border);
+    flex-shrink:0;transition:.15s;
+  }
+  #installBanner .ib-close:hover{color:var(--text);border-color:var(--accent-dim);}
+  #installBanner .ib-close svg{width:12px;height:12px;fill:currentColor;}
+  @media (max-width:560px){
+    #installBanner{flex-wrap:wrap;bottom:14px;padding:14px;}
+    #installBanner .ib-actions{width:100%;justify-content:flex-end;margin-left:54px;}
+  }
 
   @media (max-width:700px){
     .sidebar{width:0;overflow:hidden;border:none;}
@@ -1214,20 +1384,17 @@
   /* Logged-in state in topbar — eigene "Identitäts-Pille", optisch abgesetzt
      vom Utility-Cluster (Level/Chips/Icons): dezente Goldkontur, weil es hier
      um "dich" geht statt um Status-Werte. */
-  /* VIP-Karten-Tab statt Identitäts-Pille: angeschnittene linke obere Ecke,
-     scharfkantiger Avatar-Rahmen statt runder Kapsel, goldene Steckkarten-Kante links. */
+  /* Nutzer-Kapsel: runde Pille wie der Rest der Topbar, statt einer VIP-
+     Steckkarte mit angeschnittener Ecke und scharfkantigem Avatar-Rahmen. */
   .user-chip{
-    display:flex;align-items:center;gap:11px;cursor:pointer;position:relative;height:100%;
-    padding:0 18px 0 16px;transition:.16s;
-    background:linear-gradient(90deg,rgba(212,175,106,.09),transparent 65%);
-    border-left:1px solid rgba(212,175,106,.3);
+    display:flex;align-items:center;gap:11px;cursor:pointer;position:relative;height:48px;
+    padding:0 14px 0 8px;transition:.16s;border-radius:14px;
+    background:var(--surface);border:1px solid var(--border-soft);
   }
-  .user-chip:hover{background:linear-gradient(90deg,rgba(212,175,106,.15),transparent 65%);}
-  .user-chip:active{background:rgba(212,175,106,.18);}
-  .user-chip.active{background:linear-gradient(90deg,rgba(212,175,106,.18),transparent 70%);box-shadow:inset 0 -2px 0 var(--accent-hi);}
+  .user-chip:hover{background:var(--surface-2);}
+  .user-chip:active{background:rgba(212,175,106,.1);}
+  .user-chip.active{background:rgba(212,175,106,.12);box-shadow:inset 0 0 0 1px rgba(212,175,106,.3);}
   .user-chip.active .caret{fill:var(--accent-hi);transform:rotate(180deg);}
-  .user-chip .avatar-ring{border-radius:0;clip-path:polygon(0 0,100% 0,100% 100%,7px 100%,0 calc(100% - 7px));}
-  .user-chip .avatar-ring .avatar{border-radius:0;}
   .user-chip .avatar{
     display:flex;align-items:center;justify-content:center;color:var(--accent-ink);font-weight:700;font-size:13px;flex-shrink:0;
   }
@@ -2680,7 +2847,8 @@
   .bj-balance-val{font-family:var(--font-mono);font-size:16px;font-weight:600;color:var(--accent-hi);}
 
   .bj-table{
-    position:relative;border-radius:28px;padding:48px 24px 34px;min-height:320px;
+    position:relative;max-width:900px;margin-left:auto;margin-right:auto;
+    border-radius:22px 22px 50% 50% / 22px 22px 90% 90%;padding:48px 40px 40px;min-height:340px;
     background:
       repeating-linear-gradient(45deg, rgba(255,255,255,.012) 0 2px, transparent 2px 4px),
       repeating-linear-gradient(-45deg, rgba(0,0,0,.02) 0 2px, transparent 2px 4px),
@@ -3377,6 +3545,155 @@
     --gc1:var(--surface-2);--gc2:var(--surface);
   }
   .glo-overlay.open{display:block;}
+
+  /* ---- Multiplayer-Lobby ---- */
+  .mp-overlay{
+    display:none;position:fixed;inset:0;z-index:1850;
+    background:rgba(6,10,8,.82);backdrop-filter:blur(7px);
+    align-items:center;justify-content:center;padding:24px;
+  }
+  .mp-overlay.open{display:flex;animation:mpFadeIn .2s ease both;}
+  @keyframes mpFadeIn{from{opacity:0}to{opacity:1}}
+  .mp-lobby{
+    width:min(860px,100%);max-height:min(88vh,720px);display:flex;flex-direction:column;
+    background:linear-gradient(165deg,var(--surface),var(--panel));
+    border:1px solid rgba(212,175,106,.25);border-radius:20px;overflow:hidden;
+    box-shadow:0 30px 80px rgba(0,0,0,.6);animation:mpLobbyIn .32s cubic-bezier(.16,1,.3,1) both;
+  }
+  @keyframes mpLobbyIn{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:none}}
+  .mp-lobby-head{
+    display:flex;align-items:flex-start;justify-content:space-between;gap:16px;
+    padding:22px 24px 18px;border-bottom:1px solid var(--border);
+  }
+  .mp-lobby-head h1{font-family:var(--font-display);font-size:22px;font-weight:600;color:var(--text);margin:2px 0;}
+  .mp-lobby-sub{color:var(--muted);font-size:13px;}
+  .mp-close{
+    flex-shrink:0;width:34px;height:34px;border-radius:10px;border:1px solid var(--border);
+    background:rgba(0,0,0,.2);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;
+  }
+  .mp-close:hover{color:var(--accent-hi);border-color:rgba(212,175,106,.4);}
+  .mp-close svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;}
+  .mp-lobby-body{display:grid;grid-template-columns:1fr 1fr;gap:0;flex:1;min-height:0;}
+  .mp-panel{padding:18px 22px;min-height:0;display:flex;flex-direction:column;overflow:hidden;}
+  .mp-seats-panel{border-right:1px solid var(--border);}
+  .mp-panel-head{
+    font-family:var(--font-display);font-size:13px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;
+    color:var(--accent-hi);margin-bottom:14px;display:flex;align-items:center;gap:8px;
+  }
+  .mp-count{
+    font-family:var(--font-mono);font-size:11.5px;color:var(--muted);background:rgba(0,0,0,.25);
+    border:1px solid var(--border);border-radius:20px;padding:1px 9px;letter-spacing:0;text-transform:none;
+  }
+  .mp-seat-list,.mp-friend-list{display:flex;flex-direction:column;gap:8px;overflow-y:auto;flex:1;}
+  .mp-seat-row,.mp-friend-row{
+    display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:12px;
+    background:rgba(0,0,0,.18);border:1px solid var(--border);
+  }
+  .mp-seat-row .avatar,.mp-friend-row .avatar{width:36px;height:36px;flex-shrink:0;}
+  .mp-row-info{flex:1;min-width:0;}
+  .mp-row-name{font-size:14px;color:var(--text);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .mp-row-handle{font-size:12px;color:var(--muted);}
+  .mp-seat-badge{
+    font-size:10.5px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.4px;
+    padding:2px 8px;border-radius:20px;flex-shrink:0;
+  }
+  .mp-seat-badge.host{color:var(--accent-ink);background:var(--accent-hi);}
+  .mp-seat-badge.you{color:var(--accent-hi);background:rgba(212,175,106,.14);border:1px solid rgba(212,175,106,.3);}
+  .mp-seat-empty{
+    display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:12px;
+    border:1px dashed var(--border);color:var(--muted);font-size:13px;opacity:.65;
+  }
+  .mp-seat-empty .mp-empty-dot{width:36px;height:36px;border-radius:50%;border:1px dashed var(--border);flex-shrink:0;}
+  .mp-friend-row .mp-btn{margin-left:auto;}
+  .mp-empty-hint{color:var(--muted);font-size:12.5px;padding:8px 2px;line-height:1.5;}
+  .mp-lobby-foot{
+    display:flex;align-items:center;justify-content:space-between;gap:14px;
+    padding:16px 22px;border-top:1px solid var(--border);background:rgba(0,0,0,.15);
+  }
+  .mp-lobby-status{color:var(--muted);font-size:12.5px;flex:1;min-width:0;}
+  .mp-lobby-actions{display:flex;gap:10px;}
+  .mp-btn{
+    font-family:var(--font-display);font-size:13px;font-weight:600;padding:9px 16px;border-radius:10px;
+    cursor:pointer;border:1px solid var(--border);background:rgba(0,0,0,.2);color:var(--text);transition:.15s;white-space:nowrap;
+  }
+  .mp-btn:hover{border-color:rgba(212,175,106,.4);}
+  .mp-btn:disabled{opacity:.4;cursor:not-allowed;}
+  .mp-btn-primary{
+    background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:var(--accent-ink);border:none;
+  }
+  .mp-btn-primary:hover{filter:brightness(1.06);}
+  .mp-btn-small{padding:6px 12px;font-size:12px;}
+  .mp-btn-ghost{background:transparent;}
+
+  /* ---- Einladungs-Popup ---- */
+  .mp-invite-pop{
+    display:none;position:fixed;right:22px;bottom:22px;z-index:1900;width:min(340px,calc(100vw - 44px));
+    background:linear-gradient(165deg,var(--surface),var(--panel));
+    border:1px solid rgba(212,175,106,.35);border-radius:16px;padding:15px 16px;gap:13px;align-items:center;
+    box-shadow:0 18px 50px rgba(0,0,0,.55);
+  }
+  .mp-invite-pop.show{display:flex;animation:mpPopIn .3s cubic-bezier(.16,1,.3,1) both;}
+  @keyframes mpPopIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  .mp-invite-pop-avatar .avatar{width:44px;height:44px;}
+  .mp-invite-pop-body{flex:1;min-width:0;}
+  .mp-invite-pop-text{font-size:13px;color:var(--text);line-height:1.4;margin-bottom:9px;}
+  .mp-invite-pop-text strong{color:var(--accent-hi);}
+  .mp-invite-pop-actions{display:flex;gap:8px;}
+  @media (max-width:640px){
+    .mp-lobby-body{grid-template-columns:1fr;overflow-y:auto;}
+    .mp-seats-panel{border-right:none;border-bottom:1px solid var(--border);}
+  }
+
+  /* ---- Multiplayer-Tisch (Gemeinschaftsspiel) ---- */
+  /* Runder Casino-Tisch: gewölbte Oberkante (Dealer), stark gerundete Unterkante
+     (Spieler sitzen entlang der Kurve). Alles im normalen Fluss, damit nichts überlappt. */
+  .mpg-table{
+    max-width:900px;width:100%;margin:0 auto;
+    min-height:440px;align-items:center;justify-content:flex-start;
+    padding:36px 46px 44px;
+    border-radius:22px 22px 50% 50% / 22px 22px 90% 90%;
+  }
+  .mpg-table .bj-seat.dealer{margin-top:4px;}
+  .mpg-table .bj-shoe{top:20px;right:44px;}
+  .mpg-table .bj-message{margin:2px 0;}
+  .mpg-seats{
+    display:flex;gap:16px;justify-content:center;flex-wrap:wrap;align-items:flex-start;
+    margin-top:auto;width:100%;padding:0 6px;
+  }
+  .mpg-seat{
+    min-width:132px;max-width:170px;display:flex;flex-direction:column;align-items:center;gap:6px;
+    padding:10px 10px 12px;border-radius:14px;background:rgba(0,0,0,.22);border:1px solid var(--border);
+    transition:.2s;position:relative;
+  }
+  .mpg-seat.is-turn{border-color:var(--accent-hi);box-shadow:0 0 0 1px var(--accent-hi),0 0 22px rgba(240,207,142,.28);}
+  .mpg-seat.is-me{background:rgba(212,175,106,.07);}
+  .mpg-seat-head{display:flex;align-items:center;gap:7px;width:100%;}
+  .mpg-seat-head .avatar{width:26px;height:26px;flex-shrink:0;font-size:13px;}
+  .mpg-seat-name{font-size:12.5px;color:var(--text);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0;}
+  .mpg-seat .bj-hand{min-height:54px;transform:scale(.82);transform-origin:top center;margin:-2px 0;}
+  .mpg-seat-foot{display:flex;flex-direction:column;align-items:center;gap:3px;width:100%;}
+  .mpg-seat-bet{font-size:11.5px;color:var(--muted);font-family:var(--font-mono);}
+  .mpg-seat-bet strong{color:var(--accent-hi);}
+  .mpg-turn-tag{
+    position:absolute;top:-9px;left:50%;transform:translateX(-50%);font-size:9.5px;font-family:var(--font-mono);
+    text-transform:uppercase;letter-spacing:.5px;color:var(--accent-ink);background:var(--accent-hi);
+    padding:1px 8px;border-radius:20px;white-space:nowrap;
+  }
+  .mpg-result{font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px;}
+  .mpg-result.win{color:#7ee0a0;background:rgba(70,190,120,.14);}
+  .mpg-result.lose{color:#e88;background:rgba(200,90,90,.14);}
+  .mpg-result.push{color:var(--muted);background:rgba(255,255,255,.06);}
+  .mpg-seat-waiting{font-size:11px;color:var(--muted);font-style:italic;opacity:.7;min-height:54px;display:flex;align-items:center;}
+  .mpg-hint{
+    text-align:center;color:var(--muted);font-size:13px;padding:12px;margin-top:4px;
+    background:rgba(0,0,0,.15);border:1px solid var(--border);border-radius:12px;
+  }
+  .mpg-hint strong{color:var(--accent-hi);}
+  @media (max-width:720px){
+    .mpg-table{border-radius:26px;padding:24px 14px 28px;min-height:auto;}
+    .mpg-seats{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;}
+  }
+
   .glo-stripes{
     position:absolute;inset:0;
     background:repeating-linear-gradient(135deg,
@@ -3802,9 +4119,9 @@
       Deploy erkannt
     </div>
 
-    <h1>Ein Update ist gerade im Gange</h1>
-    <p class="upd-sub">Es gibt ein Update. <strong>Lade die Seite bitte neu</strong>, um die Änderungen zu sehen.</p>
-    <p class="upd-sub upd-sub-note">Auch nach dem Neuladen kann es 1–3 Minuten dauern, bis alle Änderungen vollständig wirksam sind.</p>
+    <h1 id="updTitle">Ein Update ist gerade im Gange</h1>
+    <p class="upd-sub" id="updSubMain">Es gibt ein Update. <strong>Lade die Seite bitte neu</strong>, um die Änderungen zu sehen.</p>
+    <p class="upd-sub upd-sub-note" id="updSubNote">Auch nach dem Neuladen kann es 1–3 Minuten dauern, bis alle Änderungen vollständig wirksam sind.</p>
 
   </div>
 </div>
@@ -3900,6 +4217,25 @@
       <button type="submit" class="submit" id="forgotSubmitBtn">Link senden</button>
     </form>
     <button type="button" class="link-btn" id="backToLogin">Zurück zum Login</button>
+  </div>
+</div>
+
+<!-- Generisches Bestätigungs-Modal (ersetzt native confirm()-Dialoge) — bewusst
+     als direktes Kind von <body>, GESCHWISTER von .sidebar/.main statt darin
+     verschachtelt (damit das fixed Overlay wirklich den gesamten Viewport inkl.
+     Sidebar überdeckt), aber VOR dem Haupt-<script>-Block (der beim Laden per
+     document.getElementById('confirmOverlay') synchron darauf zugreift). -->
+<div class="overlay" id="confirmOverlay" style="z-index:1500;">
+  <div class="modal confirm-modal">
+    <div class="confirm-icon" id="confirmIcon">
+      <svg viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 6.5c.55 0 1 .45 1 1v4.5a1 1 0 01-2 0V9.5c0-.55.45-1 1-1zM12 17.2a1.2 1.2 0 110-2.4 1.2 1.2 0 010 2.4z"/></svg>
+    </div>
+    <h1 id="confirmTitle">Bist du sicher?</h1>
+    <p class="sub" id="confirmMessage">Diese Aktion kannst du nicht rückgängig machen.</p>
+    <div class="confirm-btn-row">
+      <button type="button" class="adm-ghost-btn confirm-cancel-btn" id="confirmCancelBtn">Abbrechen</button>
+      <button type="button" class="submit" id="confirmOkBtn" style="width:auto;flex:1;">Bestätigen</button>
+    </div>
   </div>
 </div>
 
@@ -4005,6 +4341,14 @@
         </div>
 
         <div class="hud-divider"></div>
+
+        <div class="hud-divider" id="installTopDivider" style="display:none;"></div>
+
+        <div class="icon-btn-wrap">
+          <div class="icon-btn" id="installTopBtn" title="Royal Deck als App installieren" style="display:none;">
+            <svg viewBox="0 0 24 24"><path d="M11 2.8h2v9.3l2.9-2.9 1.4 1.4L12 15.9l-5.3-5.3 1.4-1.4 2.9 2.9V2.8z"/><rect x="4.8" y="17.4" width="14.4" height="2.2" rx="1.1"/></svg>
+          </div>
+        </div>
 
         <div class="icon-btn-wrap">
           <div class="icon-btn" id="notifBtn">
@@ -4806,21 +5150,6 @@
     </div>
   </div>
 
-  <!-- Generisches Bestätigungs-Modal (ersetzt native confirm()-Dialoge) -->
-  <div class="overlay" id="confirmOverlay" style="z-index:1500;">
-    <div class="modal confirm-modal">
-      <div class="confirm-icon" id="confirmIcon">
-        <svg viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 6.5c.55 0 1 .45 1 1v4.5a1 1 0 01-2 0V9.5c0-.55.45-1 1-1zM12 17.2a1.2 1.2 0 110-2.4 1.2 1.2 0 010 2.4z"/></svg>
-      </div>
-      <h1 id="confirmTitle">Bist du sicher?</h1>
-      <p class="sub" id="confirmMessage">Diese Aktion kannst du nicht rückgängig machen.</p>
-      <div class="confirm-btn-row">
-        <button type="button" class="adm-ghost-btn confirm-cancel-btn" id="confirmCancelBtn">Abbrechen</button>
-        <button type="button" class="submit" id="confirmOkBtn" style="width:auto;flex:1;">Bestätigen</button>
-      </div>
-    </div>
-  </div>
-
   <!-- Profilbild-Auswahlfenster -->
   <div class="overlay" id="avatarPickerOverlay" style="z-index:1200;">
     <div class="modal avatar-modal">
@@ -4904,11 +5233,18 @@
   <div class="content" id="discoverView" style="display:none;">
     <div class="discover-hero">
       <div class="discover-hero-eyebrow">
-        <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-6h2zm0-8h-2V7h2z"/></svg>
+        <span class="discover-hero-eyebrow-badge">
+          <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-6h2zm0-8h-2V7h2z"/></svg>
+        </span>
         Entdecken
       </div>
       <h1>Erweitere deine Bibliothek</h1>
       <p>Alle Spiele von Royal Deck an einem Ort. Füg dir dazu, worauf du Lust hast.</p>
+      <div class="hero-stats" style="position:relative;z-index:1;">
+        <div class="hero-stat"><strong id="discoverStatCount">3</strong> Spiele im Katalog</div>
+        <div class="hero-stat-sep"></div>
+        <div class="hero-stat">Kein Echtgeld · nur Punkte</div>
+      </div>
     </div>
 
     <div class="section-head">
@@ -5058,6 +5394,72 @@
         </button>
         <button class="bj-action-btn primary" id="bjNextRoundBtn" style="display:none;">Nächste Runde</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- Multiplayer-Blackjack: Gemeinschaftstisch (Phase 2)          -->
+  <!-- ============================================================ -->
+  <div class="content" id="mpgameView" style="display:none;">
+    <div class="bj-wrap mpg-wrap">
+      <div class="bj-head">
+        <button class="bj-back" id="mpgBackBtn" title="Tisch verlassen">
+          <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>
+        </button>
+        <div class="bj-head-text">
+          <div class="page-eyebrow">Multiplayer · Blackjack</div>
+          <h1>Gemeinschaftstisch</h1>
+          <p id="mpgSubtitle">Ihr spielt gemeinsam gegen den Dealer.</p>
+        </div>
+        <div class="bj-balance">
+          <span class="bj-balance-label">Guthaben</span>
+          <span class="bj-balance-val" id="mpgBalance">0</span>
+        </div>
+      </div>
+
+      <div class="bj-table felt-card mpg-table" data-suit="♠">
+        <div class="bj-shoe" id="mpgShoe" aria-hidden="true">
+          <div class="bj-shoe-card"></div>
+          <div class="bj-shoe-card"></div>
+          <div class="bj-shoe-card"></div>
+        </div>
+        <div class="bj-seat dealer">
+          <div class="bj-seat-label">Dealer</div>
+          <div class="bj-hand" id="mpgDealerHand"></div>
+          <div class="bj-total" id="mpgDealerTotal"></div>
+        </div>
+
+        <div class="bj-message" id="mpgMessage"></div>
+
+        <div class="mpg-seats" id="mpgSeats"></div>
+      </div>
+
+      <div class="bj-panel mpg-panel" id="mpgBetPanel">
+        <div class="bj-bet-row">
+          <span class="bj-bet-label">Dein Einsatz</span>
+          <div class="bj-chip-row" id="mpgChipRow"></div>
+          <div class="bj-current-bet">
+            <span>Aktuell:</span> <strong id="mpgCurrentBet">0</strong>
+            <button class="bj-clear-bet" id="mpgClearBet">Zurücksetzen</button>
+          </div>
+        </div>
+        <button class="bj-deal-btn" id="mpgDealBtn" disabled>Karten geben</button>
+      </div>
+
+      <div class="bj-panel bj-action-panel mpg-panel" id="mpgActionPanel" style="display:none;">
+        <button class="bj-action-btn bj-act-hit" id="mpgHitBtn">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Hit
+        </button>
+        <button class="bj-action-btn bj-act-stand" id="mpgStandBtn">
+          <svg viewBox="0 0 24 24"><path d="M6 12h12"/></svg>Stand
+        </button>
+        <button class="bj-action-btn bj-act-double" id="mpgDoubleBtn">
+          <svg viewBox="0 0 24 24"><path d="M4 8h7v8H4zM13 8h7v8h-7z"/></svg>Verdoppeln
+        </button>
+        <button class="bj-action-btn primary" id="mpgNextRoundBtn" style="display:none;">Nächste Runde</button>
+      </div>
+
+      <div class="mpg-hint" id="mpgHint" style="display:none;"></div>
     </div>
   </div>
 
@@ -5265,6 +5667,23 @@
 
 <div class="toast" id="toast"></div>
 
+<div id="installBannerBackdrop"></div>
+<div id="installBanner">
+  <div class="ib-icon">
+    <svg viewBox="0 0 24 24"><path d="M12 2l2.6 5.9 6.4.6-4.8 4.3 1.5 6.3L12 15.8 6.3 19.1l1.5-6.3-4.8-4.3 6.4-.6z"/></svg>
+  </div>
+  <div class="ib-body">
+    <div class="ib-title">Royal Deck als App</div>
+    <div class="ib-sub" id="installBannerSub">Schneller Zugriff direkt vom Startbildschirm.</div>
+  </div>
+  <div class="ib-actions">
+    <button type="button" class="ib-btn" id="installBannerBtn">Jetzt als App hinzufügen</button>
+    <div class="ib-close" id="installBannerClose" title="Schließen" role="button" aria-label="Schließen">
+      <svg viewBox="0 0 24 24"><path d="M18.3 5.71 12 12l6.3 6.29-1.41 1.42L10.59 13.4 4.3 19.71 2.89 18.3 9.17 12 2.89 5.71 4.3 4.29l6.29 6.3 6.29-6.3z"/></svg>
+    </div>
+  </div>
+</div>
+
 <div class="glo-overlay" id="gloOverlay">
   <div class="glo-stripes"></div>
   <div class="glo-vignette"></div>
@@ -5310,14 +5729,62 @@
             <span>Solo Spielen</span>
             <svg class="glo-item-arrow" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
           </button>
-          <button type="button" class="glo-item glo-item-locked" id="gloMultiBtn">
-            <span>Multiplayer Spielen<span class="glo-item-sub">Bald verfügbar</span></span>
+          <button type="button" class="glo-item" id="gloMultiBtn">
+            <span>Multiplayer Spielen<span class="glo-item-sub">Mit Freunden am selben Tisch</span></span>
+            <svg class="glo-item-arrow" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
           </button>
           <button type="button" class="glo-item glo-item-ghost" id="gloModeBackBtn">
             <span>Zurück</span>
           </button>
         </nav>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- Multiplayer-Lobby (Blackjack-Tisch mit Freunden)             -->
+<!-- ============================================================ -->
+<div class="mp-overlay" id="mpOverlay">
+  <div class="mp-lobby">
+    <div class="mp-lobby-head">
+      <div>
+        <div class="page-eyebrow">Multiplayer · Blackjack</div>
+        <h1 id="mpLobbyTitle">Tisch-Lobby</h1>
+        <p class="mp-lobby-sub" id="mpLobbySub">Lade Freunde ein — ihr spielt gemeinsam gegen den Dealer.</p>
+      </div>
+      <button class="mp-close" id="mpCloseBtn" title="Schließen"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+
+    <div class="mp-lobby-body">
+      <div class="mp-panel mp-seats-panel">
+        <div class="mp-panel-head">Am Tisch <span class="mp-count" id="mpSeatCount">0/5</span></div>
+        <div class="mp-seat-list" id="mpSeatList"></div>
+      </div>
+      <div class="mp-panel mp-invite-panel">
+        <div class="mp-panel-head">Freunde einladen</div>
+        <div class="mp-friend-list" id="mpInviteFriendList"></div>
+      </div>
+    </div>
+
+    <div class="mp-lobby-foot">
+      <div class="mp-lobby-status" id="mpLobbyStatus"></div>
+      <div class="mp-lobby-actions">
+        <button class="mp-btn mp-btn-ghost" id="mpLeaveBtn">Tisch verlassen</button>
+        <button class="mp-btn mp-btn-primary" id="mpStartBtn">Spiel starten</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Eingehende Tisch-Einladung (Realtime-Popup) -->
+<div class="mp-invite-pop" id="mpInvitePop">
+  <div class="mp-invite-pop-avatar" id="mpInvitePopAvatar"></div>
+  <div class="mp-invite-pop-body">
+    <div class="mp-invite-pop-text"><strong id="mpInvitePopName">Ein Freund</strong> lädt dich an einen Blackjack-Tisch ein.</div>
+    <div class="mp-invite-pop-actions">
+      <button class="mp-btn mp-btn-primary" id="mpInviteAcceptBtn">Beitreten</button>
+      <button class="mp-btn mp-btn-ghost" id="mpInviteDeclineBtn">Ablehnen</button>
     </div>
   </div>
 </div>
@@ -5331,6 +5798,15 @@
   const BOOT_GATE_MIN_MS = 4000;
   const bootGateStartedAt = Date.now();
   let bootGateHidePending = false;
+  // Wird genau in dem Moment aufgelöst, in dem der Ladebildschirm *wirklich* zu
+  // verschwinden beginnt (Start der Fade-Out-Transition) — also exakt der Moment,
+  // in dem das Hauptmenü für den Nutzer sichtbar wird. Alles, was erst NACH dem
+  // Ladebildschirm passieren soll (z.B. der Install-Banner mit 2-3s Verzögerung),
+  // muss auf dieses Promise warten statt auf den Abschluss von loadProfile() —
+  // sonst läuft die Verzögerung parallel zum (noch sichtbaren) Ladebildschirm und
+  // ist beim Ausblenden schon fertig, statt danach sichtbar zu starten.
+  let resolveBootGateRevealed;
+  const bootGateRevealed = new Promise(res => { resolveBootGateRevealed = res; });
   function hideBootGate(){
     const bg = document.getElementById('bootGate');
     if(!bg || bg.classList.contains('boot-hide') || bootGateHidePending) return;
@@ -5338,6 +5814,7 @@
     const remaining = Math.max(0, BOOT_GATE_MIN_MS - (Date.now() - bootGateStartedAt));
     setTimeout(() => {
       bg.classList.add('boot-hide');
+      resolveBootGateRevealed();
       setTimeout(() => { bg.style.display = 'none'; }, 650);
     }, remaining);
   }
@@ -5464,22 +5941,9 @@
       card.addEventListener('click', () => openGame(g.name));
       el.appendChild(card);
     });
-    // Platzhalter-Slots gehören zu keiner Kategorie — bei aktivem Filter blenden
-    // wir sie aus, damit "Kartenspiele" nicht plötzlich ein fremdes "Bald verfügbar" zeigt.
-    if(libActiveFilter === 'Alle'){
-      for(let i=0;i<PLACEHOLDER_SLOTS;i++){
-        const card = document.createElement('div');
-        card.className = 'card locked';
-        card.innerHTML = `
-          <div class="table-card">
-            <svg viewBox="0 0 24 24" class="table-card-lock"><path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-9h-1V6a5 5 0 00-10 0v2H6a2 2 0 00-2 2v9a2 2 0 002 2h12a2 2 0 002-2v-9a2 2 0 00-2-2zM9 6a3 3 0 016 0v2H9z"/></svg>
-            <div class="table-card-locked-label">Bald verfügbar</div>
-            <div class="table-card-locked-sub">Neues Spiel folgt</div>
-          </div>
-        `;
-        el.appendChild(card);
-      }
-    }
+    // "Bald verfügbar"-Platzhalter gibt's ab jetzt nur noch auf der Entdecken-Seite
+    // (siehe renderDiscover) — die Bibliothek zeigt ausschließlich Spiele, die
+    // tatsächlich hinzugefügt wurden, ohne Lücken-Karten für Zukünftiges.
   }
   makeRow('row1');
   document.getElementById('libMoreBannerBtn')?.addEventListener('click', () => {
@@ -5518,38 +5982,70 @@
   function setAddBtnState(btn, added){
     btn.classList.toggle('added', added);
     btn.innerHTML = added
-      ? `<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>In Bibliothek`
-      : `<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Zur Bibliothek hinzufügen`;
+      ? `<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>In Bibliothek</span>`
+      : `<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>Zur Bibliothek hinzufügen</span>`;
   }
 
   function renderDiscover(){
     const el = document.getElementById('discoverGrid');
     if(!el) return;
     el.innerHTML = '';
+    const statCountEl = document.getElementById('discoverStatCount');
+    if(statCountEl) statCountEl.textContent = games.length;
     games.forEach(g => {
       const card = document.createElement('div');
       card.className = 'discover-card';
       card.style.setProperty('--c1', g.c1);
       card.style.setProperty('--c2', g.c2);
       card.innerHTML = `
-        <div>
-          <div class="discover-card-suit">${g.suit}</div>
+        <div class="discover-card-glow"></div>
+        <div class="discover-card-sheen"></div>
+        <div class="discover-card-pip">${g.suit}</div>
+        <div class="discover-card-suit">${g.suit}</div>
+        <div class="discover-card-top">
+          <div class="discover-card-status"><span></span>Live</div>
+          ${g.category ? `<div class="discover-card-cat-badge">${g.category}</div>` : ''}
+        </div>
+        <div class="discover-card-body">
           <div class="discover-card-eyebrow">Casino-Tisch</div>
           <h3>${g.name}</h3>
           <p>${g.desc}</p>
+          <button type="button" class="discover-card-add-btn"></button>
         </div>
-        <button type="button" class="discover-card-add-btn"></button>
       `;
+      // Derselbe pointer-gesteuerte 3D-Tilt wie bei den Tischkarten auf der
+      // Startseite (makeRow) — Karte kippt leicht in Richtung Zeiger.
+      card.addEventListener('pointerenter', () => {
+        card.style.setProperty('--s', '1.02');
+        card.style.setProperty('--ty', '-6px');
+      });
+      card.addEventListener('pointermove', e => {
+        const r = card.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width - 0.5;
+        const py = (e.clientY - r.top) / r.height - 0.5;
+        card.style.setProperty('--ry', (px * 12) + 'deg');
+        card.style.setProperty('--rx', (py * -9) + 'deg');
+      });
+      card.addEventListener('pointerleave', () => {
+        card.style.setProperty('--ry', '0deg');
+        card.style.setProperty('--rx', '0deg');
+        card.style.setProperty('--s', '1');
+        card.style.setProperty('--ty', '0px');
+      });
       const btn = card.querySelector('.discover-card-add-btn');
       setAddBtnState(btn, isInLibrary(g.name));
       btn.addEventListener('click', () => toggleLibrary(g.name, btn));
       el.appendChild(card);
     });
+    // "Bald verfügbar"-Platzhalter bleiben exklusiv hier auf der Entdecken-Seite —
+    // in der Bibliothek (makeRow) tauchen sie nicht mehr auf.
     for(let i = 0; i < PLACEHOLDER_SLOTS; i++){
       const card = document.createElement('div');
       card.className = 'discover-card locked';
       card.innerHTML = `
-        <svg viewBox="0 0 24 24"><path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-9h-1V6a5 5 0 00-10 0v2H6a2 2 0 00-2 2v9a2 2 0 002 2h12a2 2 0 002-2v-9a2 2 0 00-2-2zM9 6a3 3 0 016 0v2H9z"/></svg>
+        <div class="discover-card-locked-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-9h-1V6a5 5 0 00-10 0v2H6a2 2 0 00-2 2v9a2 2 0 002 2h12a2 2 0 002-2v-9a2 2 0 00-2-2zM9 6a3 3 0 016 0v2H9z"/></svg>
+        </div>
         <div class="discover-card-locked-label">Bald verfügbar</div>
         <div class="discover-card-locked-sub">Neues Spiel folgt</div>
       `;
@@ -5657,7 +6153,13 @@
     if(gloCurrentGame) enterGame(gloCurrentGame.name);
   });
   document.getElementById('gloMultiBtn').addEventListener('click', () => {
-    showToast('Multiplayer kommt bald — wir arbeiten dran!');
+    if(!currentUserId){ showToast('Melde dich an, um Multiplayer zu spielen.'); openModal('login'); return; }
+    if(gloCurrentGame && gloCurrentGame.name !== 'Blackjack'){
+      showToast('Multiplayer gibt es zunächst nur für Blackjack.');
+      return;
+    }
+    gloClose();
+    mpCreateTable();   // erstellt einen Blackjack-Tisch und öffnet die Lobby
   });
   document.addEventListener('keydown', (e) => {
     if(e.key === 'Escape' && gloOverlay.classList.contains('open')) gloClose();
@@ -5795,6 +6297,7 @@
       discover: document.getElementById('discoverView'),
       friends: document.getElementById('friendsView'),
       blackjack: document.getElementById('blackjackView'),
+      mpgame: document.getElementById('mpgameView'),
       slot: document.getElementById('slotView'),
       rewards: document.getElementById('rewardsView'),
       crossy: document.getElementById('crossyView'),
@@ -5811,6 +6314,8 @@
     if(target !== 'blackjack') bjStopMusic();
     if(target !== 'crossy') crossyStop();
     if(target !== 'chat') closeChatView();
+    // Weg vom Multiplayer-Tisch navigiert -> Tisch verlassen (Sitz freigeben)
+    if(target !== 'mpgame' && mpTable) mpLeaveTable();
 
     const activeEl = views[target];
     activeEl.scrollTo({ top:0, behavior: target === 'home' ? 'smooth' : 'auto' });
@@ -6308,6 +6813,8 @@
     refreshLevelPanel();
     const bjBalanceEl = document.getElementById('bjBalance');
     if(bjBalanceEl) bjBalanceEl.textContent = val;
+    const mpgBalanceEl = document.getElementById('mpgBalance');
+    if(mpgBalanceEl) mpgBalanceEl.textContent = val;
     const slotBalanceEl = document.getElementById('slotBalance');
     if(slotBalanceEl) slotBalanceEl.textContent = val;
     const rewardsBalanceEl = document.getElementById('rewardsBalance');
@@ -7539,7 +8046,28 @@
   // --- Supabase Setup ---
   const SUPABASE_URL = 'https://tydippnbkkvdohzxplgw.supabase.co';
   const SUPABASE_ANON_KEY = 'sb_publishable_0ZvwrcL4AuFobJGdyARmhA_KfchINLa';
-  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // Eigener Storage-Key für "installierte App" (Standalone-PWA) vs. normalen Browser-Tab.
+  // Ohne das teilen sich beide denselben localStorage-Schlüssel und damit dieselbe
+  // Supabase-Session — ein Logout in der installierten App würde dann auch den ganz
+  // normalen Browser-Tab (und umgekehrt) ausloggen. Mit getrenntem Key bleiben beide
+  // Sessions vollständig unabhängig voneinander, obwohl es dieselbe Domain/Origin ist.
+  const isStandaloneNow = window.matchMedia('(display-mode: standalone)').matches
+    || window.matchMedia('(display-mode: minimal-ui)').matches
+    || window.matchMedia('(display-mode: fullscreen)').matches
+    || window.navigator.standalone === true; // iOS Safari, wenn zum Home-Bildschirm hinzugefügt
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { storageKey: isStandaloneNow ? 'rd-auth-standalone' : 'rd-auth-browser' }
+  });
+  console.log('[auth-debug] isStandaloneNow=', isStandaloneNow,
+    '| storageKey=', isStandaloneNow ? 'rd-auth-standalone' : 'rd-auth-browser',
+    '| display-mode matches=', {
+      standalone: window.matchMedia('(display-mode: standalone)').matches,
+      minimalUi: window.matchMedia('(display-mode: minimal-ui)').matches,
+      fullscreen: window.matchMedia('(display-mode: fullscreen)').matches,
+      iosStandalone: window.navigator.standalone
+    },
+    '| vorhandene rd-auth Keys im localStorage=',
+    Object.keys(localStorage).filter(k => k.startsWith('rd-auth')));
 
   // Live-Update: reagiert sofort, wenn sich maintenance_mode/coming_soon_mode oder eine der
   // Whitelists in der DB ändert (kein Reload nötig, gilt für ALLE verbundenen Clients — auch
@@ -8619,6 +9147,8 @@
 
   // --- Account / logout ---
   async function logout(){
+    await mpLeaveTable();          // Tisch verlassen, solange die Session noch gültig ist
+    mpUnsubscribeInvites();
     await supabaseClient.auth.signOut();
     currentUserId = null; currentUserEmail = null; isAdmin = false; notifications = [];
     document.getElementById('navAdmin')?.classList.remove('show');
@@ -8977,6 +9507,7 @@
         }
       }
       hideBootGate();
+      hideInstallBanner();
       return;
     }
 
@@ -9002,6 +9533,7 @@
         }
       }
       hideBootGate();
+      hideInstallBanner();
       return;
     }
 
@@ -9022,6 +9554,10 @@
         void el.offsetWidth;
         el.classList.add('soon-page-in');
       });
+      // Hauptmenü zuerst normal ankommen lassen — der Banner soll erst mit spürbarer
+      // Verzögerung nachträglich auftauchen (Bildschirm verschwimmt, dann fährt er ein),
+      // statt gleichzeitig mit dem Ladebildschirm zu verschwinden.
+      scheduleInstallBanner();
     }
 
     if(!user){
@@ -9029,6 +9565,7 @@
       document.getElementById('navAdmin')?.classList.remove('show');
       makeRow('row1');
       renderAuthArea(null);
+      hideInstallBanner();
       return;
     }
     let { data: profile, error } = await supabaseClient
@@ -9070,9 +9607,186 @@
     renderAuthArea(profile, user.email);
     subscribeFriendRequests();
     subscribeDirectMessages();
+    mpSubscribeInvites();
     loadChatUnreadCounts();
     refreshFriendsBadge();
+    scheduleInstallBanner();
   }
+
+  // ============================================================
+  // --- "Jetzt als App hinzufügen"-Banner (PWA-Install-Hinweis) ---
+  // Zeigt einen dezenten, zum Theme passenden Hinweis, sobald ein
+  // eingeloggter Nutzer die eigentliche App sieht — NICHT während des
+  // Coming-Soon- oder Wartungs-Screens (siehe Aufrufe in loadProfile()).
+  // Merkt sich ein "Schließen" per localStorage, damit der Hinweis nicht
+  // bei jedem Login erneut erscheint.
+  // ============================================================
+  let deferredInstallPrompt = null;
+  let installBannerTimer = null;
+  let installBannerScheduled = false;
+  const INSTALL_DISMISS_KEY = 'rd_install_dismissed_at';
+  const INSTALL_DISMISS_DAYS = 14;
+  const INSTALL_BANNER_DELAY_MS = 2600; // Verzögerung, bevor der Banner nach dem Laden auftaucht
+
+  function isStandaloneApp(){
+    return window.matchMedia('(display-mode: standalone)').matches
+      || window.matchMedia('(display-mode: minimal-ui)').matches
+      || window.matchMedia('(display-mode: fullscreen)').matches
+      || window.navigator.standalone === true; // iOS Safari, wenn bereits zum Home-Bildschirm hinzugefügt
+  }
+  function isIOSDevice(){
+    return /iphone|ipad|ipod/i.test(navigator.userAgent);
+  }
+  function wasInstallDismissedRecently(){
+    const raw = localStorage.getItem(INSTALL_DISMISS_KEY);
+    if(!raw) return false;
+    const dismissedAt = parseInt(raw, 10);
+    if(Number.isNaN(dismissedAt)) return false;
+    return (Date.now() - dismissedAt) / (1000 * 60 * 60 * 24) < INSTALL_DISMISS_DAYS;
+  }
+
+  // Bündelt alle Auslöser (Haupt-App sichtbar, Login ohne Reload, beforeinstallprompt) auf
+  // dieselbe, einmalige Verzögerung, statt dass jeder Trigger den Banner sofort zeigen will.
+  // WICHTIG: der eigentliche setTimeout(...INSTALL_BANNER_DELAY_MS) startet erst, NACHDEM
+  // der Ladebildschirm wirklich zu verschwinden begonnen hat (bootGateRevealed) — nicht schon
+  // wenn z.B. das beforeinstallprompt-Event zufällig während des Ladebildschirms feuert.
+  // Sonst läuft der Countdown unsichtbar hinter dem Ladebildschirm ab und ist bereits fertig,
+  // sobald der sich ausblendet (Banner+Blur "poppen" dann sofort statt sichtbar einzufahren).
+  function scheduleInstallBanner(){
+    if(installBannerScheduled) return;
+    if(!installDebug && !currentUserId) return;
+    installBannerScheduled = true;
+    bootGateRevealed.then(() => {
+      if(!installBannerScheduled) return; // in der Zwischenzeit per hideInstallBanner() abgebrochen (z.B. Wartungsmodus)
+      console.log('[install-banner] Ladebildschirm weg, Timer gestartet, zeigt sich in', INSTALL_BANNER_DELAY_MS, 'ms');
+      installBannerTimer = setTimeout(() => {
+        installBannerTimer = null;
+        maybeShowInstallBanner();
+      }, INSTALL_BANNER_DELAY_MS);
+    });
+  }
+
+  // Chrome/Android & Desktop: der Browser hält den Install-Prompt hier bereit,
+  // statt ihn automatisch anzuzeigen — wir zeigen ihn dann über unseren eigenen Button.
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    scheduleInstallBanner();
+  });
+
+  // Debug-Hilfe: ?installdebug=1 an die URL hängen, um beim Testen alle Sperren
+  // (Dismiss-Cooldown, Standalone-Check, Login-Pflicht) zu umgehen und in der Konsole
+  // zu sehen, warum der Banner sich sonst evtl. nicht zeigt.
+  const installDebug = new URLSearchParams(location.search).get('installdebug') === '1';
+
+  function maybeShowInstallBanner(){
+    const banner = document.getElementById('installBanner');
+    if(!banner) return;
+    if(!installDebug){
+      if(isStandaloneApp()){ console.log('[install-banner] übersprungen: bereits als App installiert'); return; }
+      if(!currentUserId){ console.log('[install-banner] übersprungen: nicht eingeloggt'); return; }
+      if(document.getElementById('comingSoonScreen')?.style.display === 'flex'){ console.log('[install-banner] übersprungen: Coming-Soon-Screen aktiv'); return; }
+      if(document.getElementById('maintenanceScreen')?.style.display === 'flex'){ console.log('[install-banner] übersprungen: Wartungs-Screen aktiv'); return; }
+      if(wasInstallDismissedRecently()){ console.log('[install-banner] übersprungen: kürzlich weggeklickt (localStorage rd_install_dismissed_at) — zum Testen: localStorage.removeItem(\'rd_install_dismissed_at\')'); return; }
+    }
+    console.log('[install-banner] wird jetzt angezeigt');
+
+    const sub = document.getElementById('installBannerSub');
+    if(sub){
+      if(deferredInstallPrompt){
+        sub.textContent = 'Schneller Zugriff direkt vom Startbildschirm.';
+      } else if(isIOSDevice()){
+        sub.textContent = 'Teilen-Symbol antippen, dann „Zum Home-Bildschirm“.';
+      } else {
+        // Der native Chrome/Edge-Install-Prompt ist evtl. noch nicht bereit (kommt oft erst
+        // etwas verzögert) — Banner trotzdem sofort mit generischem Hinweistext zeigen, statt
+        // auf das Event zu warten. Sobald es nachträglich feuert, wird der Text oben ersetzt.
+        sub.textContent = 'Über das Browser-Menü als App installierbar.';
+      }
+    }
+
+    const alreadyVisible = banner.classList.contains('show');
+    banner.classList.add('show');
+    document.getElementById('installBannerBackdrop')?.classList.add('show');
+    if(!alreadyVisible){
+      // Reflow erzwingen (wie beim Coming-Soon-/Wartungs-Screen), sonst überspringt der Browser
+      // die Einblend-Animation, weil display:none -> flex und Animation sonst im selben Tick passieren.
+      banner.classList.remove('ib-animate-in');
+      void banner.offsetWidth;
+      banner.classList.add('ib-animate-in');
+    }
+  }
+
+  function hideInstallBanner(){
+    const banner = document.getElementById('installBanner');
+    banner?.classList.remove('show');
+    banner?.classList.remove('ib-animate-in');
+    document.getElementById('installBannerBackdrop')?.classList.remove('show');
+    if(installBannerTimer){ clearTimeout(installBannerTimer); installBannerTimer = null; }
+    installBannerScheduled = false;
+  }
+
+  // Absichtlich KEIN Klick-Handler auf #installBannerBackdrop mehr: der Banner soll sich
+  // nur über den expliziten Schließen-Button (ib-close) wegklicken lassen, nicht schon durch
+  // einen Klick irgendwo in den verschwommenen Hintergrund.
+
+  document.getElementById('installBannerClose')?.addEventListener('click', () => {
+    hideInstallBanner();
+    localStorage.setItem(INSTALL_DISMISS_KEY, String(Date.now()));
+  });
+
+  // Gemeinsame Install-Logik für Banner-Button UND den dauerhaften Topbar-Button —
+  // fragt zuerst über das generische, mittig aufploppende Bestätigungs-Modal nach,
+  // statt sofort den Browser-Install-Prompt bzw. die Toast-Anleitung auszulösen.
+  async function runInstallPrompt(){
+    const confirmed = await showConfirmDialog({
+      title: 'Royal Deck installieren?',
+      message: 'Die App wird auf deinem Gerät installiert bzw. zum Startbildschirm hinzugefügt — für schnelleren Zugriff, ganz ohne Browser-Adressleiste.',
+      confirmText: 'Installieren',
+      cancelText: 'Abbrechen',
+      tone: 'neutral'
+    });
+    if(!confirmed) return;
+
+    if(deferredInstallPrompt){
+      deferredInstallPrompt.prompt();
+      try { await deferredInstallPrompt.userChoice; } catch(e){ /* ignore */ }
+      deferredInstallPrompt = null;
+      localStorage.setItem(INSTALL_DISMISS_KEY, String(Date.now()));
+    } else if(isIOSDevice()){
+      // iOS erlaubt keinen programmatischen Install-Prompt — kurzer Hinweis statt Button-Aktion.
+      showToast('Teilen-Symbol antippen, dann „Zum Home-Bildschirm“ wählen.');
+    } else {
+      // Chrome/Edge & Co. haben (noch) keinen Install-Prompt geliefert — generische Anleitung.
+      showToast('Browser-Menü öffnen und „App installieren“ bzw. „Zum Startbildschirm hinzufügen“ wählen.');
+    }
+  }
+
+  document.getElementById('installBannerBtn')?.addEventListener('click', async () => {
+    hideInstallBanner();
+    await runInstallPrompt();
+  });
+
+  // --- Dauerhafter Install-Button oben in der Topbar ---
+  // Bleibt (anders als der Banner) sichtbar, solange die App nicht bereits installiert
+  // ist — auch nachdem der Banner per X weggeklickt wurde. So findet man die
+  // Install-Option jederzeit wieder, statt sie nur einmalig im Banner zu sehen.
+  function updateInstallTopBtnVisibility(){
+    const btn = document.getElementById('installTopBtn');
+    const divider = document.getElementById('installTopDivider');
+    if(!btn) return;
+    const shouldShow = !isStandaloneApp();
+    btn.style.display = shouldShow ? 'flex' : 'none';
+    if(divider) divider.style.display = shouldShow ? '' : 'none';
+  }
+  document.getElementById('installTopBtn')?.addEventListener('click', runInstallPrompt);
+  updateInstallTopBtnVisibility();
+
+  window.addEventListener('appinstalled', () => {
+    hideInstallBanner();
+    deferredInstallPrompt = null;
+    updateInstallTopBtnVisibility();
+  });
 
   // --- Zeitbasierte Begrüßung im Hero-Header ---
   const heroGreeting = document.getElementById('heroGreeting');
@@ -11108,6 +11822,787 @@
   }
 
   // ============================================================
+  // --- Multiplayer-Blackjack: Lobby, Einladungen, Sitzplätze ---
+  // Host-autoritativ: der Ersteller ("host") ist Dealer-Runner. Tabellen
+  // mp_tables/mp_seats/mp_invites — siehe supabase_multiplayer.sql.
+  // Diese Ebene deckt ab: Tisch erstellen, Freunde (aus dem Freunde-System)
+  // einladen, per Realtime beitreten und die Sitzplätze live sehen.
+  // Der eigentliche synchronisierte Kartenlauf setzt in der nächsten Stufe
+  // darauf auf (Host schreibt Rundenzustand nach mp_tables.state).
+  // ============================================================
+  const MP_MAX_SEATS = 5;
+  let mpTable = null;          // aktuelle Tisch-Zeile (mp_tables)
+  let mpSeats = [];            // Sitzplätze am aktuellen Tisch (inkl. Profil)
+  let mpIsHost = false;
+  let mpTableChannel = null;   // Realtime für den aktuellen Tisch (Sitze + Tischzustand)
+  let mpInvitesChannel = null; // Realtime für eingehende Einladungen (global, solange eingeloggt)
+  let mpPendingInvite = null;  // aktuell im Popup angezeigte Einladung
+  let mpProfileCache = {};     // user_id -> öffentliches Profil (Name/Avatar)
+
+  const mpOverlayEl = () => document.getElementById('mpOverlay');
+  function mpOpenLobby(){ mpOverlayEl().classList.add('open'); }
+  function mpCloseLobby(){ mpOverlayEl().classList.remove('open'); }
+
+  function mpHandleDbError(error, fallbackMsg){
+    console.error('Multiplayer-Fehler:', error);
+    if(error && (error.code === '42P01' || /relation .* does not exist|could not find the table/i.test(error.message || ''))){
+      showToast('Multiplayer-Tabellen fehlen — bitte supabase_multiplayer.sql im Supabase-SQL-Editor ausführen.');
+    } else {
+      showToast(fallbackMsg || 'Multiplayer-Fehler.');
+    }
+  }
+
+  // --- Tisch erstellen (Ersteller wird Host/Dealer-Runner, nimmt Sitz 0) ---
+  async function mpCreateTable(){
+    if(!currentUserId){ showToast('Melde dich an, um Multiplayer zu spielen.'); return; }
+    if(mpTable){ mpOpenLobby(); return; }
+    const { data, error } = await supabaseClient
+      .from('mp_tables')
+      .insert({ host_id: currentUserId, game: 'blackjack', status: 'lobby', phase: 'betting', max_seats: MP_MAX_SEATS })
+      .select('*').single();
+    if(error){ mpHandleDbError(error, 'Tisch konnte nicht erstellt werden.'); return; }
+    mpTable = data;
+    mpIsHost = true;
+    const seatErr = await mpSitDown(mpTable.id, 0);
+    if(seatErr){
+      await supabaseClient.from('mp_tables').delete().eq('id', mpTable.id);
+      mpTable = null; mpIsHost = false;
+      mpHandleDbError(seatErr, 'Tisch konnte nicht erstellt werden.');
+      return;
+    }
+    if(!friendsCache.friends.length) await loadFriendsData();
+    mpSubscribeTable();
+    await mpLoadSeats();
+    mpOpenLobby();
+    mpRenderLobby();
+  }
+
+  async function mpSitDown(tableId, seatIndex){
+    const { error } = await supabaseClient
+      .from('mp_seats')
+      .insert({ table_id: tableId, user_id: currentUserId, seat_index: seatIndex, status: 'seated', bet: 0 });
+    return error;
+  }
+
+  // --- Tisch beitreten (aus einer Einladung heraus) ---
+  async function mpJoinTable(tableId){
+    if(!currentUserId) return;
+    if(mpTable && mpTable.id === tableId){ mpOpenLobby(); return; }
+    if(mpTable) await mpLeaveTable();
+    const { data: t, error } = await supabaseClient.from('mp_tables').select('*').eq('id', tableId).single();
+    if(error || !t){ showToast('Tisch nicht mehr verfügbar.'); return; }
+    if(t.status === 'closed'){ showToast('Dieser Tisch wurde geschlossen.'); return; }
+
+    const { data: seats } = await supabaseClient.from('mp_seats').select('seat_index, status').eq('table_id', tableId);
+    const active = (seats || []).filter(s => s.status !== 'left');
+    if(active.length >= (t.max_seats || MP_MAX_SEATS)){ showToast('Der Tisch ist voll.'); return; }
+    const taken = new Set(active.map(s => s.seat_index));
+    let seatIndex = 0; while(taken.has(seatIndex)) seatIndex++;
+
+    const seatErr = await mpSitDown(tableId, seatIndex);
+    if(seatErr && seatErr.code !== '23505'){ mpHandleDbError(seatErr, 'Beitritt fehlgeschlagen.'); return; }
+
+    mpTable = t;
+    mpIsHost = (t.host_id === currentUserId);
+    if(!friendsCache.friends.length) await loadFriendsData();
+    mpSubscribeTable();
+    await mpLoadSeats();
+    mpOpenLobby();
+    mpRenderLobby();
+    showToast('Du bist dem Tisch beigetreten.');
+  }
+
+  // --- Tisch verlassen (Host löst den Tisch auf, Gast steht nur auf) ---
+  async function mpLeaveTable(){
+    const t = mpTable;
+    mpUnsubscribeTable();
+    mpCloseLobby();
+    if(!t){ mpTable = null; mpIsHost = false; mpSeats = []; return; }
+    const wasHost = mpIsHost;
+    mpTable = null; mpIsHost = false; mpSeats = [];
+    if(wasHost){
+      await supabaseClient.from('mp_tables').delete().eq('id', t.id);   // Sitze/Einladungen per Cascade
+    } else {
+      await supabaseClient.from('mp_seats').delete().eq('table_id', t.id).eq('user_id', currentUserId);
+    }
+  }
+
+  async function mpLoadSeats(){
+    if(!mpTable) return;
+    const { data, error } = await supabaseClient
+      .from('mp_seats').select('*').eq('table_id', mpTable.id).order('seat_index', { ascending: true });
+    if(error){ console.error(error); return; }
+    const seats = (data || []).filter(s => s.status !== 'left');
+    const missing = seats.map(s => s.user_id).filter(id => !mpProfileCache[id]);
+    if(missing.length){
+      const map = await fetchPublicProfiles([...new Set(missing)]);
+      Object.assign(mpProfileCache, map);
+    }
+    mpSeats = seats.map(s => ({ ...s, profile: mpProfileCache[s.user_id] || { id: s.user_id, username: '?', name: '' } }));
+  }
+
+  function mpRenderLobby(){
+    if(!mpTable) return;
+    const max = mpTable.max_seats || MP_MAX_SEATS;
+    document.getElementById('mpSeatCount').textContent = mpSeats.length + '/' + max;
+    const hostProf = mpProfileCache[mpTable.host_id];
+    document.getElementById('mpLobbyTitle').textContent = mpIsHost
+      ? 'Dein Tisch'
+      : 'Tisch von ' + ((hostProf && (hostProf.name || hostProf.username)) || 'einem Freund');
+    document.getElementById('mpLobbySub').textContent = mpIsHost
+      ? 'Lade Freunde ein — ihr spielt gemeinsam gegen den Dealer.'
+      : 'Warte, bis der Host das Spiel startet.';
+
+    const seatList = document.getElementById('mpSeatList');
+    let html = mpSeats.map(s => {
+      const p = s.profile;
+      const isHost = s.user_id === mpTable.host_id;
+      const isMe = s.user_id === currentUserId;
+      return `<div class="mp-seat-row">
+        ${friendAvatarHTML(p)}
+        <div class="mp-row-info">
+          <div class="mp-row-name">${chatEscape(p.name || p.username || 'Spieler')}</div>
+          <div class="mp-row-handle">@${chatEscape(p.username || '')}</div>
+        </div>
+        ${isHost ? '<span class="mp-seat-badge host">Dealer-Host</span>' : (isMe ? '<span class="mp-seat-badge you">Du</span>' : '')}
+      </div>`;
+    }).join('');
+    for(let i = mpSeats.length; i < max; i++){
+      html += `<div class="mp-seat-empty"><div class="mp-empty-dot"></div>Freier Platz</div>`;
+    }
+    seatList.innerHTML = html;
+
+    mpRenderInviteList();
+
+    const startBtn = document.getElementById('mpStartBtn');
+    startBtn.style.display = mpIsHost ? '' : 'none';
+    startBtn.disabled = mpSeats.length < 1;
+    const status = document.getElementById('mpLobbyStatus');
+    if(mpIsHost){
+      status.textContent = mpSeats.length < 2
+        ? 'Lade Freunde ein und starte, sobald ihr bereit seid.'
+        : `${mpSeats.length} Spieler am Tisch — starte, wenn ihr bereit seid.`;
+    } else {
+      status.textContent = 'Warte auf den Host — das Spiel startet gleich.';
+    }
+  }
+
+  function mpRenderInviteList(){
+    const listEl = document.getElementById('mpInviteFriendList');
+    if(!mpIsHost){
+      listEl.innerHTML = `<div class="mp-empty-hint">Nur der Host kann Freunde an diesen Tisch einladen.</div>`;
+      return;
+    }
+    const seatedIds = new Set(mpSeats.map(s => s.user_id));
+    const friends = (friendsCache.friends || []).filter(f => !seatedIds.has(f.id));
+    if(!friends.length){
+      listEl.innerHTML = `<div class="mp-empty-hint">${(friendsCache.friends || []).length
+        ? 'Alle deine Freunde sitzen schon am Tisch.'
+        : 'Du hast noch keine Freunde. Füge unter „Freunde“ welche hinzu, um sie einzuladen.'}</div>`;
+      return;
+    }
+    listEl.innerHTML = friends.map(f => `
+      <div class="mp-friend-row">
+        ${friendAvatarHTML(f)}
+        <div class="mp-row-info">
+          <div class="mp-row-name">${chatEscape(f.name || f.username)}</div>
+          <div class="mp-row-handle">@${chatEscape(f.username || '')}</div>
+        </div>
+        <button class="mp-btn mp-btn-primary mp-btn-small" data-invite="${f.id}">Einladen</button>
+      </div>`).join('');
+    listEl.querySelectorAll('[data-invite]').forEach(b => b.addEventListener('click', () => mpInviteFriend(b.dataset.invite, b)));
+  }
+
+  async function mpInviteFriend(friendId, btn){
+    if(!mpTable || !mpIsHost) return;
+    if(btn){ btn.disabled = true; btn.textContent = 'Eingeladen'; }
+    const { error } = await supabaseClient
+      .from('mp_invites')
+      .upsert({ table_id: mpTable.id, from_user: currentUserId, to_user: friendId, status: 'pending' }, { onConflict: 'table_id,to_user' });
+    if(error){
+      if(btn){ btn.disabled = false; btn.textContent = 'Einladen'; }
+      mpHandleDbError(error, 'Einladung fehlgeschlagen.');
+      return;
+    }
+    showToast('Einladung gesendet.');
+  }
+
+  // --- Realtime für den aktuellen Tisch (Sitze + Tischzustand) ---
+  function mpSubscribeTable(){
+    mpUnsubscribeTable();
+    if(!mpTable) return;
+    const tid = mpTable.id;
+    mpTableChannel = supabaseClient
+      .channel('mp_table_' + tid)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'mp_seats', filter: 'table_id=eq.' + tid }, payload => mpOnSeatsEvent(payload))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'mp_tables', filter: 'id=eq.' + tid }, payload => mpOnTableChanged(payload))
+      .subscribe();
+  }
+  function mpUnsubscribeTable(){
+    if(mpTableChannel){ supabaseClient.removeChannel(mpTableChannel); mpTableChannel = null; }
+  }
+  const mpInGame = () => document.getElementById('mpgameView').style.display !== 'none';
+  async function mpOnSeatsEvent(payload){
+    if(!mpTable) return;
+    await mpLoadSeats();
+    if(mpOverlayEl().classList.contains('open')) mpRenderLobby();
+    // Im Spiel: neue Einsätze (Setzphase) neu zeichnen; Host verarbeitet Spieleraktionen.
+    if(mpTable.status === 'playing'){
+      if(mpInGame()) mpRenderGame();
+      if(mpIsHost && payload.new) mpHostHandleSeatChange(payload.new);
+    }
+  }
+  function mpOnTableChanged(payload){
+    if(payload.eventType === 'DELETE' || (payload.new && payload.new.status === 'closed')){
+      if(mpTable){
+        showToast('Der Tisch wurde geschlossen.');
+        mpUnsubscribeTable(); mpCloseLobby();
+        const wasInGame = mpInGame();
+        mpTable = null; mpIsHost = false; mpSeats = [];
+        if(wasInGame){ document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); document.querySelectorAll('.nav-item')[0]?.classList.add('active'); switchMainView('home'); }
+      }
+      return;
+    }
+    if(payload.new){
+      const wasStatus = mpTable ? mpTable.status : null;
+      mpTable = Object.assign({}, mpTable, payload.new);
+      if(payload.new.status === 'playing' && wasStatus !== 'playing') mpEnterGame();
+      else if(mpTable.status === 'playing' && mpInGame()) mpRenderGame();
+    }
+  }
+
+  // ============================================================
+  // --- Phase 2: Synchronisierter Kartenlauf am Gemeinschaftstisch ---
+  // Host-autoritativ: der Host mischt/teilt/spielt den NPC-Dealer und schreibt
+  // den kompletten Rundenzustand nach mp_tables.state. Gäste rendern daraus und
+  // senden nur ihre eigene Absicht (mp_seats.bet + pending_action/action_nonce).
+  // Chips bucht JEDER Client selbst über bjAdjustChips (profiles-RLS: nur der
+  // Besitzer schreibt seine chips) — gesteuert über die Phasenübergänge.
+  // Wiederverwendet die Solo-Kernlogik: bjBuildShoe/bjHandValue/bjCardValue/
+  // bjIsBlackjack/bjCardEl. Split ist in dieser Version bewusst weggelassen.
+  // ============================================================
+  let mpShoe = [];
+  let mpMyBet = 0;         // eigener Einsatz in der Setzphase
+  let mpBetRound = -1;     // Setzphase, für die mpMyBet zuletzt synchronisiert wurde
+  let mpLocalRound = -1;   // Runde, für die der eigene Einsatz schon abgezogen wurde
+  let mpPaidRound = -1;    // Runde, für die der eigene Gewinn schon gutgeschrieben wurde
+  let mpHostBusy = false;  // serialisiert Host-Schreibvorgänge
+  let mpSeenCards = new Set(); // Karten-Positionen, die in dieser Runde schon animiert wurden
+  let mpCardsRound = -1;   // Runde, für die mpSeenCards zuletzt geleert wurde
+
+  function mpDraw(){ if(mpShoe.length < BJ_RESHUFFLE_AT) mpShoe = bjBuildShoe(); return mpShoe.pop(); }
+
+  // Hängt eine Karte an; markiert sie als "neu", wenn ihre Position (key) in dieser
+  // Runde noch nicht gerendert wurde — nur solche Karten fliegen ein und klicken.
+  function mpAppendCard(container, card, hidden, key){
+    const el = bjCardEl(card, hidden);
+    el.removeAttribute('data-bj-new'); // von bjCardEl gesetzt (Solo-Mechanik), hier eigene nutzen
+    if(key && !mpSeenCards.has(key)){ mpSeenCards.add(key); el.dataset.mpgNew = '1'; }
+    container.appendChild(el);
+  }
+
+  // Lässt neu ausgeteilte Karten aus der Kartenbox (#mpgShoe) einfliegen und spielt
+  // pro Karte den Karten-Sound — dieselbe Optik wie am Solo-Tisch.
+  function mpFlyNewCards(){
+    const shoeEl = document.getElementById('mpgShoe');
+    const newCards = Array.from(document.querySelectorAll('#mpgameView .bj-card[data-mpg-new="1"]'));
+    if(!newCards.length) return;
+    if(!shoeEl){ newCards.forEach(el => el.removeAttribute('data-mpg-new')); return; }
+    const shoeRect = shoeEl.getBoundingClientRect();
+    const originX = shoeRect.left + shoeRect.width * 0.42;
+    const originY = shoeRect.top + shoeRect.height * 0.78;
+    const DUR = 640, STAGGER = 150;
+    newCards.forEach((el, i) => {
+      const r = el.getBoundingClientRect();
+      if(!r.width){ el.removeAttribute('data-mpg-new'); return; }
+      const dx = originX - (r.left + r.width / 2);
+      const dy = originY - (r.top + r.height / 2);
+      el.animate([
+        { transform:`translate(${dx}px, ${dy}px) scale(.5) rotate(-14deg)`, opacity:0 },
+        { transform:`translate(${dx*.12}px, ${dy*.12}px) scale(.92) rotate(-2deg)`, opacity:1, offset:.72 },
+        { transform:'translate(0,0) scale(1) rotate(0deg)', opacity:1 }
+      ], { duration:DUR, delay:i*STAGGER, easing:'cubic-bezier(.2,.8,.25,1)', fill:'backwards' });
+      setTimeout(() => { try{ bjPlayCardSound(); }catch(e){} }, i * STAGGER);
+      el.removeAttribute('data-mpg-new');
+    });
+  }
+  function mpMySeat(){ return mpSeats.find(s => s.user_id === currentUserId) || null; }
+  function mpState(){ return (mpTable && mpTable.state) || null; }
+  function mpMySeatState(st){ const ms = mpMySeat(); return (ms && st && st.seats && st.seats[ms.seat_index]) || null; }
+  function mpSleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+  // Wie viele der sitzenden Spieler haben schon gesetzt (eigener Einsatz = mpMyBet).
+  function mpBetCount(){
+    let done = 0;
+    mpSeats.forEach(s => { const b = (s.user_id === currentUserId) ? mpMyBet : (s.bet || 0); if(b > 0) done++; });
+    return { done, total: mpSeats.length };
+  }
+
+  function mpEnterGame(){
+    mpCloseLobby();
+    mpMyBet = 0; mpBetRound = -1; mpLocalRound = -1; mpPaidRound = -1;
+    if(mpIsHost && mpShoe.length < BJ_RESHUFFLE_AT) mpShoe = bjBuildShoe();
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    switchMainView('mpgame');
+    mpRenderChipRow();
+    mpRenderGame();
+  }
+
+  // ---- Setz-Chips (gleiche Optik wie Solo-Blackjack) ----
+  function mpRenderChipRow(){
+    const row = document.getElementById('mpgChipRow');
+    if(!row) return;
+    row.innerHTML = '';
+    BJ_CHIP_DENOMS.forEach(val => {
+      const btn = document.createElement('button');
+      btn.className = `bj-chip-btn bj-chip bj-chip-${val}`;
+      btn.innerHTML = `<span class="bj-chip-val">${val >= 1000 ? (val/1000) + 'k' : val}</span>`;
+      btn.addEventListener('click', () => mpAddChip(val));
+      row.appendChild(btn);
+    });
+  }
+  async function mpAddChip(val){
+    const st = mpState(); if(!st || st.phase !== 'betting') return;
+    const balance = (currentProfile && currentProfile.chips) || 0;
+    if(mpMyBet + val > balance){ showToast('Nicht genug Chips.'); return; }
+    mpMyBet += val;
+    bjPlayChipSound();
+    mpRenderGame();
+    await mpWriteMyBet();
+  }
+  async function mpClearMyBet(){
+    const st = mpState(); if(!st || st.phase !== 'betting') return;
+    mpMyBet = 0;
+    mpRenderGame();
+    await mpWriteMyBet();
+  }
+  async function mpWriteMyBet(){
+    if(!mpTable) return;
+    await supabaseClient.from('mp_seats').update({ bet: mpMyBet }).eq('table_id', mpTable.id).eq('user_id', currentUserId);
+  }
+
+  // ---- Rendering (läuft bei jedem State-/Sitz-Update) ----
+  function mpRenderGame(){
+    const st = mpState();
+    document.getElementById('mpgBalance').textContent = ((currentProfile && currentProfile.chips) || 0).toLocaleString('de-DE');
+    document.getElementById('mpgSubtitle').textContent = mpIsHost
+      ? 'Du bist der Dealer-Host — du teilst aus.'
+      : 'Ihr spielt gemeinsam gegen den Dealer.';
+    if(!st){ return; }
+    if(st.round !== mpCardsRound){ mpCardsRound = st.round; mpSeenCards.clear(); }
+    if(st.phase === 'betting' && mpBetRound !== st.round){
+      mpBetRound = st.round;
+      mpMyBet = (mpMySeat()?.bet) || 0;
+    }
+    mpSettleLocalChips(st);
+    mpRenderDealer(st);
+    mpRenderSeats(st);
+    mpRenderMessage(st);
+    mpRenderPanels(st);
+    mpFlyNewCards();
+  }
+
+  // Bucht den eigenen Einsatz (bei Austeilen) bzw. Gewinn (bei Auszahlung) — je einmal pro Runde.
+  function mpSettleLocalChips(st){
+    const mine = mpMySeatState(st);
+    if(!mine) return;
+    if((st.phase === 'turns' || st.phase === 'dealer' || st.phase === 'payout') && mpLocalRound !== st.round){
+      mpLocalRound = st.round;
+      mpPaidRound = -1;
+      if(mine.betInitial > 0) bjAdjustChips(-mine.betInitial);
+    }
+    if(st.phase === 'payout' && mine.result && mpPaidRound !== st.round){
+      mpPaidRound = st.round;
+      if(mine.result.ret > 0) bjAdjustChips(mine.result.ret);
+      gainXpFromWin(mine.result.ret - mine.bet);
+    }
+  }
+
+  function mpRenderDealer(st){
+    const handEl = document.getElementById('mpgDealerHand');
+    const totalEl = document.getElementById('mpgDealerTotal');
+    handEl.innerHTML = '';
+    if(!st.dealer || !st.dealer.cards || !st.dealer.cards.length){ totalEl.textContent = ''; totalEl.className = 'bj-total'; return; }
+    st.dealer.cards.forEach((c, i) => mpAppendCard(handEl, c, st.dealer.holeHidden && i === 1, 'd-' + i));
+    if(st.dealer.holeHidden){
+      totalEl.textContent = st.dealer.cards[0] ? bjCardValue(st.dealer.cards[0].rank) : '';
+      totalEl.className = 'bj-total';
+    } else {
+      const v = bjHandValue(st.dealer.cards);
+      totalEl.textContent = v;
+      totalEl.className = 'bj-total' + (v > 21 ? ' bust' : '');
+    }
+  }
+
+  function mpRenderSeats(st){
+    const wrap = document.getElementById('mpgSeats');
+    wrap.innerHTML = '';
+    if(st.phase === 'betting'){
+      mpSeats.slice().sort((a, b) => a.seat_index - b.seat_index).forEach(s => {
+        const isMe = s.user_id === currentUserId;
+        const bet = isMe ? mpMyBet : (s.bet || 0);
+        wrap.appendChild(mpSeatCardEl({
+          profile: s.profile, isMe, isHost: s.user_id === mpTable.host_id,
+          hand: null, bet, result: null, isTurn: false,
+          waiting: bet > 0 ? 'Bereit ✓' : 'setzt …'
+        }));
+      });
+      return;
+    }
+    Object.values(st.seats).sort((a, b) => a.seat - b.seat).forEach(ss => {
+      wrap.appendChild(mpSeatCardEl({
+        profile: mpProfileCache[ss.userId] || { name: ss.name, username: ss.username },
+        isMe: ss.userId === currentUserId, isHost: ss.userId === mpTable.host_id,
+        hand: ss.hand, bet: ss.bet, result: ss.result || null,
+        isTurn: st.phase === 'turns' && st.turnSeat === ss.seat,
+        keyPrefix: 's' + ss.seat
+      }));
+    });
+  }
+
+  function mpSeatCardEl(o){
+    const seat = document.createElement('div');
+    seat.className = 'mpg-seat' + (o.isTurn ? ' is-turn' : '') + (o.isMe ? ' is-me' : '');
+    const head = document.createElement('div');
+    head.className = 'mpg-seat-head';
+    head.innerHTML = friendAvatarHTML(o.profile || {}) +
+      `<span class="mpg-seat-name">${chatEscape((o.profile && (o.profile.name || o.profile.username)) || 'Spieler')}${o.isHost ? ' · Host' : ''}</span>`;
+    seat.appendChild(head);
+    if(o.isTurn){ const tag = document.createElement('div'); tag.className = 'mpg-turn-tag'; tag.textContent = o.isMe ? 'du bist dran' : 'am Zug'; seat.appendChild(tag); }
+    if(o.hand && o.hand.cards && o.hand.cards.length){
+      const handEl = document.createElement('div');
+      handEl.className = 'bj-hand';
+      o.hand.cards.forEach((c, idx) => mpAppendCard(handEl, c, false, o.keyPrefix ? o.keyPrefix + '-' + idx : null));
+      seat.appendChild(handEl);
+      const totalEl = document.createElement('div');
+      const v = bjHandValue(o.hand.cards);
+      const stt = o.hand.status;
+      totalEl.className = 'bj-total' + (stt === 'bust' ? ' bust' : stt === 'blackjack' ? ' blackjack' : '');
+      totalEl.textContent = v + (stt === 'bust' ? ' – Bust' : stt === 'blackjack' ? ' – BJ!' : '');
+      seat.appendChild(totalEl);
+    } else if(o.waiting){
+      const w = document.createElement('div'); w.className = 'mpg-seat-waiting'; w.textContent = o.waiting; seat.appendChild(w);
+    }
+    const foot = document.createElement('div');
+    foot.className = 'mpg-seat-foot';
+    if(o.bet > 0){ const b = document.createElement('div'); b.className = 'mpg-seat-bet'; b.innerHTML = `Einsatz: <strong>${o.bet.toLocaleString('de-DE')}</strong>`; foot.appendChild(b); }
+    if(o.result){
+      const r = document.createElement('div');
+      const cls = (o.result.outcome === 'win' || o.result.outcome === 'win-bj') ? 'win' : (o.result.outcome === 'push' ? 'push' : 'lose');
+      const label = o.result.outcome === 'win-bj' ? 'Blackjack 3:2' : o.result.outcome === 'win' ? 'Gewonnen' : o.result.outcome === 'push' ? 'Push' : 'Verloren';
+      r.className = 'mpg-result ' + cls; r.textContent = label; foot.appendChild(r);
+    }
+    seat.appendChild(foot);
+    return seat;
+  }
+
+  function mpRenderMessage(st){
+    const el = document.getElementById('mpgMessage');
+    let msg = st.message || '';
+    if(!msg){
+      if(st.phase === 'betting'){
+        const { done, total } = mpBetCount();
+        if(total > 0 && done === total) msg = mpIsHost ? 'Alle haben gesetzt — „Karten geben“!' : 'Alle haben gesetzt — der Host teilt gleich aus.';
+        else msg = `Setzphase — ${done} von ${total} haben gesetzt.`;
+      }
+      else if(st.phase === 'dealer') msg = 'Der Dealer spielt …';
+    }
+    el.className = 'bj-message';
+    el.textContent = msg;
+  }
+
+  function mpRenderPanels(st){
+    const betPanel = document.getElementById('mpgBetPanel');
+    const actionPanel = document.getElementById('mpgActionPanel');
+    const hint = document.getElementById('mpgHint');
+    const hit = document.getElementById('mpgHitBtn'), stand = document.getElementById('mpgStandBtn'), dbl = document.getElementById('mpgDoubleBtn'), nr = document.getElementById('mpgNextRoundBtn');
+    betPanel.style.display = 'none'; actionPanel.style.display = 'none'; hint.style.display = 'none';
+
+    if(st.phase === 'betting'){
+      betPanel.style.display = '';
+      mpRenderBetControls();
+      return;
+    }
+    const mine = mpMySeatState(st);
+    if(st.phase === 'turns'){
+      const myTurn = mine && st.turnSeat === mine.seat && mine.hand && mine.hand.status === 'playing';
+      if(myTurn){
+        actionPanel.style.display = '';
+        hit.style.display = ''; stand.style.display = ''; dbl.style.display = ''; nr.style.display = 'none';
+        const canAct = true;
+        hit.disabled = false; stand.disabled = false;
+        const balance = (currentProfile && currentProfile.chips) || 0;
+        dbl.disabled = mine.hand.cards.length !== 2 || balance < mine.betInitial;
+      } else {
+        hint.style.display = '';
+        const cur = st.seats[st.turnSeat];
+        const who = cur ? (mpProfileCache[cur.userId]?.name || cur.name || cur.username || 'Spieler') : '…';
+        hint.innerHTML = mine ? `Warte — <strong>${chatEscape(who)}</strong> ist am Zug.` : `Du schaust zu — <strong>${chatEscape(who)}</strong> ist am Zug.`;
+      }
+      return;
+    }
+    if(st.phase === 'dealer'){
+      hint.style.display = ''; hint.textContent = 'Der Dealer spielt …';
+      return;
+    }
+    if(st.phase === 'payout'){
+      if(mpIsHost){
+        actionPanel.style.display = '';
+        hit.style.display = 'none'; stand.style.display = 'none'; dbl.style.display = 'none';
+        nr.style.display = ''; nr.disabled = false;
+      } else {
+        hint.style.display = ''; hint.textContent = 'Runde beendet — warte auf die nächste Runde.';
+      }
+    }
+  }
+
+  function mpRenderBetControls(){
+    document.getElementById('mpgCurrentBet').textContent = mpMyBet.toLocaleString('de-DE');
+    const balance = (currentProfile && currentProfile.chips) || 0;
+    document.querySelectorAll('#mpgChipRow .bj-chip-btn').forEach((btn, i) => { btn.disabled = mpMyBet + BJ_CHIP_DENOMS[i] > balance; });
+    const dealBtn = document.getElementById('mpgDealBtn');
+    if(mpIsHost){
+      dealBtn.style.display = '';
+      const { done, total } = mpBetCount();
+      const allReady = total > 0 && done === total;
+      dealBtn.disabled = !allReady;
+      dealBtn.textContent = allReady ? 'Karten geben' : `Warte auf Einsätze … (${done}/${total})`;
+    } else {
+      dealBtn.style.display = 'none';
+    }
+  }
+
+  // ---- Spieleraktion senden (Gast wie Host) ----
+  async function mpSubmitAction(action){
+    const st = mpState(); if(!st || st.phase !== 'turns') return;
+    const mine = mpMySeatState(st), ms = mpMySeat();
+    if(!mine || !ms || st.turnSeat !== ms.seat_index) return;
+    if(!mine.hand || mine.hand.status !== 'playing') return;
+    ['mpgHitBtn', 'mpgStandBtn', 'mpgDoubleBtn'].forEach(id => document.getElementById(id).disabled = true);
+    if(action === 'double'){
+      const balance = (currentProfile && currentProfile.chips) || 0;
+      if(balance < mine.betInitial){ showToast('Nicht genug Chips zum Verdoppeln.'); mpRenderGame(); return; }
+      bjPlayChipSound();
+      await bjAdjustChips(-mine.betInitial);   // Extra-Einsatz für das Verdoppeln
+    }
+    await supabaseClient.from('mp_seats')
+      .update({ pending_action: action, action_nonce: Date.now() })
+      .eq('table_id', mpTable.id).eq('user_id', currentUserId);
+  }
+
+  // ---- Host: austeilen ----
+  async function mpHostDeal(){
+    if(!mpIsHost) return;
+    const st = mpState(); if(!st || st.phase !== 'betting' || mpHostBusy) return;
+    mpHostBusy = true;
+    try {
+      await mpLoadSeats();
+      const players = mpSeats.filter(s => (s.bet || 0) > 0).sort((a, b) => a.seat_index - b.seat_index);
+      if(!mpSeats.length){ showToast('Es sitzt niemand am Tisch.'); return; }
+      if(players.length !== mpSeats.length){
+        showToast(`Es haben erst ${players.length} von ${mpSeats.length} gesetzt.`);
+        return;
+      }
+      if(mpShoe.length < BJ_RESHUFFLE_AT) mpShoe = bjBuildShoe();
+      const seats = {};
+      players.forEach(s => {
+        seats[s.seat_index] = {
+          seat: s.seat_index, userId: s.user_id,
+          name: (s.profile && s.profile.name) || '', username: (s.profile && s.profile.username) || '',
+          bet: s.bet, betInitial: s.bet,
+          hand: { cards: [mpDraw(), mpDraw()], status: 'playing' }, lastNonce: 0, result: null
+        };
+      });
+      const dealer = { cards: [mpDraw(), mpDraw()], holeHidden: true };
+      Object.values(seats).forEach(ss => { if(bjIsBlackjack(ss.hand.cards)) ss.hand.status = 'blackjack'; });
+      const dealerBJ = bjIsBlackjack(dealer.cards);
+      st.seats = seats; st.dealer = dealer; st.message = '';
+      const order = Object.values(seats).sort((a, b) => a.seat - b.seat);
+      const firstPlaying = order.find(ss => ss.hand.status === 'playing');
+      if(dealerBJ || !firstPlaying){
+        st.phase = 'dealer'; st.turnSeat = null;
+        await mpHostWriteState(st);
+        await mpHostDealerPlay(st);
+      } else {
+        st.phase = 'turns'; st.turnSeat = firstPlaying.seat;
+        await mpHostWriteState(st);
+      }
+    } finally { mpHostBusy = false; }
+  }
+
+  // ---- Host: eingehende Sitz-Aktion verarbeiten ----
+  async function mpHostHandleSeatChange(seatRow){
+    if(mpHostBusy) return;
+    const st = mpState(); if(!st || st.phase !== 'turns') return;
+    if(!seatRow || seatRow.seat_index == null || seatRow.seat_index !== st.turnSeat) return;
+    const ss = st.seats[seatRow.seat_index]; if(!ss || !ss.hand) return;
+    if(!seatRow.pending_action || (seatRow.action_nonce || 0) <= (ss.lastNonce || 0)) return;
+    mpHostBusy = true;
+    try {
+      ss.lastNonce = seatRow.action_nonce;
+      mpApplyAction(st, seatRow.seat_index, seatRow.pending_action);
+      await mpHostAdvance(st);
+    } finally { mpHostBusy = false; }
+  }
+  function mpApplyAction(st, seatIdx, action){
+    const ss = st.seats[seatIdx]; if(!ss || !ss.hand || ss.hand.status !== 'playing') return;
+    if(action === 'hit'){
+      ss.hand.cards.push(mpDraw());
+      const v = bjHandValue(ss.hand.cards);
+      if(v > 21) ss.hand.status = 'bust'; else if(v === 21) ss.hand.status = 'stand';
+    } else if(action === 'stand'){
+      ss.hand.status = 'stand';
+    } else if(action === 'double'){
+      ss.bet = ss.bet * 2;
+      ss.hand.cards.push(mpDraw());
+      ss.hand.status = bjHandValue(ss.hand.cards) > 21 ? 'bust' : 'stand';
+    }
+  }
+  async function mpHostAdvance(st){
+    const cur = st.seats[st.turnSeat];
+    if(cur && cur.hand && cur.hand.status === 'playing'){ await mpHostWriteState(st); return; }
+    const next = Object.values(st.seats).sort((a, b) => a.seat - b.seat)
+      .find(ss => ss.seat > st.turnSeat && ss.hand && ss.hand.status === 'playing');
+    if(next){ st.turnSeat = next.seat; await mpHostWriteState(st); return; }
+    await mpHostDealerPlay(st);
+  }
+
+  // ---- Host: NPC-Dealer spielen & auszahlen ----
+  async function mpHostDealerPlay(st){
+    st.phase = 'dealer'; st.turnSeat = null; st.dealer.holeHidden = false;
+    await mpHostWriteState(st);
+    const allBust = Object.values(st.seats).every(ss => ss.hand.status === 'bust');
+    if(!allBust){
+      while(bjHandValue(st.dealer.cards) < 17){
+        await mpSleep(750);
+        st.dealer.cards.push(mpDraw());
+        await mpHostWriteState(st);
+      }
+    }
+    mpComputeResults(st);
+    st.phase = 'payout';
+    st.message = 'Runde beendet.';
+    await mpHostWriteState(st);
+  }
+  function mpComputeResults(st){
+    const dealerTotal = bjHandValue(st.dealer.cards);
+    const dealerBJ = bjIsBlackjack(st.dealer.cards);
+    const dealerBust = dealerTotal > 21;
+    Object.values(st.seats).forEach(ss => {
+      const h = ss.hand, pv = bjHandValue(h.cards);
+      let outcome;
+      if(h.status === 'bust') outcome = 'lose';
+      else if(h.status === 'blackjack') outcome = dealerBJ ? 'push' : 'win-bj';
+      else if(dealerBust) outcome = 'win';
+      else if(pv > dealerTotal) outcome = 'win';
+      else if(pv === dealerTotal) outcome = 'push';
+      else outcome = 'lose';
+      let ret = 0;
+      if(outcome === 'win') ret = ss.bet * 2;
+      else if(outcome === 'win-bj') ret = Math.round(ss.bet * 2.5);
+      else if(outcome === 'push') ret = ss.bet;
+      ss.result = { outcome, ret };
+    });
+  }
+
+  // ---- Host: nächste Runde ----
+  async function mpHostNextRound(){
+    if(!mpIsHost) return;
+    const st = mpState(); if(!st) return;
+    document.getElementById('mpgNextRoundBtn').disabled = true;
+    await supabaseClient.from('mp_seats').update({ bet: 0, pending_action: null, action_nonce: 0 }).eq('table_id', mpTable.id);
+    mpMyBet = 0;
+    const ns = { round: (st.round || 1) + 1, phase: 'betting', turnSeat: null, dealer: null, seats: {}, message: '' };
+    await mpHostWriteState(ns);
+  }
+
+  // Schreibt den Rundenzustand nach mp_tables.state (nur Host) und rendert lokal sofort.
+  async function mpHostWriteState(st){
+    if(!mpTable) return;
+    mpTable.state = st;
+    if(mpInGame()) mpRenderGame();
+    const { error } = await supabaseClient.from('mp_tables').update({ state: st, phase: st.phase }).eq('id', mpTable.id);
+    if(error) console.error('MP State-Write fehlgeschlagen:', error);
+  }
+
+  // ---- Verdrahtung der Spiel-Buttons ----
+  document.getElementById('mpgDealBtn').addEventListener('click', () => mpHostDeal());
+  document.getElementById('mpgHitBtn').addEventListener('click', () => mpSubmitAction('hit'));
+  document.getElementById('mpgStandBtn').addEventListener('click', () => mpSubmitAction('stand'));
+  document.getElementById('mpgDoubleBtn').addEventListener('click', () => mpSubmitAction('double'));
+  document.getElementById('mpgClearBet').addEventListener('click', () => mpClearMyBet());
+  document.getElementById('mpgNextRoundBtn').addEventListener('click', () => mpHostNextRound());
+  document.getElementById('mpgBackBtn').addEventListener('click', () => {
+    mpLeaveTable();
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.nav-item')[0]?.classList.add('active');
+    switchMainView('home');
+  });
+
+  // --- Eingehende Einladungen (global, solange eingeloggt) ---
+  function mpSubscribeInvites(){
+    mpUnsubscribeInvites();
+    if(!currentUserId) return;
+    mpInvitesChannel = supabaseClient
+      .channel('mp_invites_' + currentUserId)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'mp_invites', filter: 'to_user=eq.' + currentUserId }, payload => mpOnInviteReceived(payload.new))
+      .subscribe();
+    mpCheckPendingInvites();
+  }
+  function mpUnsubscribeInvites(){
+    if(mpInvitesChannel){ supabaseClient.removeChannel(mpInvitesChannel); mpInvitesChannel = null; }
+  }
+  async function mpCheckPendingInvites(){
+    if(!currentUserId) return;
+    const { data, error } = await supabaseClient
+      .from('mp_invites').select('*').eq('to_user', currentUserId).eq('status', 'pending')
+      .order('created_at', { ascending: false }).limit(1);
+    if(error){ if(error.code !== '42P01') console.error(error); return; }
+    if(data && data.length) mpOnInviteReceived(data[0]);
+  }
+  async function mpOnInviteReceived(inv){
+    if(!inv || inv.status !== 'pending') return;
+    if(mpTable && mpTable.id === inv.table_id) return;
+    mpPendingInvite = inv;
+    let prof = mpProfileCache[inv.from_user];
+    if(!prof){
+      const map = await fetchPublicProfiles([inv.from_user]);
+      Object.assign(mpProfileCache, map);
+      prof = map[inv.from_user];
+    }
+    document.getElementById('mpInvitePopAvatar').innerHTML = friendAvatarHTML(prof || {});
+    document.getElementById('mpInvitePopName').textContent = (prof && (prof.name || prof.username)) || 'Ein Freund';
+    document.getElementById('mpInvitePop').classList.add('show');
+  }
+
+  // --- Verdrahtung der Lobby-Buttons ---
+  document.getElementById('mpCloseBtn').addEventListener('click', () => mpLeaveTable());
+  document.getElementById('mpLeaveBtn').addEventListener('click', () => mpLeaveTable());
+  document.getElementById('mpStartBtn').addEventListener('click', async () => {
+    if(!mpTable || !mpIsHost) return;
+    // Einsätze/Aktionen aller Sitze zurücksetzen und mit Setzphase (Runde 1) starten
+    await supabaseClient.from('mp_seats').update({ bet: 0, pending_action: null, action_nonce: 0 }).eq('table_id', mpTable.id);
+    const initState = { round: 1, phase: 'betting', turnSeat: null, dealer: null, seats: {}, message: '' };
+    const { error } = await supabaseClient.from('mp_tables').update({ status: 'playing', phase: 'betting', state: initState }).eq('id', mpTable.id);
+    if(error){ mpHandleDbError(error, 'Start fehlgeschlagen.'); return; }
+  });
+  document.getElementById('mpInviteAcceptBtn').addEventListener('click', async () => {
+    const inv = mpPendingInvite; if(!inv) return;
+    document.getElementById('mpInvitePop').classList.remove('show');
+    mpPendingInvite = null;
+    await supabaseClient.from('mp_invites').update({ status: 'accepted' }).eq('id', inv.id);
+    await mpJoinTable(inv.table_id);
+  });
+  document.getElementById('mpInviteDeclineBtn').addEventListener('click', async () => {
+    const inv = mpPendingInvite; if(!inv) return;
+    document.getElementById('mpInvitePop').classList.remove('show');
+    mpPendingInvite = null;
+    await supabaseClient.from('mp_invites').update({ status: 'declined' }).eq('id', inv.id);
+  });
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape' && mpOverlayEl().classList.contains('open')) mpLeaveTable();
+  });
+
+  // ============================================================
   // --- Rangliste (Leaderboard) ---
   // Rangfolge nach XP (= Level). Braucht die Spalte "xp" in der View
   // public_profiles (siehe SQL-Hinweis). Öffentlich sichtbar; der eigene
@@ -11244,10 +12739,27 @@
   function triggerUpdateReload(){
     const overlay = document.getElementById('updateOverlay');
     if(!overlay || overlay.classList.contains('show')) return;
+
+    // In der installierten App bringt "Seite neu laden" nichts, da es keinen
+    // klassischen Reload-Weg gibt — hier muss die App einmal komplett
+    // geschlossen (nicht nur in den Hintergrund) und neu geöffnet werden.
+    const subMain = document.getElementById('updSubMain');
+    const subNote = document.getElementById('updSubNote');
+    if(subMain && subNote){
+      if(isStandaloneApp()){
+        subMain.innerHTML = 'Es gibt ein Update. <strong>Schließe die App bitte einmal vollständig</strong>, um die Änderungen zu übernehmen.';
+        subNote.textContent = 'Ein einfaches Wechseln zu einer anderen App reicht nicht — bitte die App komplett beenden und neu öffnen.';
+      } else {
+        subMain.innerHTML = 'Es gibt ein Update. <strong>Lade die Seite bitte neu</strong>, um die Änderungen zu sehen.';
+        subNote.textContent = 'Auch nach dem Neuladen kann es 1–3 Minuten dauern, bis alle Änderungen vollständig wirksam sind.';
+      }
+    }
+
     overlay.classList.add('show');
     console.log('[deploy-watcher] Update-Screen angezeigt um', new Date().toISOString());
     // Kein Auto-Reload mehr: Der Screen bleibt stehen, bis der Nutzer die Seite
-    // selbst neu lädt — erst dann sind die neuen Dateien wirklich aktiv.
+    // selbst neu lädt bzw. die App neu startet — erst dann sind die neuen
+    // Dateien wirklich aktiv.
   }
 
   async function checkForDeploy(){
@@ -11281,5 +12793,14 @@
   initDeployWatcher();
 </script>
 
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(err => {
+        console.warn('Service Worker Registrierung fehlgeschlagen:', err);
+      });
+    });
+  }
+</script>
 </body>
 </html>
